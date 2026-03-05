@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ur III Dictionary — Names & Vocabulary</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f0f14;
+            --bg-secondary: #1a1a24;
+            --bg-card: #1e1e2a;
+            --bg-hover: #252536;
+            --bg-input: #14141e;
+            --border: #2a2a3d;
+            --border-focus: #6366f1;
+            --text-primary: #e8e8f0;
+            --text-secondary: #9898b0;
+            --text-muted: #6b6b84;
+            --accent-pn: #818cf8;
+            --accent-dn: #f472b6;
+            --accent-gn: #34d399;
+            --accent-rn: #fbbf24;
+            --accent-sn: #22d3ee;
+            --accent-mn: #a78bfa;
+            --accent-tn: #fb923c;
+            --accent-wn: #38bdf8;
+            --accent-fn: #4ade80;
+            --accent-on: #e879f9;
+            --accent-an: #86efac;
+            --accent-animal: #fb923c;
+            --accent-profession: #22d3ee;
+            --accent-other: #94a3b8;
+            --gradient-start: #6366f1;
+            --gradient-end: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ---------- Header ---------- */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-primary));
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .title-row {
+            display: flex;
+            align-items: baseline;
+            gap: 1rem;
+            margin-bottom: 0.15rem;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        /* ---------- Mode tabs ---------- */
+        .mode-tabs {
+            display: flex;
+            gap: 0;
+            margin-top: 0.75rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .mode-tab {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border: none;
+            background: none;
+            position: relative;
+            transition: color 0.15s;
+        }
+
+        .mode-tab:hover {
+            color: var(--text-secondary);
+        }
+
+        .mode-tab.active {
+            color: var(--text-primary);
+        }
+
+        .mode-tab.active::after {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            border-radius: 1px;
+        }
+
+        .mode-tab .tab-count {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 0.3rem;
+        }
+
+        /* ---------- Search bar ---------- */
+        .search-row {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 0.65rem 1rem 0.65rem 2.6rem;
+            background: var(--bg-input);
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: 'Noto Serif', 'Inter', serif;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        #searchInput:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88rem;
+        }
+
+        /* ---------- Filter pills ---------- */
+        .filter-row {
+            display: flex;
+            gap: 0.35rem;
+            margin-top: 0.6rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+            margin-right: 0.2rem;
+        }
+
+        .filter-pill {
+            padding: 0.22rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1.5px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+            user-select: none;
+        }
+
+        .filter-pill:hover {
+            border-color: var(--text-muted);
+            background: var(--bg-hover);
+        }
+
+        .filter-pill.active {
+            border-color: var(--accent-pn);
+            color: var(--text-primary);
+            background: rgba(99, 102, 241, 0.12);
+        }
+
+        .filter-pill[data-pos="DN"].active {
+            border-color: var(--accent-dn);
+            background: rgba(244, 114, 182, 0.12);
+        }
+
+        .filter-pill[data-pos="GN"].active {
+            border-color: var(--accent-gn);
+            background: rgba(52, 211, 153, 0.12);
+        }
+
+        .filter-pill[data-pos="RN"].active {
+            border-color: var(--accent-rn);
+            background: rgba(251, 191, 36, 0.12);
+        }
+
+        .filter-pill[data-pos="SN"].active {
+            border-color: var(--accent-sn);
+            background: rgba(34, 211, 238, 0.12);
+        }
+
+        .filter-pill[data-pos="MN"].active {
+            border-color: var(--accent-mn);
+            background: rgba(167, 139, 250, 0.12);
+        }
+
+        .filter-pill[data-pos="TN"].active {
+            border-color: var(--accent-tn);
+            background: rgba(251, 146, 60, 0.12);
+        }
+
+        .filter-pill[data-pos="WN"].active {
+            border-color: var(--accent-wn);
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .filter-pill[data-pos="FN"].active {
+            border-color: var(--accent-fn);
+            background: rgba(74, 222, 128, 0.12);
+        }
+
+        .filter-pill[data-pos="ALL"].active,
+        .filter-pill[data-cat="ALL"].active {
+            border-color: var(--gradient-start);
+            background: rgba(99, 102, 241, 0.12);
+        }
+
+        .filter-pill[data-cat="animal"].active {
+            border-color: var(--accent-animal);
+            background: rgba(251, 146, 60, 0.12);
+        }
+
+        .filter-pill[data-cat="profession"].active {
+            border-color: var(--accent-profession);
+            background: rgba(34, 211, 238, 0.12);
+        }
+
+        .filter-pill[data-cat="other"].active {
+            border-color: var(--accent-other);
+            background: rgba(148, 163, 184, 0.12);
+        }
+
+        /* ---------- Stats bar ---------- */
+        .stats-bar {
+            max-width: 1100px;
+            margin: 0.5rem auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .stats-bar .count {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .search-mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .search-mode-toggle label {
+            font-size: 0.73rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .toggle-switch {
+            width: 30px;
+            height: 17px;
+            background: var(--border);
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .toggle-switch.on {
+            background: var(--gradient-start);
+        }
+
+        .toggle-switch::after {
+            width: 13px;
+            height: 13px;
+            background: var(--text-primary);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+        }
+
+        .toggle-switch.on::after {
+            transform: translateX(13px);
+        }
+
+        /* ---------- Results ---------- */
+        .results-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0.5rem 2rem 3rem;
+        }
+
+        /* --- Names result card --- */
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.85rem 1.1rem;
+            margin-bottom: 0.4rem;
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 0.8rem;
+            align-items: center;
+            transition: background 0.15s, border-color 0.15s;
+        }
+
+        .result-card:hover {
+            background: var(--bg-hover);
+            border-color: #3a3a50;
+        }
+
+        .result-name {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+            min-width: 0;
+        }
+
+        .transliteration {
+            font-family: 'Noto Serif', serif;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .canonical {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .canonical strong {
+            color: var(--accent-pn);
+            font-weight: 600;
+        }
+
+        .result-card[data-pos="DN"] .canonical strong {
+            color: var(--accent-dn);
+        }
+
+        .result-card[data-pos="GN"] .canonical strong {
+            color: var(--accent-gn);
+        }
+
+        .result-card[data-pos="RN"] .canonical strong {
+            color: var(--accent-rn);
+        }
+
+        .result-card[data-pos="SN"] .canonical strong {
+            color: var(--accent-sn);
+        }
+
+        .result-card[data-pos="MN"] .canonical strong {
+            color: var(--accent-mn);
+        }
+
+        .result-card[data-pos="TN"] .canonical strong {
+            color: var(--accent-tn);
+        }
+
+        .result-card[data-pos="WN"] .canonical strong {
+            color: var(--accent-wn);
+        }
+
+        .result-card[data-pos="FN"] .canonical strong {
+            color: var(--accent-fn);
+        }
+
+        .pos-badge {
+            padding: 0.18rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .pos-badge.PN {
+            background: rgba(129, 140, 248, 0.15);
+            color: var(--accent-pn);
+        }
+
+        .pos-badge.DN {
+            background: rgba(244, 114, 182, 0.15);
+            color: var(--accent-dn);
+        }
+
+        .pos-badge.GN {
+            background: rgba(52, 211, 153, 0.15);
+            color: var(--accent-gn);
+        }
+
+        .pos-badge.RN {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--accent-rn);
+        }
+
+        .pos-badge.SN {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--accent-sn);
+        }
+
+        .pos-badge.MN {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--accent-mn);
+        }
+
+        .pos-badge.TN {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--accent-tn);
+        }
+
+        .pos-badge.WN {
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent-wn);
+        }
+
+        .pos-badge.FN {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--accent-fn);
+        }
+
+        .pos-badge.ON {
+            background: rgba(232, 121, 249, 0.15);
+            color: var(--accent-on);
+        }
+
+        .pos-badge.AN {
+            background: rgba(134, 239, 172, 0.15);
+            color: var(--accent-an);
+        }
+
+        /* Category badges for glossary */
+        .cat-badge {
+            padding: 0.18rem 0.55rem;
+            border-radius: 6px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .cat-badge.animal {
+            background: rgba(251, 146, 60, 0.15);
+            color: var(--accent-animal);
+        }
+
+        .cat-badge.profession {
+            background: rgba(34, 211, 238, 0.15);
+            color: var(--accent-profession);
+        }
+
+        .cat-badge.other {
+            background: rgba(148, 163, 184, 0.1);
+            color: var(--accent-other);
+        }
+
+        .attestation-count {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-align: right;
+            min-width: 50px;
+        }
+
+        .attestation-count span {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        /* Variants row */
+        .variants {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        /* Glossary forms list */
+        .gloss-forms {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.25rem;
+        }
+
+        .gloss-form {
+            font-family: 'Noto Serif', serif;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+        }
+
+        .gloss-form .form-count {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            opacity: 0.7;
+            margin-left: 0.2rem;
+        }
+
+        /* Meaning */
+        .meaning {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .meaning strong {
+            color: var(--accent-animal);
+            font-weight: 600;
+        }
+
+        .result-card[data-cat="profession"] .meaning strong {
+            color: var(--accent-profession);
+        }
+
+        .result-card[data-cat="other"] .meaning strong {
+            color: var(--accent-other);
+        }
+
+        /* ---------- Empty / loading states ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            opacity: 0.4;
+        }
+
+        .empty-state p {
+            font-size: 0.88rem;
+            max-width: 400px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5rem;
+            gap: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .loading .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2.5px solid var(--border);
+            border-top-color: var(--gradient-start);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ---------- Keyboard hint ---------- */
+        .keyboard-hint {
+            position: fixed;
+            bottom: 1.2rem;
+            right: 1.2rem;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.4rem 0.7rem;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        kbd {
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.08rem 0.3rem;
+            font-size: 0.68rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ---------- Responsive ---------- */
+        @media (max-width: 700px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .results-container {
+                padding: 0.4rem 1rem 2rem;
+            }
+
+            .result-card {
+                grid-template-columns: 1fr auto;
+                gap: 0.4rem;
+            }
+
+            .attestation-count {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <div class="title-row">
+                <h1>Ur III Dictionary</h1>
+                <span class="subtitle">ORACC epsd2/admin/ur3</span>
+            </div>
+
+            <div class="mode-tabs">
+                <button class="mode-tab active" data-mode="names">
+                    Names <span class="tab-count" id="nameTabCount"></span>
+                </button>
+                <button class="mode-tab" data-mode="glossary">
+                    Vocabulary <span class="tab-count" id="glossTabCount"></span>
+                </button>
+            </div>
+
+            <div class="search-row">
+                <div class="search-box">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <input type="text" id="searchInput"
+                        placeholder="Search by transliteration, canonical name, or meaning…" autocomplete="off"
+                        spellcheck="false">
+                </div>
+            </div>
+
+            <!-- Name filters -->
+            <div class="filter-row" id="nameFilters">
+                <span class="filter-label">Filter</span>
+                <button class="filter-pill active" data-pos="ALL">All</button>
+                <button class="filter-pill" data-pos="PN">Personal</button>
+                <button class="filter-pill" data-pos="DN">Deity</button>
+                <button class="filter-pill" data-pos="RN">Royal</button>
+                <button class="filter-pill" data-pos="GN">Geographic</button>
+                <button class="filter-pill" data-pos="SN">Settlement</button>
+                <button class="filter-pill" data-pos="TN">Temple</button>
+                <button class="filter-pill" data-pos="MN">Month</button>
+                <button class="filter-pill" data-pos="WN">Watercourse</button>
+                <button class="filter-pill" data-pos="FN">Field</button>
+            </div>
+
+            <!-- Glossary filters -->
+            <div class="filter-row" id="glossFilters" style="display:none;">
+                <span class="filter-label">Filter</span>
+                <button class="filter-pill active" data-cat="ALL">All</button>
+                <button class="filter-pill" data-cat="animal">Animals</button>
+                <button class="filter-pill" data-cat="profession">Professions</button>
+                <button class="filter-pill" data-cat="other">Other</button>
+            </div>
+
+            <div class="stats-bar">
+                <span>Showing <span class="count" id="resultCount">0</span> results</span>
+                <div class="search-mode-toggle">
+                    <label>Fuzzy</label>
+                    <div class="toggle-switch on" id="fuzzyToggle" role="switch" aria-checked="true"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-container" id="results">
+        <div class="loading">
+            <div class="spinner"></div>
+            <span>Loading dictionary…</span>
+        </div>
+    </div>
+
+    <div class="keyboard-hint">
+        <kbd>/</kbd> focus &nbsp; <kbd>Esc</kbd> clear &nbsp; <kbd>Tab</kbd> switch mode
+    </div>
+
+    <script>
+        // ---------------------------------------------------------------------------
+        // State
+        // ---------------------------------------------------------------------------
+        let NAME_ENTRIES = [];     // deduplicated name entries
+        let GLOSSARY = [];         // glossary entries
+        let activeMode = 'names';  // 'names' | 'glossary'
+        let activeFilter = 'ALL';
+        let fuzzyMode = true;
+        let debounceTimer = null;
+
+        const POS_LABELS = {
+            PN: 'Personal', DN: 'Deity', GN: 'Geographic',
+            RN: 'Royal', SN: 'Settlement', WN: 'Watercourse',
+            ON: 'Object', FN: 'Field', TN: 'Temple',
+            MN: 'Month', QN: 'Quarter', AN: 'Agricultural', LN: 'Line',
+        };
+
+        // ---------------------------------------------------------------------------
+        // Load data
+        // ---------------------------------------------------------------------------
+        async function loadData() {
+            try {
+                const [nameResp, glossResp] = await Promise.all([
+                    fetch('oracc_name_dictionary.json'),
+                    fetch('oracc_glossary.json'),
+                ]);
+
+                if (!nameResp.ok) throw new Error('name dict: ' + nameResp.status);
+
+                const nameDict = await nameResp.json();
+
+                // Deduplicate names (Unicode + ATF share entries)
+                const seen = new Map();
+                for (const [form, data] of Object.entries(nameDict)) {
+                    const key = `${data.canonical}|${data.pos}`;
+                    const existing = seen.get(key);
+                    if (!existing || data.attestations > existing.attestations) {
+                        seen.set(key, {
+                            form, canonical: data.canonical, pos: data.pos,
+                            category: data.category, attestations: data.attestations,
+                            allForms: existing ? [...(existing.allForms || [existing.form]), form] : [form],
+                        });
+                    } else {
+                        existing.allForms = existing.allForms || [existing.form];
+                        existing.allForms.push(form);
+                    }
+                }
+                NAME_ENTRIES = Array.from(seen.values());
+                NAME_ENTRIES.sort((a, b) => b.attestations - a.attestations);
+
+                // Load glossary
+                if (glossResp.ok) {
+                    GLOSSARY = await glossResp.json();
+                }
+
+                document.getElementById('nameTabCount').textContent = `(${NAME_ENTRIES.length.toLocaleString()})`;
+                document.getElementById('glossTabCount').textContent = `(${GLOSSARY.length.toLocaleString()})`;
+
+                doSearch();
+            } catch (err) {
+                document.getElementById('results').innerHTML =
+                    `<div class="empty-state"><div class="icon">⚠️</div>
+            <p>Could not load data files. Run via local server:<br>
+            <code>python3 -m http.server 8090</code></p></div>`;
+            }
+        }
+
+        // ---------------------------------------------------------------------------
+        // Name search
+        // ---------------------------------------------------------------------------
+        function searchNames(query, filter) {
+            let pool = NAME_ENTRIES;
+            if (filter !== 'ALL') pool = pool.filter(e => e.pos === filter);
+            if (!query) return pool;
+
+            const q = query.toLowerCase();
+            const scored = [];
+
+            for (const entry of pool) {
+                let score = 0;
+                const canon = entry.canonical.toLowerCase();
+                if (canon === q) score = 1000;
+                else if (canon.startsWith(q)) score = 500;
+                else if (canon.includes(q)) score = 200;
+
+                for (const form of entry.allForms) {
+                    const f = form.toLowerCase();
+                    if (f === q) { score = Math.max(score, 900); break; }
+                    if (f.startsWith(q)) score = Math.max(score, 450);
+                    else if (f.includes(q)) score = Math.max(score, 150);
+                }
+
+                if (score === 0 && fuzzyMode) {
+                    const targets = [canon, ...entry.allForms.map(f => f.toLowerCase())];
+                    for (const t of targets) { if (fuzzyMatch(q, t)) { score = 50; break; } }
+                }
+
+                if (score > 0) {
+                    scored.push({ entry, score: score + Math.min(entry.attestations / 10000, 0.9) });
+                }
+            }
+
+            scored.sort((a, b) => b.score - a.score);
+            return scored.map(s => s.entry);
+        }
+
+        // ---------------------------------------------------------------------------
+        // Glossary search
+        // ---------------------------------------------------------------------------
+        function searchGlossary(query, filter) {
+            let pool = GLOSSARY;
+            if (filter !== 'ALL') pool = pool.filter(e => e.category === filter);
+            if (!query) return pool;
+
+            const q = query.toLowerCase();
+            const scored = [];
+
+            for (const entry of pool) {
+                let score = 0;
+
+                // Check citation form
+                const cf = entry.citation.toLowerCase();
+                if (cf === q) score = 1000;
+                else if (cf.startsWith(q)) score = 500;
+                else if (cf.includes(q)) score = 200;
+
+                // Check meaning
+                const m = entry.meaning.toLowerCase();
+                if (m === q) score = Math.max(score, 900);
+                else if (m.startsWith(q)) score = Math.max(score, 450);
+                else if (m.includes(q)) score = Math.max(score, 180);
+
+                // Check all forms
+                for (const f of entry.forms) {
+                    const fn = f.form.toLowerCase();
+                    const fa = f.atf.toLowerCase();
+                    if (fn === q || fa === q) { score = Math.max(score, 850); break; }
+                    if (fn.startsWith(q) || fa.startsWith(q)) score = Math.max(score, 400);
+                    else if (fn.includes(q) || fa.includes(q)) score = Math.max(score, 130);
+                }
+
+                // Fuzzy
+                if (score === 0 && fuzzyMode) {
+                    const targets = [cf, m, ...entry.forms.map(f => f.atf.toLowerCase())];
+                    for (const t of targets) { if (fuzzyMatch(q, t)) { score = 50; break; } }
+                }
+
+                if (score > 0) {
+                    scored.push({ entry, score: score + Math.min(entry.attestations / 100000, 0.9) });
+                }
+            }
+
+            scored.sort((a, b) => b.score - a.score);
+            return scored.map(s => s.entry);
+        }
+
+        function fuzzyMatch(q, t) {
+            let qi = 0;
+            for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+                if (t[ti] === q[qi]) qi++;
+            }
+            return qi === q.length;
+        }
+
+        // ---------------------------------------------------------------------------
+        // Rendering
+        // ---------------------------------------------------------------------------
+        function renderNameResults(entries) {
+            const container = document.getElementById('results');
+            const count = document.getElementById('resultCount');
+
+            if (entries.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="icon">—</div>
+            <p>No names found. Try a different spelling or filter.</p></div>`;
+                count.textContent = '0';
+                return;
+            }
+
+            const shown = entries.slice(0, 200);
+            count.textContent = entries.length > 200
+                ? `200 of ${entries.length.toLocaleString()}` : entries.length.toLocaleString();
+
+            container.innerHTML = shown.map(e => {
+                const displayForm = pickDisplayForm(e);
+                const variants = e.allForms.filter(f => f !== displayForm).slice(0, 5).join(', ');
+                const variantHtml = variants ? ` <span class="variants">(${esc(variants)})</span>` : '';
+
+                return `<div class="result-card" data-pos="${e.pos}">
+            <div class="result-name">
+                <div class="transliteration">${esc(displayForm)}${variantHtml}</div>
+                <div class="canonical">→ <strong>${esc(e.canonical)}</strong></div>
+            </div>
+            <span class="pos-badge ${e.pos}">${e.pos}</span>
+            <div class="attestation-count"><span>${e.attestations.toLocaleString()}</span> att.</div>
+        </div>`;
+            }).join('');
+        }
+
+        function renderGlossaryResults(entries) {
+            const container = document.getElementById('results');
+            const count = document.getElementById('resultCount');
+
+            if (entries.length === 0) {
+                container.innerHTML = `<div class="empty-state"><div class="icon">—</div>
+            <p>No vocabulary entries found. Try a different search.</p></div>`;
+                count.textContent = '0';
+                return;
+            }
+
+            const shown = entries.slice(0, 200);
+            count.textContent = entries.length > 200
+                ? `200 of ${entries.length.toLocaleString()}` : entries.length.toLocaleString();
+
+            container.innerHTML = shown.map(e => {
+                const topForms = e.forms.slice(0, 8).map(f => {
+                    const display = f.atf !== f.form ? f.atf : f.form;
+                    return `<span class="gloss-form">${esc(display)}<span class="form-count">×${f.count.toLocaleString()}</span></span>`;
+                }).join('');
+
+                const catLabel = '';
+
+                return `<div class="result-card" data-cat="${e.category}">
+            <div class="result-name">
+                <div class="transliteration">${esc(e.citation)} ${catLabel}</div>
+                <div class="meaning">= <strong>${esc(e.meaning)}</strong> <span style="color:var(--text-muted); font-size:0.78rem;">[${e.pos}]</span></div>
+                <div class="gloss-forms">${topForms}</div>
+            </div>
+            <span class="cat-badge ${e.category}">${e.category}</span>
+            <div class="attestation-count"><span>${e.attestations.toLocaleString()}</span> att.</div>
+        </div>`;
+            }).join('');
+        }
+
+        function pickDisplayForm(entry) {
+            const atf = entry.allForms.filter(f => /[a-z]\d/.test(f));
+            return atf.length > 0 ? atf[0] : entry.form;
+        }
+
+        function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        // ---------------------------------------------------------------------------
+        // Main search dispatcher
+        // ---------------------------------------------------------------------------
+        function doSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+
+            if (activeMode === 'names') {
+                const results = searchNames(query, activeFilter);
+                renderNameResults(results);
+            } else {
+                const results = searchGlossary(query, activeFilter);
+                renderGlossaryResults(results);
+            }
+        }
+
+        function switchMode(mode) {
+            activeMode = mode;
+            activeFilter = 'ALL';
+
+            // Update tab UI
+            document.querySelectorAll('.mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
+
+            // Show appropriate filters
+            document.getElementById('nameFilters').style.display = mode === 'names' ? 'flex' : 'none';
+            document.getElementById('glossFilters').style.display = mode === 'glossary' ? 'flex' : 'none';
+
+            // Reset filter pills
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            const allPill = mode === 'names'
+                ? document.querySelector('#nameFilters [data-pos="ALL"]')
+                : document.querySelector('#glossFilters [data-cat="ALL"]');
+            if (allPill) allPill.classList.add('active');
+
+            // Update placeholder
+            const input = document.getElementById('searchInput');
+            input.placeholder = mode === 'names'
+                ? 'Search by transliteration or canonical name…  e.g. ab-ba-sa6  or Enlil'
+                : 'Search by Sumerian word, English meaning…  e.g. udu, sheep, shepherd';
+
+            doSearch();
+        }
+
+        // ---------------------------------------------------------------------------
+        // Events
+        // ---------------------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+
+            document.getElementById('searchInput').addEventListener('input', () => {
+                clearTimeout(debounceTimer);
+                debounceTimer = setTimeout(doSearch, 100);
+            });
+
+            // Mode tabs
+            document.querySelectorAll('.mode-tab').forEach(tab => {
+                tab.addEventListener('click', () => switchMode(tab.dataset.mode));
+            });
+
+            // Name filter pills
+            document.querySelectorAll('#nameFilters .filter-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('#nameFilters .filter-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    activeFilter = pill.dataset.pos;
+                    doSearch();
+                });
+            });
+
+            // Glossary filter pills
+            document.querySelectorAll('#glossFilters .filter-pill').forEach(pill => {
+                pill.addEventListener('click', () => {
+                    document.querySelectorAll('#glossFilters .filter-pill').forEach(p => p.classList.remove('active'));
+                    pill.classList.add('active');
+                    activeFilter = pill.dataset.cat;
+                    doSearch();
+                });
+            });
+
+            // Fuzzy toggle
+            document.getElementById('fuzzyToggle').addEventListener('click', function () {
+                fuzzyMode = !fuzzyMode;
+                this.classList.toggle('on', fuzzyMode);
+                doSearch();
+            });
+
+            // Keyboard
+            document.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement !== document.getElementById('searchInput')) {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+                if (e.key === 'Escape') {
+                    document.getElementById('searchInput').value = '';
+                    document.getElementById('searchInput').blur();
+                    doSearch();
+                }
+                if (e.key === 'Tab' && !e.shiftKey && document.activeElement !== document.getElementById('searchInput')) {
+                    e.preventDefault();
+                    switchMode(activeMode === 'names' ? 'glossary' : 'names');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

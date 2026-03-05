@@ -1,0 +1,32 @@
+# Generated data files — large, reproducible from source
+drehem_extracted.csv
+tablet_data.json
+drehem_database.csv
+oracc_name_dictionary.json
+oracc_glossary.json
+
+# Backups (managed separately)
+backups/
+
+# Archive (kept locally, not tracked)
+_archive/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# macOS
+.DS_Store
+
+# ORACC cache (downloaded on demand)
+.oracc_cache/
+
+# Validation outputs
+validation/
+
+# Benchmark outputs
+benchmark/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
