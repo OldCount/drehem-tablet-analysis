@@ -233,6 +233,52 @@ def get_translation(token_clean, role):
     return en, nl
 
 
+def _matches_transaction_keyword(token_clean: str, tokens: list[str], idx: int) -> bool:
+    """Return True if token at idx starts a transaction keyword match.
+
+    Uses exact token equality (not substring), which prevents false positives
+    such as 'ba-ti' inside 'ba-ba-ti' matching the second word of 'szu ba-ti'.
+    """
+    from drehem_extract import strip_atf_damage as _sad
+    for kw in TRANSACTION_KEYWORDS:
+        parts = kw.split()
+        if token_clean == parts[0]:
+            # single-token keyword: always a match
+            if len(parts) == 1:
+                return True
+            # multi-token keyword: check subsequent tokens
+            match = True
+            for j, part in enumerate(parts[1:], start=1):
+                if idx + j >= len(tokens):
+                    match = False
+                    break
+                if _sad(tokens[idx + j]).lower() != part:
+                    match = False
+                    break
+            if match:
+                return True
+    return False
+
+
+def _get_transaction_keyword(token_clean: str, tokens: list[str], idx: int) -> str | None:
+    """Return the matched transaction keyword string, or None."""
+    from drehem_extract import strip_atf_damage as _sad
+    for kw in TRANSACTION_KEYWORDS:
+        parts = kw.split()
+        if token_clean != parts[0]:
+            continue
+        if len(parts) == 1:
+            return kw
+        match = True
+        for j, part in enumerate(parts[1:], start=1):
+            if idx + j >= len(tokens) or _sad(tokens[idx + j]).lower() != part:
+                match = False
+                break
+        if match:
+            return kw
+    return None
+
+
 def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
     """Produce token-level annotations for visualization."""
     result = extract_tablet(tablet_id, transliteration, date_of_origin)
@@ -432,15 +478,13 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 role = "person"
                 detail = f"official ({label}, {matched_o})"
 
-            elif any(token_clean == k or content[content.find(token):].startswith(k) for k in TRANSACTION_KEYWORDS):
-                matched_tx = None
-                for k in TRANSACTION_KEYWORDS:
-                    if token_clean == k.split()[0] if " " in k else token_clean == k:
-                        matched_tx = k
-                        break
+            elif _matches_transaction_keyword(token_clean, tokens_raw, i):
+                matched_tx = _get_transaction_keyword(token_clean, tokens_raw, i)
                 if matched_tx:
                     role = "transaction"
                     detail = TRANSACTION_KEYWORDS[matched_tx]
+                    # Skip extra tokens consumed by multi-token keywords
+                    i += len(matched_tx.split()) - 1
                 else:
                     role = "text"
 
