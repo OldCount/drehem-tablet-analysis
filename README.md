@@ -1,46 +1,37 @@
-# CDLI Daily Bulk Data Dump
+# Drehem Tablet Analysis
 
-**Last update was August 2022.**   
-  
-The repository contains a daily dump of all public catalogue and text data from the Cuneiform Digital Library Initiative. 
+This project is a specialized data extraction and visualization pipeline for Ur III administrative clay tablets from Puzrish-Dagan (modern Drehem). It processes raw transliteration data (originally sourced from the Cuneiform Digital Library Initiative) to extract semantic information and provides an interactive visualizer for analysis and demonstration.
 
-## Getting the data
+## Features
 
-Make sure you have the Git Large File Storage extentions ([`git-lfs`](https://github.com/git-lfs/git-lfs)) installed, see [here](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage) for instructions. For installing under, say, Ubuntu, you can also use
+- **Transliteration Parsing (`drehem_extract.py`)**: Custom ATF (ASCII Text Format) parser that identifies animals, persons, administrative roles, geographical destinations, and date formulas.
+- **Semantic Annotation (`tablet_visualizer.py`)**: Token-level classification of Sumerian terms (e.g., animals, qualifiers, numerals, structural markers, person names, deities).
+- **Interactive Visualization (`tablet_vis.html`)**: A local web interface providing visual syntax highlighting, cross-referencing, translation (English/Dutch), and extracted metadata panels.
+- **ORACC Name Integration**: Built-in support for matching and normalizing names against the ORACC name dictionary.
 
-    $> curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-    $> sudo apt-get install git-lfs
-  
-Clone the repository
+## Project Structure
 
-    $> git clone https://github.com/cdli-gh/data
-  
-Retrieve Git LSF data:
-  
-    $> cd data
-    $> git lfs fetch
+- `drehem_extract.py`: Core extraction engine for extracting entities and relationships.
+- `tablet_visualizer.py`: Annotation pipeline that structures data for the frontend and serves it locally.
+- `tablet_vis.html`: Interactive frontend for tablet visualization.
+- `name_search.html` & `build_name_dictionary.py`: Interface and tooling for the ORACC name normalization dictionary.
+- `drehem.sh`: Command-line utility script for running extraction pipelines.
+- `Open Dashboard.command`: macOS shortcut to launch the visualizer.
+- `logs/`: Session worklogs tracking development progress and technical decisions.
+- `_archive/` & `backups/`: (Local only) Superseded scripts and full data backups.
 
-## Format
-### Text Data
-The CDLI transliterations dump is offered in plain text UTF-8 ATF format.
-For more information about ATF, visit :
+## Usage
 
-      http://oracc.museum.upenn.edu/doc/help/editinginatf/cdliatf/index.html (Scroll down for an example).
+To start the interactive tablet visualizer, launch the local server:
 
-
-### Catalogue data
-The catalogue is offered in a UTF-8 comma separated format. Most fields are thoroughly explained here:
-
-     https://cdli.ucla.edu/?q=cdli-search-information  
-Our data schema is currently being remodeled, get in touch if you would like a sneak peak!
-
-To view a sample of the catalogue, you can use the head command on a Unix machine using this syntax, while you are in the directory where the file is stored:
-```
-head cdli_catalogue_1of2.csv
-```
-With Windows Power Shell, try
-```
-Get-Content *filename* -Head *n*
+```bash
+python3 tablet_visualizer.py --port 8585
 ```
 
-EPP cdli@ucla.edu
+Navigate to `http://localhost:8585` in your browser.
+
+Alternatively, on macOS, you can simply run the `Open Dashboard.command` script.
+
+## Background & Data Sources
+
+This tool is being developed as part of a bachelor's thesis project focusing on data engineering and the quantitative analysis of Ur III animal administration. The underlying transliteration text data originates from the public catalogue of the [Cuneiform Digital Library Initiative (CDLI)](https://cdli.ucla.edu/).
