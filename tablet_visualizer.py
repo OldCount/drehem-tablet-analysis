@@ -486,12 +486,12 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 role = "summary_marker"
                 detail = "grand total"
 
-            elif token in ("x", "...") or token.startswith("[") or token.endswith("]"):
+            elif token in ("x", "...") or token.startswith("[") or token.endswith("]") or token == "[...]":
                 role = "damage"
                 detail = "broken/illegible"
 
-                if role == "unknown":
-                    role = "text"
+            if role == "unknown":
+                role = "text"
 
             en, nl = get_translation(token_clean, role)
             # For roles with detail, use detail as English if no dict entry

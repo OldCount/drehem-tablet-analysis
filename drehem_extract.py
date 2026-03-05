@@ -118,6 +118,14 @@ DESTINATION_CATEGORIES = {
     "tum-ma-al":        "sacred-site",    # Tummal
     # Palace variants
     "e2-gal-la":        "palace",
+    # Cities (for ensi2 CITY{ki} patterns and giri3 lines)
+    "nibru{ki}":        "city",      # Nippur
+    "nibru":            "city",
+    "uri2{ki}":         "city",      # Ur
+    "lagasz{ki}":       "city",      # Lagash
+    "umma{ki}":         "city",      # Umma
+    "irisagrig{ki}":    "city",      # Irisagrig
+    "hu-ur5-ti{ki}":    "city",      # Hurti
 }
 
 # Bala: rotating administrative office delivering animals to central stockyard.
@@ -475,10 +483,14 @@ def _sum_numerals(text: str) -> int:
 
 
 def strip_atf_damage(text: str) -> str:
-    """Remove damage markers (#, ?, !, [...], <<>>) but keep readable content."""
+    """Remove damage markers (#, ?, !, [...], <<>>) but keep readable content.
+    Also normalises ATF komma notation: s, → s (represents the sibilant ṣ;
+    the comma is a transliteration convention, not a separator).
+    """
     text = re.sub(r"\[([^\]]*)\]", r"\1", text)  # [x] → x
     text = text.replace("#", "").replace("?", "").replace("!", "")
     text = re.sub(r"<<[^>]*>>", "", text)
+    text = text.replace("s,", "s").replace("S,", "S")  # komma notation
     return text.strip()
 
 
@@ -1054,10 +1066,18 @@ def extract_date(lines: list[str]) -> tuple[str, str, str]:
                 candidate = re.sub(r"\s+ba-zal.*$", "", candidate).strip()
                 month = candidate
 
-        # Day: u4 N-kam or u4 N ba-zal
-        day_match = re.search(r"u4\s+([\d()\w\s]+?)(?:-kam|ba-zal)", cleaned)
+        # Day: u4 N-kam or u4 N ba-zal  (la2 subtraction handled by parse_numeral,
+        # so "u4 3(u) la2 1" correctly yields day 29)
+        day_match = re.search(r"u4\s+([\d()\w\s]+?)(?:-kam|\s+ba-zal|\s+ba-ra-zal)", cleaned)
         if day_match and not day:
             day_num = parse_numeral(day_match.group(1))
+            if day_num > 0:
+                day = str(day_num)
+
+        # iti-ta u4 N ba-ra-zal: "of the month, day N has passed" (P123620)
+        iti_ta_match = re.search(r"iti-ta\s+u4\s+([\d()\w\s]+?)\s+ba-ra-zal", cleaned)
+        if iti_ta_match and not day:
+            day_num = parse_numeral(iti_ta_match.group(1))
             if day_num > 0:
                 day = str(day_num)
 

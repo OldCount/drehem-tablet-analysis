@@ -2154,8 +2154,19 @@
 
       // Divine recipients
       if (ext.divine_recipients?.length && ext.divine_recipients.join('')) {
-        const divStr = Array.isArray(ext.divine_recipients) ? ext.divine_recipients.join(', ') : ext.divine_recipients;
-        if (divStr) html += `<h3>Divine Recipients</h3><div class="extraction-item"><div class="value" style="color:var(--c-deity);">${divStr}</div></div>`;
+        html += `<h3>Divine Recipients</h3>`;
+        const translated = ext.divine_recipients_translated;
+        if (translated?.length) {
+          for (const d of translated) {
+            const trans = useDutch ? (d.nl || d.en) : (d.en || d.name);
+            html += `<div class="extraction-item"><div class="value" style="color:var(--c-deity);">${esc(d.name)}</div>`;
+            if (trans && trans !== d.name) html += `<div class="item-sub">${esc(trans)}</div>`;
+            html += `</div>`;
+          }
+        } else {
+          const divStr = Array.isArray(ext.divine_recipients) ? ext.divine_recipients.join(', ') : ext.divine_recipients;
+          if (divStr) html += `<div class="extraction-item"><div class="value" style="color:var(--c-deity);">${divStr}</div></div>`;
+        }
       }
       if (ext.destination) html += `<h3>Destination</h3><div class="extraction-item"><div class="value">${ext.destination}</div></div>`;
       if (ext.year) html += `<h3>Year Name</h3><div class="extraction-item"><div class="value" style="font-size:10px;">${ext.year}</div></div>`;
