@@ -30,3 +30,6 @@ benchmark/
 
 # Jupyter checkpoints
 .ipynb_checkpoints/
+
+# Old GitHub Actions workflows (not currently used)
+.github/
