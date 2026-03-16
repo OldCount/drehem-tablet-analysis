@@ -29,7 +29,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 TRANSACTION_PATTERNS = {
-    "szu ba-ti":   "receipt",
+    "szu ba-ti":   "to accept",
     "mu-kux(DU)":  "delivery",
     "i3-dab5":     "transfer",
     "ba-zi":       "expenditure",
@@ -118,14 +118,22 @@ DESTINATION_CATEGORIES = {
     "tum-ma-al":        "sacred-site",    # Tummal
     # Palace variants
     "e2-gal-la":        "palace",
+    # Sheephouse
+    "e2-udu":           "sheephouse",
+    "e2-udu-sag":       "sheephouse",
+    "e2-udu-ka":        "sheephouse",
+    "e2-udu-niga":      "fattening-house",
     # Cities (for ensi2 CITY{ki} patterns and giri3 lines)
     "nibru{ki}":        "city",      # Nippur
     "nibru":            "city",
     "uri2{ki}":         "city",      # Ur
+    "uri2":             "city",
     "lagasz{ki}":       "city",      # Lagash
     "umma{ki}":         "city",      # Umma
     "irisagrig{ki}":    "city",      # Irisagrig
     "hu-ur5-ti{ki}":    "city",      # Hurti
+    "tummal{ki}":       "sacred-site",  # Tummal
+    "tummal":           "sacred-site",
 }
 
 # Bala: rotating administrative office delivering animals to central stockyard.
@@ -235,6 +243,7 @@ ANIMAL_TERMS = {
     "amar masz-da3": "gazelle calf",
     "lulim":         "red deer",
     "lulim-nita2":   "stag",
+    "lulim-munus":   "female red deer/stag",
     "si-gar":        "wild sheep",
     "segbar":        "wild sheep",
     "szeg9-bar-nita2": "male deer",
@@ -490,7 +499,7 @@ def strip_atf_damage(text: str) -> str:
     text = re.sub(r"\[([^\]]*)\]", r"\1", text)  # [x] → x
     text = text.replace("#", "").replace("?", "").replace("!", "")
     text = re.sub(r"<<[^>]*>>", "", text)
-    text = text.replace("s,", "s").replace("S,", "S")  # komma notation
+    # We do NOT replace "s," with "s", to preserve ATF "s," for exact matches with dictionary keys (te-s,i-in-ma-ma)
     return text.strip()
 
 
@@ -620,10 +629,13 @@ def extract_transaction_type(lines: list[str]) -> str:
     """Identify primary transaction type from content lines."""
     # Primary transaction keywords, checked against the last lines first
     primary_keywords = {
-        "szu ba-ti":  "receipt",
+        "szu ba-ti":  "to accept",
         "ba-zi":      "expenditure",
         "i3-dab5":    "transfer",
         "mu-kux(DU)": "delivery",
+        "mu-kux(DU)-ra-ta": "delivery",
+        "mu-kux(DU)-ra": "delivery",
+        "mu-kux":     "delivery",
     }
 
     # Scan lines in reverse: the last-occurring keyword is the primary transaction
@@ -690,6 +702,18 @@ def extract_persons(lines: list[str]) -> list[Person]:
             name = ki_match.group(1).strip()
             title = extract_title_from_line(cleaned)
             persons.append(Person(name=name, role="source", title=title))
+        elif cleaned.startswith("ki ") and not ki_match:
+            # ki PN (without -ta): source when preceded by zi-ga
+            prev_cleaned = strip_atf_damage(lines[i - 1]).strip() if i > 0 else ""
+            if prev_cleaned == "zi-ga" or "zi-ga" in prev_cleaned:
+                ki_name_match = re.search(r"ki\s+(.+)", cleaned)
+                if ki_name_match:
+                    name = ki_name_match.group(1).strip()
+                    title = extract_title_from_line(name)
+                    if title:
+                        name = name[:name.index(title)].strip()
+                    if name and not any(name.startswith(kw) for kw in ["iti", "mu "]):
+                        persons.append(Person(name=name, role="source", title=title))
 
         # PN szu ba-ti → receiver
         szu_match = re.search(r"^(.+?)\s+szu ba-ti", cleaned)
@@ -753,24 +777,35 @@ def extract_persons(lines: list[str]) -> list[Person]:
             name = kiszib_match.group(1).strip()
             persons.append(Person(name=name, role="sealer"))
 
-        # mu-kux(DU) PN → deliverer (when person name follows)
-        mukux_match = re.search(r"mu-kux\(DU\)\s+(.+)", cleaned)
+        # mu-kux(DU) PN or mu-kux PN → deliverer (when person name follows)
+        mukux_match = re.search(r"mu-kux(?:\(DU\))?\s+(.+)", cleaned)
         if mukux_match:
             name = mukux_match.group(1).strip()
             if not any(name.startswith(kw) for kw in ["lugal", "iti", "mu "]):
-                persons.append(Person(name=name, role="deliverer"))
+                # Strip title if present
+                title = extract_title_from_line(name)
+                if title:
+                    name = name[:name.index(title)].strip()
+                persons.append(Person(name=name, role="deliverer", title=title))
 
         # sza3-bi-ta marks sub-disbursement section (structural marker, not person)
 
         # zi-ga PN → expenditure agent (variant of ba-zi)
+        # zi-ga bala ensi2 PLACE → bala-tax from governor of PLACE (not a person named "bala")
         ziga_match = re.search(r"zi-ga\s+(.+)", cleaned)
         if ziga_match:
-            name = ziga_match.group(1).strip()
-            title = extract_title_from_line(name)
-            if title:
-                name = name[:name.index(title)].strip()
-            if name and not any(name.startswith(kw) for kw in ["ki ", "iti", "mu "]):
-                persons.append(Person(name=name, role="source", title=title))
+            rest = ziga_match.group(1).strip()
+            bala_gov = re.match(r"bala\s+ensi2\s+(.+)", rest)
+            if bala_gov:
+                place = bala_gov.group(1).strip()
+                persons.append(Person(name=f"governor of {place}", role="source", title="ensi2"))
+            else:
+                name = rest
+                title = extract_title_from_line(name)
+                if title:
+                    name = name[:name.index(title)].strip()
+                if name and not any(name.startswith(kw) for kw in ["ki ", "iti", "mu ", "bala"]):
+                    persons.append(Person(name=name, role="source", title=title))
 
         # bala PN ensi2 → official providing animals from rotating bala office
         bala_match = BALA_PATTERN.search(cleaned)
@@ -1011,33 +1046,32 @@ def extract_animals(lines: list[str]) -> tuple[list[AnimalEntry], bool, bool]:
 
     # [x] ANIMAL [...] — broken numeral with identifiable animal. Match on raw line before stripping damage.
     for raw_line in lines:
-        x_match = re.match(r"^\[x\]\s+", raw_line)
-        if not x_match:
-            continue
-        if is_summary_line(raw_line):
-            continue
-        # Strip damage for the animal lookup: "[x] udu [...]" → "udu"
-        after_bracket = raw_line[x_match.end():]
-        after_x = strip_atf_damage(after_bracket).strip()
-        cleaned_raw = strip_atf_damage(raw_line)
-        for animal in sorted_animals:
-            if after_x.startswith(animal):
-                end_pos = len(animal)
-                if end_pos >= len(after_x) or after_x[end_pos] in " \t":
-                    if not _is_animal_false_positive(animal, after_x):
-                        remaining = after_x[end_pos:].strip()
-                        remaining_words = remaining.split() if remaining else []
-                        qualifiers = [
-                            q for q in ANIMAL_QUALIFIERS
-                            if q in remaining_words
-                        ]
-                        entries.append(AnimalEntry(
-                            count=1,
-                            animal=animal,
-                            qualifiers=qualifiers,
-                            raw=cleaned_raw.strip(),
-                            damaged=True,  # always uncertain: [x] = unknown quantity
-                        ))
+        for x_match in re.finditer(r"\[x\]\s+", raw_line):
+            if is_summary_line(raw_line):
+                continue
+            # Strip damage for the animal lookup: "[x] udu [...]" → "udu"
+            after_bracket = raw_line[x_match.end():]
+            after_x = strip_atf_damage(after_bracket).strip()
+            for animal in sorted_animals:
+                if after_x.startswith(animal):
+                    end_pos = len(animal)
+                    if end_pos >= len(after_x) or after_x[end_pos] in " \t":
+                        if not _is_animal_false_positive(animal, after_x):
+                            qualifiers = []
+                            remaining = after_x[len(animal):].strip()
+                            remaining_words = re.split(r"[\s]+", remaining)
+                            for qual in ANIMAL_QUALIFIERS:
+                                if qual in remaining_words:
+                                    qualifiers.append(qual)
+                            
+                            entries.append(AnimalEntry(
+                                count=1,  # Ensure unknown amounts count as at least 1
+                                animal=animal,
+                                qualifiers=qualifiers,
+                                raw=raw_line.strip(),
+                                damaged=True,
+                            ))
+                        break
                 break
 
     return entries, has_summary, has_sza3
