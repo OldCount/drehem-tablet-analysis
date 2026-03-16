@@ -31,6 +31,7 @@
       --c-animal: #00d68f;
       --c-qualifier: #85e0c8;
       --c-person: #c084fc;
+      --c-receiver: #f472b6;
       --c-transaction: #ff6b81;
       --c-month: #4bcffa;
       --c-deity: #ffd32a;
@@ -44,19 +45,25 @@
     }
 
     body.colorblind {
-      --c-numeral: #e69f00;
-      --c-animal: #0072b2;
-      --c-qualifier: #56b4e9;
-      --c-person: #cc79a7;
-      --c-transaction: #d55e00;
-      --c-month: #009e73;
-      --c-deity: #f0e442;
-      --c-role-marker: #38bdf8;
-      --c-summary: #e69f00;
-      --c-damage: #888;
-      --c-measure: #999;
-      --c-title: #cc79a7;
-      --c-year-text: #aaa;
+      --c-numeral: #E69F00;
+      --c-animal: #0072B2;
+      --c-qualifier: #56B4E9;
+      --c-person: #CC79A7;
+      --c-receiver: #D55E00;
+      --c-transaction: #F0E442;
+      --c-month: #009E73;
+      --c-deity: #E69F00;
+      --c-role-marker: #0072B2;
+      --c-summary: #F0E442;
+      --c-damage: #5A5A6A;
+      --c-measure: #999999;
+      --c-structural: #56B4E9;
+      --c-title: #CC79A7;
+      --c-year-text: #666666;
+    }
+
+    body.colorblind .token[class*="role-"] {
+      background: rgba(255, 255, 255, 0.1) !important;
     }
 
     * {
@@ -97,6 +104,7 @@
       padding: 0 20px;
       gap: 12px;
       position: relative;
+      box-shadow: inset 0 -1px 6px rgba(0, 0, 0, 0.15);
     }
 
     .header::after {
@@ -224,12 +232,14 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      box-shadow: inset -2px 0 8px rgba(0, 0, 0, 0.12);
     }
 
     .sidebar-header {
       padding: 10px 12px 6px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-header h2 {
@@ -276,6 +286,76 @@
       font-size: 10px;
       color: var(--text-dim);
       padding: 3px 0 0;
+    }
+
+    .pinned-section {
+      padding: 6px 8px 2px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pinned-section h3 {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+
+    .pinned-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .pinned-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text);
+      transition: background 0.15s;
+    }
+
+    .pinned-item:hover {
+      background: var(--surface2);
+    }
+
+    .pinned-item .pin-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    .pinned-item .pin-remove {
+      margin-left: auto;
+      opacity: 0;
+      font-size: 10px;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .pinned-item:hover .pin-remove {
+      opacity: 0.7;
+    }
+
+    .pinned-item .pin-remove:hover {
+      opacity: 1;
+      color: var(--c-transaction);
+    }
+
+    .btn-pin {
+      font-size: 10px;
+      padding: 3px 6px;
+      cursor: pointer;
+    }
+
+    .btn-pin.is-pinned {
+      color: var(--gold);
+      border-color: var(--gold);
     }
 
     .tablet-list-wrap {
@@ -545,7 +625,9 @@
       font-size: 15px;
       line-height: 1.5;
       position: relative;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.15);
+      user-select: text;
+      -webkit-user-select: text;
     }
 
     .section-divider {
@@ -660,6 +742,8 @@
       line-height: 1.1;
       margin-top: 1px;
       display: block;
+      user-select: none;
+      -webkit-user-select: none;
     }
 
     .transliteration.role-filtered .token-wrap {
@@ -690,6 +774,60 @@
       color: var(--c-person);
       background: rgba(176, 127, 224, 0.12);
       font-weight: 600;
+    }
+
+    .token-wrap[data-role="person"][data-detail*="receiver"] .token {
+      color: var(--c-receiver, #f472b6);
+      background: rgba(244, 114, 182, 0.12);
+    }
+
+    body.colorblind .token-wrap[data-role="person"][data-detail*="receiver"] .token {
+      background: rgba(170, 170, 170, 0.12);
+    }
+
+    .token-wrap[data-detail="source_suffix"] .token {
+      border-bottom: 2px solid var(--c-role-marker);
+    }
+
+    .token-wrap[data-detail="destination_suffix"] .token {
+      border-bottom: 2px dashed var(--c-role-marker);
+    }
+
+    .suffix-wrap-group {
+      display: inline-flex;
+      align-items: flex-start;
+      position: relative;
+      padding-bottom: 10px;
+      margin-bottom: -2px;
+    }
+
+    .suffix-wrap-group::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 8px;
+      border-bottom: 2px solid var(--c-role-marker);
+      border-left: 2px solid var(--c-role-marker);
+      border-right: 2px solid var(--c-role-marker);
+      border-radius: 0 0 4px 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+
+    .suffix-wrap-group:hover::after {
+      content: attr(data-wrap-label);
+      height: 12px;
+      font-size: 8px;
+      color: var(--c-role-marker);
+      text-align: center;
+      line-height: 12px;
+      opacity: 1;
+    }
+
+    .suffix-wrap-group.wrap-destination::after {
+      border-style: dashed;
     }
 
     .token.role-person_part {
@@ -748,6 +886,12 @@
     .token.role-year_text {
       color: var(--c-year-text);
       opacity: 0.5;
+    }
+
+    .token.role-glossary_term {
+      color: #e2e8f0;
+      background: rgba(148, 163, 184, 0.15);
+      border-bottom: 1px dotted rgba(148, 163, 184, 0.5);
     }
 
     .token.role-line_number {
@@ -882,6 +1026,7 @@
       border-left: 1px solid var(--border);
       overflow-y: auto;
       padding: 16px;
+      box-shadow: inset 2px 0 8px rgba(0, 0, 0, 0.12);
     }
 
     .panel h3 {
@@ -926,6 +1071,7 @@
       border: 1px solid transparent;
       position: relative;
       overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.12);
     }
 
     .stat-card::before {
@@ -979,6 +1125,7 @@
       cursor: pointer;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid transparent;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
     }
 
     .extraction-item:hover {
@@ -1050,6 +1197,7 @@
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       border: 1px solid transparent;
       margin-bottom: 4px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
     }
 
     .animal-group:hover {
@@ -1523,6 +1671,57 @@
       animation-fill-mode: both;
     }
 
+    /* Structural load of the transliteration lines */
+    @keyframes structuralLoad {
+      0% {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes classificationReveal {
+      0% {
+        filter: grayscale(1) brightness(0.6);
+        transform: scale(0.98);
+      }
+
+      50% {
+        filter: saturate(1.2) brightness(1.1);
+        transform: scale(1.05);
+      }
+
+      100% {
+        filter: saturate(1) brightness(1);
+        transform: scale(1);
+      }
+    }
+
+    .t-line.cascade-enter {
+      opacity: 0;
+      animation: structuralLoad 0.4s ease-out forwards;
+      animation-fill-mode: both;
+    }
+
+    .t-line.cascade-enter .cascade-color {
+      display: inline-block;
+      /* Required for transform */
+      filter: grayscale(1) brightness(0.6);
+      /* Pop in the exact classification colors with a slight scale effect for emphasis */
+      animation: classificationReveal 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      animation-fill-mode: both;
+    }
+
+    .section-divider.cascade-enter {
+      opacity: 0;
+      animation: structuralLoad 0.4s ease-out forwards;
+      animation-fill-mode: both;
+    }
+
     @keyframes spin {
       to {
         transform: rotate(360deg);
@@ -1785,17 +1984,56 @@
       border-bottom: none;
     }
 
+    /* Custom scrollbars */
     ::-webkit-scrollbar {
-      width: 5px;
+      width: 6px;
+      height: 6px;
     }
 
     ::-webkit-scrollbar-track {
-      background: transparent;
+      background: rgba(10, 14, 26, 0.4);
+      border-radius: 3px;
     }
 
     ::-webkit-scrollbar-thumb {
-      background: var(--border);
+      background: linear-gradient(180deg, rgba(74, 158, 255, 0.25), rgba(60, 70, 110, 0.4));
       border-radius: 3px;
+      transition: background 0.2s;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(180deg, rgba(74, 158, 255, 0.4), rgba(60, 70, 110, 0.6));
+    }
+
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+
+    /* Tablet Summary */
+    .tablet-summary {
+      background: linear-gradient(135deg, var(--gold-glow), rgba(212, 168, 83, 0.03));
+      border: 1px solid rgba(212, 168, 83, 0.2);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+
+    .tablet-summary .summary-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+      width: 18px;
+      height: 18px;
+      opacity: 0.5;
+    }
+
+    .tablet-summary .summary-text {
+      font-family: 'Noto Serif', serif;
     }
   </style>
 </head>
@@ -1806,8 +2044,10 @@
       <button class="btn small" id="btnToggleSidebar" title="Toggle tablet list">&#9776;</button>
       <h1><span class="cuneiform-accent">&#x12038;</span> Drehem <span>Visualizer</span></h1>
       <div class="header-controls">
-        <button class="btn small" id="btnStats" title="Corpus overview">Overview</button>
-        <button class="btn primary" id="btnRandom">Random <kbd class="kbd">R</kbd></button>
+        <button class="btn small" id="btnStats" title="Corpus overview" data-en="Overview"
+          data-nl="Overzicht">Overview</button>
+        <button class="btn primary" id="btnRandom" data-en='Random <kbd class="kbd">R</kbd>'
+          data-nl='Willekeurig <kbd class="kbd">R</kbd>'>Random <kbd class="kbd">R</kbd></button>
         <button class="btn small" id="btnPrev">&larr;</button>
         <button class="btn small" id="btnNext">&rarr;</button>
         <button class="btn small active" id="btnLang" title="Toggle English / Dutch translations">EN</button>
@@ -1817,8 +2057,12 @@
     </div>
 
     <div class="sidebar" id="sidebar">
+      <div class="pinned-section" id="pinnedSection" style="display:none;">
+        <h3>Pinned</h3>
+        <div class="pinned-list" id="pinnedList"></div>
+      </div>
       <div class="sidebar-header">
-        <h2>Tablets</h2>
+        <h2 data-en="Tablets" data-nl="Tabletten">Tablets</h2>
         <div class="search-box" style="margin-bottom:12px;width:100%;"><input type="text" id="searchInput"
             placeholder="Search ID (e.g. P200031)..." style="width:100%;" /></div>
         <div class="filter-row" id="txFilters">
@@ -1849,20 +2093,32 @@
       <div class="welcome" id="welcomeScreen">
         <div class="welcome-cuneiform">&#x12000; &#x12038; &#x120FB; &#x12197;</div>
         <h2><span>Puzri&#353;-Dagan</span> Tablet Visualizer</h2>
-        <p class="subtitle">Automated extraction and semantic annotation of Ur III administrative tablets from the
-          Drehem corpus</p>
+        <p class="subtitle" id="welcomeSubtitle">Automated extraction and semantic annotation of Ur III administrative
+          tablets from the Drehem corpus</p>
         <div class="welcome-actions">
-          <button class="btn primary" onclick="document.getElementById('btnRandom').click()">Explore Random Tablet <kbd
+          <button class="btn primary" onclick="document.getElementById('btnRandom').click()"
+            data-en='Explore Random Tablet <kbd class="kbd">R</kbd>'
+            data-nl='Verken Willekeurig Tablet <kbd class="kbd">R</kbd>'>Explore Random Tablet <kbd
               class="kbd">R</kbd></button>
-          <button class="btn" onclick="renderCorpusStats()">Corpus Overview <kbd class="kbd">O</kbd></button>
+          <button class="btn" onclick="renderCorpusStats()" data-en='Corpus Overview <kbd class="kbd">O</kbd>'
+            data-nl='Corpus Overzicht <kbd class="kbd">O</kbd>'>Corpus Overview <kbd class="kbd">O</kbd></button>
         </div>
         <div class="welcome-stats" id="welcomeStats"></div>
+        <div
+          style="margin-top:40px;font-size:11px;color:var(--text-dim);opacity:0.6;animation: fadeInUp 0.6s ease-out 0.8s both;">
+          Data and dictionaries courtesy of <a href="http://oracc.museum.upenn.edu" target="_blank"
+            style="color:inherit">ORACC</a>, <a href="https://cdli.mpiwg-berlin.mpg.de" target="_blank"
+            style="color:inherit">CDLI</a>, and <a href="http://bdtns.filol.csic.es" target="_blank"
+            style="color:inherit">BDTNS</a>.
+        </div>
       </div>
     </div>
 
     <div class="panel" id="rightPanel">
       <div class="empty-state" style="height:auto;padding:40px 16px;">
-        <p style="font-size:12px;color:var(--text-dim);">Select a tablet to see extraction results</p>
+        <p style="font-size:12px;color:var(--text-dim);" data-en="Select a tablet to see extraction results"
+          data-nl="Selecteer een tablet om de extractieresultaten te bekijken">Select a tablet to see extraction results
+        </p>
       </div>
     </div>
   </div>
@@ -1901,34 +2157,70 @@
   <script>
     const API = '';
     let tabletIndex = [], filteredIndex = [], currentTabletId = null, currentData = null;
-    let currentFilterIdx = -1, activeRoleFilter = null, filterTx = '', filterConf = '';
+    let currentFilterIdx = -1, activeRoleFilters = new Set(), filterTx = '', filterConf = '';
     let corpusStats = null;
     let isolatedCategory = null;
     let currentLang = 'en';
+
+    // Pinned tablets (persisted via localStorage)
+    let pinnedTablets = JSON.parse(localStorage.getItem('pinnedTablets') || '[]');
+
+    function savePins() {
+      localStorage.setItem('pinnedTablets', JSON.stringify(pinnedTablets));
+      renderPinnedList();
+    }
+
+    function togglePin(id) {
+      const idx = pinnedTablets.indexOf(id);
+      if (idx >= 0) pinnedTablets.splice(idx, 1);
+      else pinnedTablets.push(id);
+      savePins();
+      // Re-render current tablet to update button state
+      if (currentData && currentData.tablet_id === id) {
+        renderTablet(currentData);
+        renderPanel(currentData);
+      }
+    }
+
+    function renderPinnedList() {
+      const section = document.getElementById('pinnedSection');
+      const list = document.getElementById('pinnedList');
+      if (!pinnedTablets.length) { section.style.display = 'none'; return; }
+      section.style.display = '';
+      list.innerHTML = pinnedTablets.map(id => {
+        const info = tabletIndex.find(t => t.id === id);
+        const label = info ? `${info.designation || ''}` : '';
+        return `<div class="pinned-item" onclick="loadTablet('${id}')">
+          <span class="pin-id">P${id}</span>
+          <span style="font-size:10px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(label)}</span>
+          <span class="pin-remove" onclick="event.stopPropagation();togglePin('${id}')">&times;</span>
+        </div>`;
+      }).join('');
+    }
 
     const ROLE_LABELS = {
       numeral: 'Numeral', animal: 'Animal', qualifier: 'Qualifier', person: 'Person',
       transaction: 'Transaction', month: 'Month', deity: 'Deity', role_marker: 'Role Marker',
       summary_marker: 'Total', structural_keyword: 'Structural', damage: 'Damaged',
-      measure: 'Non-Animal', title: 'Title', year_text: 'Year Name',
+      measure: 'Non-Animal', title: 'Title', year_text: 'Year Name', glossary_term: 'Glossary Term'
     };
 
     const ROLE_COLORS_NORMAL = {
       numeral: '#ff9f43', animal: '#00d68f', qualifier: '#85e0c8', person: '#c084fc',
       transaction: '#ff6b81', month: '#4bcffa', deity: '#ffd32a', role_marker: '#22d3ee',
       summary_marker: '#f7b731', damage: '#5a5a6a', measure: '#8899aa', structural_keyword: '#4a9eff',
-      title: '#f0abfc', year_text: '#a3a3a3',
+      title: '#f0abfc', year_text: '#a3a3a3', glossary_term: '#b2bec3'
     };
 
     const ROLE_COLORS_CB = {
       numeral: '#e69f00', animal: '#0072b2', qualifier: '#56b4e9', person: '#cc79a7',
       transaction: '#d55e00', month: '#009e73', deity: '#f0e442', role_marker: '#38bdf8',
       summary_marker: '#e69f00', damage: '#888', measure: '#999', structural_keyword: '#4a9eff',
-      title: '#cc79a7', year_text: '#aaa',
+      title: '#cc79a7', year_text: '#aaa', glossary_term: '#adb5bd'
     };
 
     let ROLE_COLORS = ROLE_COLORS_NORMAL;
-    const LEGEND_ROLES = ['numeral', 'animal', 'qualifier', 'person', 'title', 'transaction', 'month', 'deity', 'role_marker', 'summary_marker', 'structural_keyword', 'damage', 'measure'];
+    const LEGEND_ROLES = ['numeral', 'animal', 'qualifier', 'person', 'title', 'transaction', 'month', 'deity', 'role_marker', 'summary_marker', 'structural_keyword', 'damage', 'measure', 'glossary_term'];
 
     // ---- Init ----
     async function loadIndex() {
@@ -1937,6 +2229,7 @@
         tabletIndex = await iRes.json();
         corpusStats = await sRes.json();
         applyFilters();
+        renderPinnedList();
         const ws = document.getElementById('welcomeStats');
         if (ws && corpusStats) {
           ws.innerHTML = `
@@ -1999,7 +2292,7 @@
     function renderTablet(data) {
       const main = document.getElementById('mainContent');
       const ext = data.extraction;
-      activeRoleFilter = null;
+      activeRoleFilters.clear();
       isolatedCategory = null;
       clearConnectionLine();
 
@@ -2013,8 +2306,16 @@
       const cdliUrl = `https://cdli.mpiwg-berlin.mpg.de/artifacts/${data.tablet_id}`;
       html += `<div class="tablet-links">`;
       if (data.designation) html += `<span class="designation">${esc(data.designation)}</span>`;
-      if (data.date_of_origin) html += `<span class="designation">${esc(data.date_of_origin)}</span>`;
+      if (data.date_of_origin) {
+        const dp = data.date_of_origin.split('.');
+        const dateDisplay = dp.length >= 4
+          ? `${dp[0].replace('-', ' ')} year ${parseInt(dp[1]) || '?'}, month ${parseInt(dp[2]) || '?'}${parseInt(dp[3]) ? ', day ' + parseInt(dp[3]) : ''}`
+          : data.date_of_origin;
+        html += `<span class="designation" title="${esc(data.date_of_origin)}">${esc(dateDisplay)}</span>`;
+      }
       html += `<button class="btn small" onclick="copyText()" style="font-size:10px;padding:3px 6px;">Copy Text</button>`;
+      const isPinned = pinnedTablets.includes(data.tablet_id);
+      html += `<button class="btn small btn-pin${isPinned ? ' is-pinned' : ''}" onclick="togglePin('${data.tablet_id}')" style="font-size:10px;padding:3px 6px;">${isPinned ? 'Unpin' : 'Pin'}</button>`;
       html += `<a href="${cdliUrl}" target="_blank">CDLI &#8599;</a>`;
       if (currentFilterIdx >= 0) html += `<span class="designation" style="margin-left:auto;opacity:0.5;">${currentFilterIdx + 1} / ${filteredIndex.length}</span>`;
       html += `</div>`;
@@ -2023,6 +2324,15 @@
         <img src="https://cdli.earth/dl/photo/P${data.tablet_id}.jpg" onerror="this.style.display='none'" onclick="openImg(this.src)" loading="lazy" />
         <img src="https://cdli.earth/dl/lineart/P${data.tablet_id}.jpg" onerror="this.style.display='none'" onclick="openImg(this.src)" loading="lazy" />
       </div></details>`;
+
+      // Plain-language summary
+      if (data.summary) {
+        const summaryText = currentLang === 'nl' ? data.summary.nl : data.summary.en;
+        html += `<div class="tablet-summary fade-in-up" id="tabletSummary">
+          <svg class="summary-icon" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h6"/></svg>
+          <div class="summary-text">${esc(summaryText)}</div>
+        </div>`;
+      }
 
       // Legend
       html += `<div class="legend" id="legend">`;
@@ -2034,34 +2344,92 @@
       // Transliteration
       html += `<div class="transliteration" id="transliteration">`;
       let lastSection = '';
+      let animIdx = 0;
       for (const line of data.lines) {
         if (line.section !== lastSection) {
-          html += `<span class="section-divider">${line.section.replace('_', ' ')}</span>`;
+          html += `<span class="section-divider cascade-enter" style="animation-delay:${animIdx * 40}ms">${line.section.replace('_', ' ')}</span>`;
           lastSection = line.section;
+          animIdx++;
         }
         if (line.type === 'metadata' || (line.tokens.length === 1 && ['section_header', 'metadata', 'damage_note', 'ruling'].includes(line.tokens[0].role))) {
-          html += `<span class="t-line"><span class="token role-${line.tokens[0].role}">${esc(line.raw)}</span></span>`;
+          html += `<span class="t-line cascade-enter" style="animation-delay:${animIdx * 40}ms"><span class="token role-${line.tokens[0].role} cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(line.raw)}</span></span>`;
+          animIdx++;
           continue;
         }
-        let lc = 't-line';
+        let lc = 't-line cascade-enter';
         if (line.type === 'summary') lc += ' summary-line';
         if (line.type === 'date' || line.type === 'year') lc += ' date-line';
         if (line.type === 'transaction') lc += ' transaction-line';
         if (line.section === 'left_edge') lc += ' left-edge-line';
         const lineIdx = line.line_idx != null ? line.line_idx : '';
-        html += `<span class="${lc}" data-lidx="${lineIdx}">`;
-        for (const tok of line.tokens) {
+        html += `<span class="${lc}" data-lidx="${lineIdx}" style="animation-delay:${animIdx * 40}ms">`;
+        // Detect suffix-wrap patterns: ki...(-ta), mu/PN...(-sze3), giri3...PN
+        const toks = line.tokens;
+        let ti = 0;
+        while (ti < toks.length) {
+          const tok = toks[ti];
           const r = tok.role || 'text';
           const tl = currentLang === 'nl' ? (tok.nl || tok.en || '') : (tok.en || '');
-          if (r === 'line_number') { html += `<span class="token role-line_number">${esc(tok.text)}</span>`; continue; }
+          if (r === 'line_number') { html += `<span class="token role-line_number cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(tok.text)}</span>`; ti++; continue; }
+
+          // Check for ki + person(s) + -ta pattern
+          const tcl = (tok.detail || '').toLowerCase();
+          const isKi = r === 'role_marker' && tok.text.replace(/[\[\]]/g,'').toLowerCase() === 'ki';
+          const isGiri3 = r === 'role_marker' && tok.text.replace(/[\[\]]/g,'').toLowerCase() === 'giri3';
+          const isMaszkim = r === 'role_marker' && tok.text.replace(/[\[\]]/g,'').toLowerCase() === 'maszkim';
+          if (isKi || isGiri3 || isMaszkim) {
+            // Scan ahead for person tokens and closing suffix
+            let endIdx = ti + 1;
+            let hasPerson = false;
+            let closingSuffix = null;
+            while (endIdx < toks.length) {
+              const nr = toks[endIdx].role || 'text';
+              const nd = (toks[endIdx].detail || '').toLowerCase();
+              if (nr === 'person' || nr === 'person_part' || nr === 'title') { hasPerson = true; endIdx++; }
+              else if (nr === 'role_marker' && (nd === 'source_suffix' || nd === 'destination_suffix')) { closingSuffix = nd; endIdx++; break; }
+              else break;
+            }
+            if (hasPerson && (closingSuffix || isGiri3 || isMaszkim)) {
+              // Collect person name(s) from the wrapped tokens
+              const personNames = [];
+              for (let pi = ti + 1; pi < endIdx; pi++) {
+                if (toks[pi].role === 'person' || toks[pi].role === 'person_part') {
+                  personNames.push(toks[pi].text.replace(/[\[\]]/g, ''));
+                }
+              }
+              const pnStr = personNames.join(' ') || 'PN';
+              const label = isKi ? (closingSuffix === 'destination_suffix' ? `to ${pnStr}` : `from ${pnStr}`)
+                          : isGiri3 ? `via ${pnStr}`
+                          : `commissioner: ${pnStr}`;
+              const wrapClass = closingSuffix === 'destination_suffix' ? 'suffix-wrap-group wrap-destination' : 'suffix-wrap-group';
+              html += `<span class="${wrapClass}" data-wrap-label="${esc(label)}">`;
+              for (let wi = ti; wi < endIdx; wi++) {
+                const wt = toks[wi];
+                const wr = wt.role || 'text';
+                const wtl = currentLang === 'nl' ? (wt.nl || wt.en || '') : (wt.en || '');
+                html += `<span class="token-wrap" data-role="${wr}" data-en="${esc(wt.en || '')}" data-nl="${esc(wt.nl || '')}" data-detail="${esc(wt.detail || '')}" data-text="${esc(wt.text)}">`;
+                html += `<span class="token role-${wr} cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(wt.text)}</span>`;
+                if (wtl && !['text', 'unknown', 'damage', 'damage_note', 'ruling', 'metadata', 'section_header', 'line_number', 'year_text'].includes(wr)) {
+                  html += `<span class="token-tl cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(wtl)}</span>`;
+                }
+                html += `</span>`;
+              }
+              html += `</span>`;
+              ti = endIdx;
+              continue;
+            }
+          }
+
           html += `<span class="token-wrap" data-role="${r}" data-en="${esc(tok.en || '')}" data-nl="${esc(tok.nl || '')}" data-detail="${esc(tok.detail || '')}" data-text="${esc(tok.text)}">`;
-          html += `<span class="token role-${r}">${esc(tok.text)}</span>`;
+          html += `<span class="token role-${r} cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(tok.text)}</span>`;
           if (tl && !['text', 'unknown', 'damage', 'damage_note', 'ruling', 'metadata', 'section_header', 'line_number', 'year_text'].includes(r)) {
-            html += `<span class="token-tl">${esc(tl)}</span>`;
+            html += `<span class="token-tl cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(tl)}</span>`;
           }
           html += `</span>`;
+          ti++;
         }
         html += `</span>`;
+        animIdx++;
       }
       html += `</div></div>`;
       main.innerHTML = html;
@@ -2082,29 +2450,28 @@
       const ext = data.extraction;
       let html = `<div class="fade-in">`;
 
-      // Stat cards
-      const matchIcon = ext.edge_total > 0 && ext.edge_total === ext.total_animals ? ' &#10003;' : '';
+      // Stat cards — animals card now shows edge total inline
+      const edgeMatch = ext.edge_total > 0 && ext.edge_total === ext.total_animals;
+      const edgeBadge = ext.edge_total > 0
+        ? `<span style="font-size:9px;color:${edgeMatch ? 'var(--c-animal)' : 'var(--c-transaction)'};opacity:0.7;margin-left:2px;">${edgeMatch ? '&#10003;' : '&#x2260;'}${ext.edge_total}</span>`
+        : '';
+      // Date display: show translated month name
+      const MONTH_EN = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV', 5: 'V', 6: 'VI', 7: 'VII', 8: 'VIII', 9: 'IX', 10: 'X', 11: 'XI', 12: 'XII' };
+      const monthNum = ext.month_number || null;
+      const dateStr = monthNum
+        ? `Month ${MONTH_EN[monthNum] || monthNum}${ext.day ? ', Day ' + ext.day : ''}`
+        : (ext.month ? ext.month + (ext.day ? ' D' + ext.day : '') : '—');
+
       html += `<h3>Extraction</h3><div class="stat-grid">
         <div class="stat-card fade-in-up stagger-1" data-hover="animals" style="position:relative;">
-          <div class="label">Animals</div>
+          <div class="label">Animals${edgeBadge}</div>
           <div class="value" style="color:var(--c-animal);">${ext.total_animals}</div>
           ${buildAnimalPopup(ext)}
         </div>
-        <div class="stat-card fade-in-up stagger-2" data-hover="edge"><div class="label">Edge Total${matchIcon}</div><div class="value" style="color:${ext.edge_total > 0 ? (ext.edge_total === ext.total_animals ? 'var(--c-animal)' : 'var(--c-transaction)') : 'var(--text-dim)'};">${ext.edge_total || '—'}</div></div>
-        <div class="stat-card fade-in-up stagger-3"><div class="label">Transaction</div><div class="value" style="color:var(--c-transaction);font-size:12px;">${ext.transaction_type || '—'}</div></div>
-        <div class="stat-card fade-in-up stagger-4"><div class="label">Date</div><div class="value" style="font-size:12px;color:var(--c-month);">${ext.month ? `M${ext.month}` : '—'}${ext.day ? ` D${ext.day}` : ''}</div></div>
+        <div class="stat-card fade-in-up stagger-2"><div class="label">Transaction</div><div class="value" style="color:var(--c-transaction);font-size:12px;">${ext.transaction_type || '—'}</div></div>
+        <div class="stat-card fade-in-up stagger-3"><div class="label">Date</div><div class="value" style="font-size:11px;color:var(--c-month);">${dateStr}</div></div>
+        <div class="stat-card fade-in-up stagger-4"><div class="label">Confidence</div><div class="value" style="font-size:12px;color:${ext.confidence === 'high' ? 'var(--c-animal)' : ext.confidence === 'medium' ? 'var(--c-deity)' : 'var(--c-transaction)'};">${ext.confidence}</div></div>
       </div>`;
-
-      // Edge total bar
-      if (ext.edge_total > 0 && ext.total_animals > 0) {
-        const mx = Math.max(ext.edge_total, ext.total_animals);
-        const match = ext.edge_total === ext.total_animals;
-        html += `<div style="margin:6px 0 10px;">
-          <div style="font-size:10px;color:var(--text-dim);margin-bottom:3px;">Extracted vs. scribe's edge total</div>
-          <div class="total-compare"><span style="color:var(--c-animal);font-weight:700;width:35px;text-align:right;">${ext.total_animals}</span><div class="total-bar"><div class="total-bar-fill" style="width:${Math.round(ext.total_animals / mx * 100)}%;background:${match ? 'var(--c-animal)' : 'var(--c-transaction)'};"></div></div></div>
-          <div class="total-compare"><span style="color:var(--text-dim);font-weight:700;width:35px;text-align:right;">${ext.edge_total}</span><div class="total-bar"><div class="total-bar-fill" style="width:${Math.round(ext.edge_total / mx * 100)}%;background:var(--text-dim);opacity:0.3;"></div></div></div>
-        </div>`;
-      }
 
       // Persons
       if (ext.persons?.length) {
@@ -2158,7 +2525,7 @@
         const translated = ext.divine_recipients_translated;
         if (translated?.length) {
           for (const d of translated) {
-            const trans = useDutch ? (d.nl || d.en) : (d.en || d.name);
+            const trans = currentLang === 'nl' ? (d.nl || d.en) : (d.en || d.name);
             html += `<div class="extraction-item"><div class="value" style="color:var(--c-deity);">${esc(d.name)}</div>`;
             if (trans && trans !== d.name) html += `<div class="item-sub">${esc(trans)}</div>`;
             html += `</div>`;
@@ -2356,12 +2723,59 @@
       const lineData = lineEl.dataset.lidx != null ? currentData?.lines?.find(l => l.line_idx === parseInt(lineEl.dataset.lidx)) : null;
       const lineType = lineData?.type || '';
 
-      if (role === 'animal' || role === 'qualifier') {
-        const card = document.querySelector('[data-hover="animals"]');
-        if (card) { card.classList.add('panel-highlight'); drawConnectionLine(tokenEl, card); }
-      } else if (role === 'numeral' && (lineType === 'content' || lineType === 'summary')) {
-        const card = document.querySelector('[data-hover="animals"]');
-        if (card) { card.classList.add('panel-highlight'); drawConnectionLine(tokenEl, card); }
+      if (role === 'animal' || role === 'qualifier' || (role === 'numeral' && (lineType === 'content' || lineType === 'summary'))) {
+        let matched = false;
+        if (lineData && lineData.links) {
+          const animalLinks = lineData.links.filter(l => l.target === 'animals');
+          let linkToUse = animalLinks[0];
+
+          if (animalLinks.length > 1) {
+            const tokens = Array.from(lineEl.querySelectorAll('.token-wrap'));
+            const myIndex = tokens.indexOf(tokenEl.closest('.token-wrap') || tokenEl);
+            let closestAnimalName = '';
+            for (let i = myIndex; i < tokens.length; i++) {
+              if (tokens[i].dataset.role === 'animal' && tokens[i].dataset.text) {
+                closestAnimalName = tokens[i].dataset.text.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+                break;
+              }
+            }
+            if (!closestAnimalName) {
+              for (let i = myIndex; i >= 0; i--) {
+                if (tokens[i].dataset.role === 'animal' && tokens[i].dataset.text) {
+                  closestAnimalName = tokens[i].dataset.text.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase();
+                  break;
+                }
+              }
+            }
+            if (closestAnimalName && currentData && currentData.extraction && currentData.extraction.animals) {
+              const matchedLinks = animalLinks.filter(l => currentData.extraction.animals[l.index] && (currentData.extraction.animals[l.index].animal.includes(closestAnimalName) || closestAnimalName.includes(currentData.extraction.animals[l.index].animal)));
+              if (matchedLinks.length > 0) {
+                const sameAnimTokens = tokens.filter(wrap => wrap.dataset.role === 'animal' && wrap.dataset.text.replace(/[^a-zA-Z0-9-]/g, '').toLowerCase() === closestAnimalName);
+                if (sameAnimTokens.length > 1) {
+                  const relativeIdx = sameAnimTokens.indexOf(tokens[myIndex].dataset.role === 'animal' ? tokens[myIndex] : sameAnimTokens.reduce((p, c) => Math.abs(tokens.indexOf(c) - myIndex) < Math.abs(tokens.indexOf(p) - myIndex) ? c : p));
+                  linkToUse = matchedLinks[relativeIdx] || matchedLinks[0];
+                } else {
+                  linkToUse = matchedLinks[0];
+                }
+              }
+            }
+          }
+
+          if (linkToUse) {
+            const subrow = document.querySelector(`.animal-subrow[data-aidx="${linkToUse.index}"]`);
+            const group = subrow ? subrow.closest('.animal-group') : null;
+            if (subrow) {
+              if (group && !group.classList.contains('expanded')) group.classList.add('expanded');
+              subrow.classList.add('panel-highlight');
+              drawConnectionLine(tokenEl, subrow);
+              matched = true;
+            }
+          }
+        }
+        if (!matched) {
+          const card = document.querySelector('[data-hover="animals"]');
+          if (card) { card.classList.add('panel-highlight'); drawConnectionLine(tokenEl, card); }
+        }
       } else if (role === 'person' || role === 'title') {
         const name = tokenEl.dataset.detail || tokenEl.dataset.text;
         document.querySelectorAll('[data-drill="person"]').forEach(el => {
@@ -2395,27 +2809,34 @@
 
     function clearConnectionLine() { document.getElementById('connectionSvg').innerHTML = ''; }
 
-    // ---- Legend filter ----
+    // ---- Legend filter (multi-select) ----
     function toggleRoleFilter(role) {
       const trans = document.getElementById('transliteration');
       if (!trans) return;
-      if (activeRoleFilter === role) {
-        activeRoleFilter = null;
+      if (activeRoleFilters.has(role)) {
+        activeRoleFilters.delete(role);
+      } else {
+        activeRoleFilters.add(role);
+      }
+      if (activeRoleFilters.size === 0) {
         trans.classList.remove('role-filtered');
         trans.querySelectorAll('.token-wrap').forEach(t => t.classList.remove('role-highlight'));
         document.querySelectorAll('#legend .legend-item').forEach(el => el.classList.remove('active'));
       } else {
-        activeRoleFilter = role;
         trans.classList.add('role-filtered');
-        trans.querySelectorAll('.token-wrap').forEach(t => t.classList.toggle('role-highlight', t.dataset.role === role));
-        document.querySelectorAll('#legend .legend-item').forEach(el => el.classList.toggle('active', el.dataset.role === role));
+        trans.querySelectorAll('.token-wrap').forEach(t => {
+          t.classList.toggle('role-highlight', activeRoleFilters.has(t.dataset.role));
+        });
+        document.querySelectorAll('#legend .legend-item').forEach(el => {
+          el.classList.toggle('active', activeRoleFilters.has(el.dataset.role));
+        });
       }
     }
 
     function clearRoleFilter() {
       const trans = document.getElementById('transliteration');
-      if (!trans || !activeRoleFilter) return;
-      activeRoleFilter = null;
+      if (!trans || activeRoleFilters.size === 0) return;
+      activeRoleFilters.clear();
       trans.classList.remove('role-filtered');
       trans.querySelectorAll('.token-wrap').forEach(t => t.classList.remove('role-highlight'));
       document.querySelectorAll('#legend .legend-item').forEach(el => el.classList.remove('active'));
@@ -2604,10 +3025,29 @@
     function openImg(src) { document.getElementById('imgModalSrc').src = src; document.getElementById('imgModal').classList.add('visible'); }
     function copyText() {
       if (!currentData) return;
-      const text = currentData.lines.filter(l => l.type !== 'structural' && l.type !== 'metadata').map(l => {
-        return l.tokens.map(t => t.text).join(' ');
-      }).join('\\n');
-      navigator.clipboard.writeText(text).then(() => {
+      const parts = [];
+      parts.push(`&P${currentData.tablet_id}`);
+      let lastSection = '';
+      for (const line of currentData.lines) {
+        if (line.section !== lastSection) {
+          lastSection = line.section;
+          const sectionTag = '@' + line.section.replace('_', ' ');
+          parts.push(sectionTag);
+        }
+        if (line.type === 'metadata') continue;
+        if (line.tokens.length === 1 && ['section_header', 'damage_note', 'ruling'].includes(line.tokens[0].role)) {
+          parts.push(line.raw);
+          continue;
+        }
+        const tokenTexts = line.tokens.filter(t => t.role !== 'line_number').map(t => t.text).join(' ');
+        const lineNum = line.tokens.find(t => t.role === 'line_number');
+        if (lineNum) {
+          parts.push(`${lineNum.text} ${tokenTexts}`);
+        } else if (tokenTexts.trim()) {
+          parts.push(tokenTexts);
+        }
+      }
+      navigator.clipboard.writeText(parts.join('\n')).then(() => {
         const btn = document.querySelector('.tablet-links button');
         const orig = btn.textContent; btn.textContent = 'Copied!'; setTimeout(() => btn.textContent = orig, 1500);
       });
@@ -2656,8 +3096,28 @@
       const btn = document.getElementById('btnLang');
       btn.textContent = currentLang.toUpperCase();
       btn.title = currentLang === 'en' ? 'Showing English — click for Dutch' : 'Showing Dutch — click for English';
+      updateStaticTranslations();
       if (currentData) { renderTablet(currentData); renderPanel(currentData); }
     });
+
+    function updateStaticTranslations() {
+      // Setup subtitle
+      const subtitle = document.getElementById('welcomeSubtitle');
+      if (subtitle) {
+        subtitle.innerHTML = currentLang === 'nl'
+          ? 'Geautomatiseerde extractie en semantische annotatie van Ur III administratieve tabletten uit het Drehem corpus'
+          : 'Automated extraction and semantic annotation of Ur III administrative tablets from the Drehem corpus';
+      }
+
+      // Update buttons and headers with data-en/data-nl
+      document.querySelectorAll('[data-en][data-nl]').forEach(el => {
+        el.innerHTML = currentLang === 'nl' ? el.getAttribute('data-nl') : el.getAttribute('data-en');
+      });
+    }
+
+    // Call once on load
+    updateStaticTranslations();
+
     document.getElementById('btnHelp').addEventListener('click', () => document.getElementById('helpModal').classList.toggle('visible'));
     document.getElementById('helpModal').addEventListener('click', e => { if (e.target === e.currentTarget) e.currentTarget.classList.remove('visible'); });
     document.getElementById('imgModal').addEventListener('click', () => document.getElementById('imgModal').classList.remove('visible'));
@@ -2666,6 +3126,7 @@
 
     document.addEventListener('keydown', e => {
       if (e.target.tagName === 'INPUT') { if (e.key === 'Escape') e.target.blur(); return; }
+      if (e.metaKey || e.ctrlKey) return;
       switch (e.key) {
         case 'ArrowLeft': case 'j': document.getElementById('btnPrev').click(); break;
         case 'ArrowRight': case 'k': document.getElementById('btnNext').click(); break;
