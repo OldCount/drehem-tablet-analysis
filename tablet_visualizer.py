@@ -62,6 +62,11 @@ TRANSLATIONS = {
     "kunga2-nita2": ("male equid", "mannelijke ezel"),
     "|U8+HUL2|": ("sheep (composite)", "schaap (samengesteld)"),
     "kun-gid2": ("fat-tailed sheep", "vetstaartschaap"),
+    "dusu2-nita2": ("male donkey", "mannelijke ezel"),
+    "dusu2-munus": ("female donkey", "vrouwelijke ezel"),
+    "dusu2": ("donkey", "ezel"),
+    "dur3": ("young male donkey", "jonge mannelijke ezel"),
+    "eme6": ("female donkey", "vrouwelijke ezel"),
     # Qualifiers
     "niga": ("fattened", "vetgemest"),
     "u2": ("grass-fed", "grasgevoerd"),
@@ -76,12 +81,22 @@ TRANSLATIONS = {
     "ba-usz2": ("dead", "dood"),
     "ba-ug7": ("dead", "dood"),
     "usz2": ("dead", "dood"),
+    "saga": ("fine/good quality", "fijn/goede kwaliteit"),
     # Transaction types
-    "mu-kux(DU)": ("delivery (incoming)", "levering (inkomend)"),
+    "mu-kux(du)": ("delivery (incoming)", "levering (inkomend)"),
+    "mu-kux": ("delivery (incoming)", "levering (inkomend)"),
     "ba-zi": ("expenditure (outgoing)", "uitgave (uitgaand)"),
     "i3-dab5": ("transfer (took over)", "overdracht (overgenomen)"),
     "szu": ("hand", "hand"),
     "ba-ti": ("received", "ontvangen"),
+    "szu ba-ti": ("to accept / to receive", "accepteren / ontvangen"),
+    "zi-ga": ("expenditure (outgoing)", "uitgave (uitgaand)"),
+    "lulim-munus": ("female red deer/stag", "vrouwelijk edelhert/hinde"),
+    "diri": ("extra / surplus", "extra / overschot"),
+    "nig2-diri": ("extra / surplus", "extra / overschot"),
+    "e2-u4-1(u)-5(disz)": ("house of the 15th day (full moon)", "huis van de 15e dag (volle maan)"),
+    "e2 u4-sakar": ("house of the crescent moon", "huis van de wassende maan"),
+    "e2-u4-sakar": ("house of the crescent moon", "huis van de wassende maan"),
     # Role markers
     "ki": ("place / from", "plaats / van"),
     "giri3": ("via (intermediary)", "via (tussenpersoon)"),
@@ -138,12 +153,18 @@ TRANSLATIONS = {
     "nagar": ("carpenter", "timmerman"),
     "aga3-us2": ("soldier", "soldaat"),
     "lu2-kin-gi4-a": ("messenger", "boodschapper"),
+    "deliverer": ("deliverer", "leveraar"),
+    "commissioner": ("commissioner", "commissaris"),
+    "receiver": ("receiver", "ontvanger"),
+    "intermediary": ("intermediary", "tussenpersoon"),
+    "sealer": ("sealer", "bezegelaar"),
+    "source": ("source", "bron"),
     # Common non-animal terms
     "ensi2": ("governor", "gouverneur"),
     "sukkal": ("minister", "minister"),
     "szagina": ("general", "generaal"),
     "lugal": ("king", "koning"),
-    "e2": ("house/temple", "huis/tempel"),
+    "e2": ("house/temple", "geen vertaling"),
     "dingir": ("god", "god"),
     "en": ("lord/priest", "heer/priester"),
     "a-ba": ("father", "vader"),
@@ -155,8 +176,20 @@ TRANSLATIONS = {
     "a-sza3-ga": ("field/meadow", "veld/weide"),
     "nu2-a": ("lying down/mating", "liggend/parend"),
     "kaskal": ("journey/expedition", "reis/expeditie"),
-    "sza3": ("heart/inside", "hart/binnenin"),
-    "bala": ("rotating office", "roterend kantoor"),
+    "sza3": ("in/at (location)", "in/bij (locatie)"),
+    "bala": ("bala-tax/rotating obligation", "bala-belasting/roterende verplichting"),
+    "u3-tu-da": ("offspring/newborn", "nageslacht/pasgeboren"),
+    "e2-udu": ("sheephouse", "schapenhuis"),
+    "e2-udu-sag": ("sheephouse", "schapenhuis"),
+    "e2-udu-ka": ("sheephouse", "schapenhuis"),
+    "tummal": ("Tummal (sacred site)", "Tummal (heilige plaats)"),
+    "la2": ("minus", "min"),
+    "dub-la2-mah": ("Dublamah (great binding place)", "Dublamah (grote bindplaats)"),
+    "e2-uz-ga": ("royal warehouse", "koninklijk magazijn"),
+    "uzu": ("meat", "vlees"),
+    "uzu-a": ("cooked meat", "gekookt vlees"),
+    "ka-izi": ("roasting (mouth of fire)", "roosteren (mond van vuur)"),
+    "ka-izi-sze3": ("for roasting", "om te roosteren"),
 }
 
 # Dutch month translations
@@ -167,10 +200,14 @@ MONTH_TRANSLATIONS_NL = {
 }
 
 TRANSACTION_KEYWORDS = {
-    "mu-kux(DU)": "delivery",
+    "mu-kux(du)": "delivery",
+    "mu-kux(du)-ra-ta": "delivery",
+    "mu-kux(du)-ra": "delivery",
+    "mu-kux": "delivery",
     "ba-zi": "expenditure",
     "i3-dab5": "transfer",
-    "szu ba-ti": "receipt",
+    "szu ba-ti": "to accept",
+    "zi-ga": "expenditure",
 }
 
 ROLE_KEYWORDS = {
@@ -179,6 +216,8 @@ ROLE_KEYWORDS = {
     "giri3": "intermediary_marker",
     "maszkim": "commissioner_marker",
     "kiszib3": "sealer_marker",
+    "sza3": "location_marker",
+    "-sze3": "destination_suffix",
 }
 
 STRUCTURAL_KEYWORDS = {
@@ -189,9 +228,34 @@ STRUCTURAL_KEYWORDS = {
     "nig2-dab5": "provisions",
     "iti": "month_marker",
     "u4": "day_marker",
+    "u3-tu-da": "offspring/newborn",
+    "bala": "bala-tax",
 }
 # Note: "mu" removed — it's only structural at the START of year-name lines.
 # In other positions it means "for" (dative) or is part of person names.
+
+TEMPLE_NAMES = {
+    "dub-la2-mah": "Dublamah (great binding place)",
+}
+
+DESTINATION_TERMS = {
+    "e2-muhaldim": "kitchen",
+    "e2-kiszib3-ba": "warehouse",
+    "e2-gal": "palace",
+    "e2-gal-la": "palace",
+    "e2-uz-ga": "royal warehouse",
+    "e2-udu": "sheephouse",
+    "e2-udu-sag": "sheephouse",
+    "e2-udu-ka": "sheephouse",
+    "e2-udu-niga": "fattening-house",
+    "aga3-us2-e-ne": "soldiers",
+    "kas4-ke4-ne": "runners",
+    "du6-ku3": "sacred-site",
+    "du6-ku3-ga": "sacred-site",
+    "e2-u4-1(u)-5(disz)": "15th-day-house",
+    "e2 u4-sakar": "crescent-moon-house",
+    "e2-u4-sakar": "crescent-moon-house",
+}
 
 DEITY_PREFIX = "{d}"
 ALL_OFFICIALS = set(k.lower() for k in OFFICIALS_TO_OFFICE)
@@ -203,6 +267,7 @@ QUALIFIERS = {
     "masz2": "billy goat", "sila4": "lamb", "gal": "large",
     "tur": "small/young", "amar": "calf/young",
     "ba-usz2": "dead", "ba-ug7": "dead", "usz2": "dead",
+    "saga": "fine/good quality",
 }
 
 # Role explanation patterns for the "why" drill-down
@@ -233,6 +298,12 @@ def get_translation(token_clean, role):
     return en, nl
 
 
+def _normalize_mukux(token: str) -> str:
+    """Normalize mu-kux variants to canonical lowercase form."""
+    token = token.replace("ku\u2093", "kux")
+    return re.sub(r"mu-kux?\(du\)", "mu-kux(du)", token, flags=re.IGNORECASE)
+
+
 def _matches_transaction_keyword(token_clean: str, tokens: list[str], idx: int) -> bool:
     """Return True if token at idx starts a transaction keyword match.
 
@@ -240,13 +311,13 @@ def _matches_transaction_keyword(token_clean: str, tokens: list[str], idx: int) 
     such as 'ba-ti' inside 'ba-ba-ti' matching the second word of 'szu ba-ti'.
     """
     from drehem_extract import strip_atf_damage as _sad
+    tc = _normalize_mukux(token_clean)
     for kw in TRANSACTION_KEYWORDS:
         parts = kw.split()
-        if token_clean == parts[0]:
-            # single-token keyword: always a match
+        first = parts[0]
+        if tc == first or token_clean == first:
             if len(parts) == 1:
                 return True
-            # multi-token keyword: check subsequent tokens
             match = True
             for j, part in enumerate(parts[1:], start=1):
                 if idx + j >= len(tokens):
@@ -263,9 +334,11 @@ def _matches_transaction_keyword(token_clean: str, tokens: list[str], idx: int) 
 def _get_transaction_keyword(token_clean: str, tokens: list[str], idx: int) -> str | None:
     """Return the matched transaction keyword string, or None."""
     from drehem_extract import strip_atf_damage as _sad
+    tc = _normalize_mukux(token_clean)
     for kw in TRANSACTION_KEYWORDS:
         parts = kw.split()
-        if token_clean != parts[0]:
+        first = parts[0]
+        if tc != first and token_clean != first:
             continue
         if len(parts) == 1:
             return kw
@@ -277,6 +350,59 @@ def _get_transaction_keyword(token_clean: str, tokens: list[str], idx: int) -> s
         if match:
             return kw
     return None
+
+
+_oracc_dict = None
+
+def _load_oracc_dict():
+    global _oracc_dict
+    if _oracc_dict is not None:
+        return _oracc_dict
+    path = BASE_DIR / "oracc_name_dictionary.json"
+    if path.exists():
+        with open(path, "r", encoding="utf-8") as f:
+            raw = json.load(f)
+            _oracc_dict = {k.replace("ku\u2093", "kux"): v for k, v in raw.items()}
+    else:
+        _oracc_dict = {}
+    return _oracc_dict
+
+
+def _oracc_lookup(token: str) -> dict | None:
+    """Check if token is a known name in the ORACC dictionary."""
+    d = _load_oracc_dict()
+    if not d:
+        return None
+    # Try exact match first
+    if token in d:
+        return d[token]
+    # Try stripping case suffixes
+    for suf in ("-ta", "-sze3", "-ra", "-ke4", "-ka", "-kam", "-me"):
+        if token.endswith(suf) and token[:-len(suf)] in d:
+            return d[token[:-len(suf)]]
+    return None
+
+
+_oracc_glossary = None
+
+def _load_oracc_glossary():
+    global _oracc_glossary
+    if _oracc_glossary is not None:
+        return _oracc_glossary
+    path = BASE_DIR / "oracc_glossary.json"
+    _oracc_glossary = {}
+    if path.exists():
+        with open(path, "r", encoding="utf-8") as f:
+            glossary_data = json.load(f)
+            # Flatten the forms so any text token maps directly to its parent meaning/pos
+            for entry in glossary_data:
+                meaning = entry.get("meaning", "")
+                pos = entry.get("pos", "")
+                for form in entry.get("forms", []):
+                    atf = form.get("atf", "").lower().replace("ku\u2093", "kux")
+                    if atf and atf not in _oracc_glossary:
+                        _oracc_glossary[atf] = {"meaning": meaning, "pos": pos}
+    return _oracc_glossary
 
 
 def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
@@ -292,7 +418,18 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
     for p in result.persons:
         n = p.name.lower().strip()
         person_names.add(n)
-        person_roles[n] = p.role
+        r_en, r_nl = get_translation(p.role, "text")
+        role_en = r_en or p.role
+        role_nl = r_nl or r_en or p.role
+        
+        detail_en = role_en
+        detail_nl = role_nl
+        if p.title:
+            t_en, t_nl = get_translation(p.title, "text")
+            detail_en += f" ({t_en or p.title})"
+            detail_nl += f" ({t_nl or t_en or p.title})"
+        
+        person_roles[n] = {"en": detail_en, "nl": detail_nl}
 
     # Build animal line index: exact match on cleaned raw text → animal indices
     from collections import defaultdict
@@ -391,16 +528,53 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
             annotated_tokens.append({"text": line_num, "role": "line_number", "en": "", "nl": ""})
 
         i = 0
+        _prev_tx_continuation = None  # track multi-token keyword continuation
         while i < len(tokens_raw):
             token = tokens_raw[i]
             token_clean = strip_atf_damage(token).lower()
             role = "unknown"
             detail = ""
 
+            # Explicitly separate -ta and -sze3 suffixes so they render alongside structural lines correctly
+            suf = ""
+            if token_clean.endswith("-ta") and token_clean != "-ta": suf = "-ta"
+            elif token_clean.endswith("-sze3") and token_clean != "-sze3": suf = "-sze3"
+            
+            if suf and _normalize_mukux(token_clean) not in TRANSACTION_KEYWORDS:
+                prefix = token_clean[:-len(suf)]
+                if (prefix in person_names or prefix in ALL_OFFICIALS or prefix in STRUCTURAL_KEYWORDS or
+                    prefix in DESTINATION_TERMS or _oracc_lookup(prefix) or len(prefix) > 3):
+                    last_hyphen = token.rfind("-")
+                    if last_hyphen != -1:
+                        tokens_raw[i] = token[:last_hyphen]
+                        tokens_raw.insert(i + 1, token[last_hyphen:])
+                        token = tokens_raw[i]
+                        token_clean = strip_atf_damage(token).lower()
+
+            # Check if this token is part of a multi-token transaction keyword
+            if _prev_tx_continuation and token_clean == _prev_tx_continuation[0]:
+                role = "transaction"
+                detail = _prev_tx_continuation[1]
+                _prev_tx_continuation = None
+                en, nl = get_translation(token_clean, role)
+                if not en and detail:
+                    en = detail
+                annotated_tokens.append({
+                    "text": token, "role": role, "detail": detail,
+                    "en": en, "nl": nl,
+                })
+                i += 1
+                continue
+            _prev_tx_continuation = None
+
             if NUMERAL_PATTERN.match(token_clean):
                 val = parse_numeral(token_clean)
                 role = "numeral"
                 detail = str(val)
+
+            elif token_clean == "la2":
+                role = "numeral"
+                detail = "minus"
 
             elif token_clean in ANIMAL_TERMS:
                 role = "animal"
@@ -410,15 +584,14 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 role = "qualifier"
                 detail = QUALIFIERS[token_clean]
 
-            elif any(token_clean == k or content[content.find(token):].startswith(k) for k in TRANSACTION_KEYWORDS):
-                matched_tx = None
-                for k in TRANSACTION_KEYWORDS:
-                    if token_clean == k.split()[0] if " " in k else token_clean == k:
-                        matched_tx = k
-                        break
+            elif _matches_transaction_keyword(_normalize_mukux(token_clean), tokens_raw, i):
+                matched_tx = _get_transaction_keyword(_normalize_mukux(token_clean), tokens_raw, i)
                 if matched_tx:
                     role = "transaction"
                     detail = TRANSACTION_KEYWORDS[matched_tx]
+                    parts = matched_tx.split()
+                    if len(parts) > 1:
+                        _prev_tx_continuation = (parts[1], detail)
                 else:
                     role = "text"
 
@@ -455,13 +628,17 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 role = "month"
                 detail = f"month {MONTH_NAMES[token_clean]}"
 
-            elif token_clean in person_names:
+            elif token_clean in TEMPLE_NAMES:
+                role = "structural_keyword"
+                detail = f"temple: {TEMPLE_NAMES[token_clean]}"
+
+            elif token_clean in person_names and token_clean not in TEMPLE_NAMES:
                 role = "person"
-                detail = person_roles.get(token_clean, "")
+                detail = person_roles.get(token_clean, {}).get("en", "")
             elif any(token_clean.startswith(pn + "-") or token_clean.startswith(pn) for pn in person_names if len(pn) > 3 and token_clean.startswith(pn)):
                 matched_pn = next(pn for pn in person_names if token_clean.startswith(pn) and len(pn) > 3)
                 role = "person"
-                detail = person_roles.get(matched_pn, "") + f" ({matched_pn})"
+                detail = person_roles.get(matched_pn, {}).get("en", "") + f" ({matched_pn})"
             elif any(pn in cleaned_lower and token_clean in pn.split("-") for pn in person_names):
                 # If token is part of a multi-part person name that exists on this line, tag it as person_part
                 matched_pn = next(pn for pn in person_names if pn in cleaned_lower and token_clean in pn.split("-"))
@@ -478,24 +655,18 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 role = "person"
                 detail = f"official ({label}, {matched_o})"
 
-            elif _matches_transaction_keyword(token_clean, tokens_raw, i):
-                matched_tx = _get_transaction_keyword(token_clean, tokens_raw, i)
-                if matched_tx:
-                    role = "transaction"
-                    detail = TRANSACTION_KEYWORDS[matched_tx]
-                    # Skip extra tokens consumed by multi-token keywords
-                    i += len(matched_tx.split()) - 1
-                else:
-                    role = "text"
 
             elif token_clean in STRUCTURAL_KEYWORDS:
                 role = "structural_keyword"
                 detail = STRUCTURAL_KEYWORDS[token_clean]
 
             elif DEITY_PREFIX in token:
-                # Deities inside year-name lines are NOT divine recipients
-                # — they are part of royal/year formulae (e.g. mu {d}szu-{d}suen ...)
-                if cleaned_lower.startswith("mu ") and any(
+                # First check if it's actually a known personal name that happens to be theophoric
+                oracc = _oracc_lookup(token_clean)
+                if oracc and oracc.get("pos") == "PN":
+                    role = "person"
+                    detail = oracc.get("canonical", token_clean)
+                elif cleaned_lower.startswith("mu ") and any(
                     t.get("role") == "structural_keyword" and t.get("detail") == "year_marker"
                     for t in annotated_tokens
                 ):
@@ -514,7 +685,7 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                     role = "measure"
                     detail = "non-animal commodity"
 
-            elif token_clean in ("ki", "giri3", "maszkim", "kiszib3"):
+            elif token_clean in ("ki", "giri3", "maszkim", "kiszib3", "sza3", "-ta", "-sze3"):
                 role = "role_marker"
                 detail = ROLE_KEYWORDS.get(token_clean, "")
 
@@ -530,14 +701,56 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 role = "summary_marker"
                 detail = "grand total"
 
+            elif token_clean in DESTINATION_TERMS:
+                role = "structural_keyword"
+                detail = f"destination: {DESTINATION_TERMS[token_clean]}"
+
+            elif "{ki}" in token_clean:
+                role = "structural_keyword"
+                city = token_clean.replace("{ki}", "")
+                detail = f"place: {city}"
+
             elif token in ("x", "...") or token.startswith("[") or token.endswith("]") or token == "[...]":
                 role = "damage"
                 detail = "broken/illegible"
 
             if role == "unknown":
-                role = "text"
+                # ORACC dictionary fallback: recognize personal/geographic/divine names
+                oracc = _oracc_lookup(token_clean)
+                if oracc and oracc.get("pos") == "PN":
+                    role = "person"
+                    detail = oracc.get("canonical", token_clean)
+                elif oracc and oracc.get("pos") == "DN":
+                    role = "deity"
+                    detail = oracc.get("canonical", token_clean)
+                elif oracc and oracc.get("pos") in ("GN", "SN"):
+                    role = "structural_keyword"
+                    detail = f"place: {oracc.get('canonical', token_clean)}"
+                else:
+                    glossary_lookup = _load_oracc_glossary()
+                    if token_clean in glossary_lookup:
+                        entry = glossary_lookup[token_clean]
+                        role = "glossary_term"
+                        detail = entry.get("meaning", "known term")
+                    else:
+                        role = "text"
 
             en, nl = get_translation(token_clean, role)
+            
+            # Special override for persons to include their translated roles
+            if role == "person":
+                for pn in person_names:
+                    if pn in token_clean:
+                        pr = person_roles.get(pn, {})
+                        if pr:
+                            if "part of" in detail:
+                                en = f"part of {pn} ({pr.get('en', '')})"
+                                nl = f"deel van {pn} ({pr.get('nl', '')})"
+                            else:
+                                en = pr.get("en", en)
+                                nl = pr.get("nl", nl)
+                        break
+
             # For roles with detail, use detail as English if no dict entry
             if not en and detail:
                 en = detail
@@ -631,6 +844,9 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
             "nl": nl or f"god {d_clean}",
         })
         
+    summary = _build_plain_summary(result, animals_summary, persons_summary,
+                                     divine_recips, edge_total)
+
     return {
         "tablet_id": tablet_id,
         "lines": annotated_lines,
@@ -641,6 +857,7 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
             "animals": animals_summary,
             "persons": persons_summary,
             "month": result.month,
+            "month_number": getattr(result, 'month_number', None),
             "day": result.day,
             "year": result.year,
             "has_summary_line": result.has_summary_line,
@@ -650,8 +867,108 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
             "divine_recipients_translated": divine_recips,
             "destination": result.destination,
         },
+        "summary": summary,
         "issues": issues,
     }
+
+
+def _build_plain_summary(result, animals_summary, persons_summary,
+                         divine_recips, edge_total):
+    """Generate a plain-language English + Dutch summary of the tablet."""
+    tx = result.transaction_type or "unknown transaction"
+    tx_map = {
+        "delivery": "records a delivery of",
+        "expenditure": "records an expenditure of",
+        "to accept": "records the acceptance of",
+        "transfer": "records a transfer of",
+        "royal_delivery": "records a royal delivery of",
+        "sub_disbursement": "records a sub-disbursement of",
+        "regular_offering": "records regular offerings of",
+        "birth_record": "records the birth of",
+    }
+    tx_map_nl = {
+        "delivery": "beschrijft een levering van",
+        "expenditure": "beschrijft een uitgave van",
+        "to accept": "beschrijft de acceptatie van",
+        "transfer": "beschrijft een overdracht van",
+        "royal_delivery": "beschrijft een koninklijke levering van",
+        "sub_disbursement": "beschrijft een sub-uitgifte van",
+        "regular_offering": "beschrijft reguliere offergaven van",
+        "birth_record": "beschrijft de geboorte van",
+    }
+    tx_en = tx_map.get(tx, f"records a {tx} involving")
+    tx_nl = tx_map_nl.get(tx, f"beschrijft een {tx} van")
+
+    # Animal description
+    animal_parts_en = []
+    animal_parts_nl = []
+    for a in animals_summary:
+        name_en = a.get("en") or a["animal"]
+        name_nl = a.get("nl") or a["animal"]
+        q = ", ".join(a.get("qualifiers", []))
+        animal_parts_en.append(f"{a['count']} {name_en}" + (f" ({q})" if q else ""))
+        animal_parts_nl.append(f"{a['count']} {name_nl}" + (f" ({q})" if q else ""))
+
+    if animal_parts_en:
+        animals_en = ", ".join(animal_parts_en[:5])
+        animals_nl = ", ".join(animal_parts_nl[:5])
+        if len(animal_parts_en) > 5:
+            animals_en += f" and {len(animal_parts_en) - 5} more entries"
+            animals_nl += f" en {len(animal_parts_nl) - 5} meer"
+    else:
+        animals_en = "animals (details unclear)"
+        animals_nl = "dieren (details onduidelijk)"
+
+    # Persons
+    source = next((p for p in persons_summary if p["role"] == "source"), None)
+    receiver = next((p for p in persons_summary if p["role"] == "receiver"), None)
+    intermediary = next((p for p in persons_summary if p["role"] == "intermediary"), None)
+    deliverer = next((p for p in persons_summary if p["role"] == "deliverer"), None)
+
+    def pname(p):
+        if not p:
+            return None
+        n = p.get("normalized") or p["name"]
+        t = p.get("title")
+        o = p.get("office")
+        parts = [n]
+        if t:
+            parts.append(f"({t})")
+        if o:
+            parts.append(f"[{o}]")
+        return " ".join(parts)
+
+    # Build sentences
+    en_parts = [f"This tablet {tx_en} {animals_en}."]
+    nl_parts = [f"Dit tablet {tx_nl} {animals_nl}."]
+
+    if source:
+        en_parts.append(f"From {pname(source)}.")
+        nl_parts.append(f"Van {pname(source)}.")
+    if deliverer:
+        en_parts.append(f"Delivered by {pname(deliverer)}.")
+        nl_parts.append(f"Geleverd door {pname(deliverer)}.")
+    if receiver:
+        en_parts.append(f"Received by {pname(receiver)}.")
+        nl_parts.append(f"Ontvangen door {pname(receiver)}.")
+    if intermediary:
+        en_parts.append(f"Via {pname(intermediary)}.")
+        nl_parts.append(f"Via {pname(intermediary)}.")
+    if divine_recips:
+        gods = ", ".join(d.get("en", d["name"]) for d in divine_recips)
+        en_parts.append(f"For {gods}.")
+        nl_parts.append(f"Voor {gods}.")
+    if result.destination:
+        dest_en = result.destination
+        en_parts.append(f"Destination: {dest_en}.")
+        nl_parts.append(f"Bestemming: {dest_en}.")
+    if result.month:
+        en_parts.append(f"Dated month {result.month}" +
+                        (f", day {result.day}" if result.day else "") + ".")
+        nl_parts.append(f"Gedateerd maand {result.month}" +
+                        (f", dag {result.day}" if result.day else "") + ".")
+
+    return {"en": " ".join(en_parts), "nl": " ".join(nl_parts)}
 
 
 def load_database():
