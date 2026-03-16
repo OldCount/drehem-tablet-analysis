@@ -89,7 +89,7 @@ Lines containing these terms are not animal entries:
 
 ## 5. New Tool: `audit_extraction.py`
 
-Full audit toolkit for thesis-quality validation:
+Full audit toolkit for validation:
 
 - `python audit_extraction.py` — Full diagnostic report (→ `audit/audit_report.json`)
 - `python audit_extraction.py --stats` — Corpus-wide extraction coverage statistics
