@@ -33,3 +33,4 @@ benchmark/
 
 # Old GitHub Actions workflows (not currently used)
 .github/
+logs/
