@@ -1929,6 +1929,188 @@
       transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Timeline view */
+    .timeline-view {
+      padding: 24px 28px 60px;
+    }
+    .timeline-view h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .timeline-view .tl-subtitle {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 18px;
+    }
+    .timeline-legend {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .timeline-legend .lg-item { display: flex; align-items: center; gap: 6px; }
+    .timeline-legend .lg-swatch {
+      width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+    }
+    .timeline-grid-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      overflow-x: auto;
+    }
+    .tl-grid {
+      display: grid;
+      grid-auto-flow: row;
+      gap: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      min-width: 720px;
+    }
+    .tl-row {
+      display: grid;
+      align-items: center;
+      gap: 0;
+      border-bottom: 1px solid rgba(42, 48, 80, 0.25);
+    }
+    .tl-row.tl-header {
+      position: sticky;
+      top: 0;
+      background: var(--surface);
+      z-index: 2;
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 1px solid var(--border-glow);
+    }
+    .tl-row.tl-office {
+      background: rgba(74, 158, 255, 0.05);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .tl-row.tl-office .tl-name { padding: 8px 8px 8px 6px; }
+    .tl-name {
+      padding: 6px 8px 6px 18px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .tl-name:hover { color: var(--accent); }
+    .tl-cell {
+      height: 22px;
+      border-left: 1px solid rgba(42, 48, 80, 0.18);
+      position: relative;
+    }
+    .tl-cell .tl-bar {
+      position: absolute;
+      bottom: 2px;
+      left: 1px;
+      right: 1px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .tl-cell .tl-bar:hover { filter: brightness(1.4); }
+    .tl-period-label {
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      padding: 6px 0;
+      text-align: center;
+      color: var(--text-dim);
+    }
+    .tl-period-label.tl-reign-start {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .tl-meta {
+      padding: 0 6px;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-align: right;
+      white-space: nowrap;
+    }
+    .tl-detail-panel {
+      margin-top: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: none;
+    }
+    .tl-detail-panel.open { display: block; }
+    .tl-detail-panel h3 {
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+    .tl-detail-panel .tl-detail-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .tl-stat-row {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .tl-stat {
+      background: var(--surface2);
+      padding: 10px 14px;
+      border-radius: 8px;
+      min-width: 100px;
+    }
+    .tl-stat .v {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tl-stat .l {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .tl-edges {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .tl-edges h4 {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .tl-edge-list { font-size: 12px; }
+    .tl-edge-list .e {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(42, 48, 80, 0.25);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .tl-edge-list .e:last-child { border-bottom: none; }
+    .tl-edge-list .e .c {
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .tl-office-color-C { background: #4a9eff; }
+    .tl-office-color-D { background: #b07fe0; }
+    .tl-office-color-S { background: #00d68f; }
+    .tl-office-color-X { background: #ff6b81; }
+
     /* Help modal */
     .help-modal {
       position: fixed;
@@ -2046,6 +2228,8 @@
       <div class="header-controls">
         <button class="btn small" id="btnStats" title="Corpus overview" data-en="Overview"
           data-nl="Overzicht">Overview</button>
+        <button class="btn small" id="btnTimeline" title="Officials & timeline (T)" data-en="Timeline"
+          data-nl="Tijdlijn">Timeline</button>
         <button class="btn primary" id="btnRandom" data-en='Random <kbd class="kbd">R</kbd>'
           data-nl='Willekeurig <kbd class="kbd">R</kbd>'>Random <kbd class="kbd">R</kbd></button>
         <button class="btn small" id="btnPrev">&larr;</button>
@@ -2144,6 +2328,7 @@
             class="kbd">&larr;</kbd></span></div>
       <div class="shortcut-row"><span>Toggle sidebar</span><span><kbd class="kbd">S</kbd></span></div>
       <div class="shortcut-row"><span>Corpus overview</span><span><kbd class="kbd">O</kbd></span></div>
+      <div class="shortcut-row"><span>Officials timeline</span><span><kbd class="kbd">T</kbd></span></div>
       <div class="shortcut-row"><span>Focus search</span><span><kbd class="kbd">/</kbd></span></div>
       <div class="shortcut-row"><span>Clear / close</span><span><kbd class="kbd">Esc</kbd></span></div>
       <div class="shortcut-row"><span>Colorblind mode</span><span><kbd class="kbd">C</kbd></span></div>
@@ -2159,6 +2344,7 @@
     let tabletIndex = [], filteredIndex = [], currentTabletId = null, currentData = null;
     let currentFilterIdx = -1, activeRoleFilters = new Set(), filterTx = '', filterConf = '';
     let corpusStats = null;
+    let timelineData = null;
     let isolatedCategory = null;
     let currentLang = 'en';
 
@@ -2991,6 +3177,141 @@
     }
 
     // ---- Corpus stats ----
+    async function renderTimelineView() {
+      if (!timelineData) {
+        try {
+          const r = await fetch(`${API}/api/timeline`);
+          timelineData = await r.json();
+        } catch (e) {
+          document.getElementById('mainContent').innerHTML = '<div class="empty-state" style="padding:40px;">Failed to load timeline data.</div>';
+          return;
+        }
+      }
+      const t = timelineData;
+      const periods = t.periods;
+      const pIdx = Object.fromEntries(periods.map((p, i) => [p, i]));
+      const officeOrder = ['C', 'D', 'S', 'X'];
+      const officeColor = { C: '#4a9eff', D: '#b07fe0', S: '#00d68f', X: '#ff6b81' };
+
+      // Build edge lookup for the detail panel
+      const outgoing = {}, incoming = {};
+      for (const e of t.edges) {
+        (outgoing[e.source] = outgoing[e.source] || []).push(e);
+        (incoming[e.target] = incoming[e.target] || []).push(e);
+      }
+
+      // Identify reign boundaries on x-axis (where the abbreviation prefix changes)
+      const reignStarts = new Set();
+      let prevPrefix = '';
+      for (const p of periods) {
+        const pre = p.split('.')[0];
+        if (pre !== prevPrefix) { reignStarts.add(p); prevPrefix = pre; }
+      }
+
+      // Group officials by office
+      const grouped = {};
+      for (const o of t.officials) {
+        (grouped[o.office] = grouped[o.office] || []).push(o);
+      }
+
+      // Find max activity in any single (official, period) cell, for bar scaling
+      let maxCellActivity = 1;
+      for (const o of t.officials) {
+        for (const v of Object.values(o.by_period)) {
+          if (v > maxCellActivity) maxCellActivity = v;
+        }
+      }
+
+      const nameCol = '180px';
+      const metaCol = '90px';
+      const cellCol = '14px';
+      const gridTemplate = `${nameCol} repeat(${periods.length}, ${cellCol}) ${metaCol}`;
+
+      let html = `<div class="timeline-view fade-in">
+        <h2>Officials &amp; Timeline</h2>
+        <div class="tl-subtitle">${t.officials.length} active officials across ${periods.length} regnal-year periods. Cell height ≈ tablets in that year.</div>
+        <div class="timeline-legend">
+          <div class="lg-item"><span class="lg-swatch tl-office-color-C"></span>Chief Official (C)</div>
+          <div class="lg-item"><span class="lg-swatch tl-office-color-D"></span>Disbursal Office (D)</div>
+          <div class="lg-item"><span class="lg-swatch tl-office-color-S"></span>Shepherds Office (S)</div>
+          <div class="lg-item"><span class="lg-swatch tl-office-color-X"></span>Dead Animals Office (X)</div>
+        </div>
+        <div class="timeline-grid-wrap">
+          <div class="tl-grid" style="grid-template-columns:${gridTemplate};">`;
+
+      // Header row: period labels
+      html += `<div class="tl-row tl-header" style="grid-template-columns:${gridTemplate};">
+        <div class="tl-name">Official</div>`;
+      for (const p of periods) {
+        const cls = reignStarts.has(p) ? 'tl-period-label tl-reign-start' : 'tl-period-label';
+        html += `<div class="${cls}" title="${p}">${p}</div>`;
+      }
+      html += `<div class="tl-meta">Tablets</div></div>`;
+
+      for (const officeKey of officeOrder) {
+        const list = grouped[officeKey];
+        if (!list || !list.length) continue;
+        const label = t.office_labels[officeKey] || officeKey;
+        // Office banner row
+        html += `<div class="tl-row tl-office" style="grid-template-columns:${gridTemplate};">
+          <div class="tl-name">${label}</div>
+          <div style="grid-column: span ${periods.length + 1};"></div></div>`;
+
+        for (const o of list) {
+          html += `<div class="tl-row" style="grid-template-columns:${gridTemplate};">
+            <div class="tl-name" onclick="showOfficialDetail('${esc(o.name)}')" title="${esc(o.sub_office)}">${esc(o.name)}</div>`;
+          for (const p of periods) {
+            const v = o.by_period[p] || 0;
+            if (v > 0) {
+              // Bar height: log-ish scaling so single tablets are still visible
+              const h = Math.max(3, Math.round(18 * Math.sqrt(v / maxCellActivity)));
+              const op = 0.4 + 0.6 * Math.min(1, v / maxCellActivity);
+              html += `<div class="tl-cell"><div class="tl-bar" style="height:${h}px;background:${officeColor[officeKey]};opacity:${op};" title="${esc(o.name)} · ${p} · ${v} tablets" onclick="showOfficialDetail('${esc(o.name)}')"></div></div>`;
+            } else {
+              html += `<div class="tl-cell"></div>`;
+            }
+          }
+          html += `<div class="tl-meta">${o.total_tablets.toLocaleString()}</div></div>`;
+        }
+      }
+
+      html += `</div></div>
+        <div class="tl-detail-panel" id="tlDetailPanel"></div>
+      </div>`;
+
+      document.getElementById('mainContent').innerHTML = html;
+      document.getElementById('rightPanel').innerHTML = '<div class="empty-state" style="height:auto;padding:40px 16px;"><p style="font-size:12px;">Click an official to see partners</p></div>';
+      currentTabletId = null;
+
+      // Expose handlers for inline onclick
+      window.showOfficialDetail = function (name) {
+        const o = timelineData.officials.find(x => x.name === name);
+        if (!o) return;
+        const out = (outgoing[name] || []).slice(0, 12);
+        const inc = (incoming[name] || []).slice(0, 12);
+        const panel = document.getElementById('tlDetailPanel');
+        let h = `<h3>${esc(o.name)}</h3>
+          <div class="tl-detail-sub">${esc(o.office_label)} · ${esc(o.sub_office)} · ${o.first_period || '?'} → ${o.last_period || '?'}</div>
+          <div class="tl-stat-row">
+            <div class="tl-stat"><div class="v">${o.total_tablets.toLocaleString()}</div><div class="l">Tablets</div></div>
+            <div class="tl-stat"><div class="v">${o.as_source.toLocaleString()}</div><div class="l">As source</div></div>
+            <div class="tl-stat"><div class="v">${o.as_receiver.toLocaleString()}</div><div class="l">As receiver</div></div>
+            <div class="tl-stat"><div class="v">${o.as_intermediary.toLocaleString()}</div><div class="l">As intermediary</div></div>
+          </div>
+          <div class="tl-edges">
+            <div><h4>Sent to (top)</h4><div class="tl-edge-list">`;
+        if (!out.length) h += `<div class="e" style="color:var(--text-dim);">No outgoing transactions recorded.</div>`;
+        for (const e of out) h += `<div class="e"><span>${esc(e.target)}</span><span class="c">${e.count}</span></div>`;
+        h += `</div></div><div><h4>Received from (top)</h4><div class="tl-edge-list">`;
+        if (!inc.length) h += `<div class="e" style="color:var(--text-dim);">No incoming transactions recorded.</div>`;
+        for (const e of inc) h += `<div class="e"><span>${esc(e.source)}</span><span class="c">${e.count}</span></div>`;
+        h += `</div></div></div>`;
+        panel.innerHTML = h;
+        panel.classList.add('open');
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      };
+    }
+
     function renderCorpusStats() {
       if (!corpusStats) return;
       const s = corpusStats;
@@ -3085,6 +3406,7 @@
       loadTablet(filteredIndex[currentFilterIdx].id);
     });
     document.getElementById('btnStats').addEventListener('click', renderCorpusStats);
+    document.getElementById('btnTimeline').addEventListener('click', renderTimelineView);
     document.getElementById('btnColorblind').addEventListener('click', () => {
       document.body.classList.toggle('colorblind');
       ROLE_COLORS = document.body.classList.contains('colorblind') ? ROLE_COLORS_CB : ROLE_COLORS_NORMAL;
@@ -3132,6 +3454,7 @@
         case 'ArrowRight': case 'k': document.getElementById('btnNext').click(); break;
         case 'r': document.getElementById('btnRandom').click(); break;
         case 'o': renderCorpusStats(); break;
+        case 't': renderTimelineView(); break;
         case 's': document.getElementById('btnToggleSidebar').click(); break;
         case 'c': document.getElementById('btnColorblind').click(); break;
         case '/': e.preventDefault(); document.getElementById('searchInput').focus(); break;

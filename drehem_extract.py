@@ -492,6 +492,8 @@ class AnimalEntry:
     qualifiers: list[str] = field(default_factory=list)
     raw: str = ""
     damaged: bool = False      # True if count involves damaged/uncertain readings
+    is_imputed: bool = False   # True if count was deterministically inferred from totals
+    imputed_count: int = 0     # the inferred value (0 if not imputed)
 
 @dataclass
 class DamageReport:
@@ -525,6 +527,11 @@ class TabletExtraction:
     source_office: str = ""
     receiver_office: str = ""
     damage: DamageReport = field(default_factory=DamageReport)
+    # Deterministic imputation of damaged counts (lacunes resolved from totals)
+    total_animals_resolved: int = 0   # post-imputation total; 0 with status=incomplete = NaN
+    total_animals_status: str = "complete"   # complete | imputed | incomplete
+    imputation_method: str = ""       # "" | "edge_total" | "szunigin"
+    imputation_target: str = ""       # animal term that received the inferred count
     raw_lines: list[str] = field(default_factory=list)
 
 
@@ -1159,25 +1166,27 @@ def extract_animals(lines: list[str]) -> tuple[list[AnimalEntry], bool, bool]:
             after_bracket = raw_line[x_match.end():]
             after_x = strip_atf_damage(after_bracket).strip()
             for animal in sorted_animals:
-                if after_x.startswith(animal):
-                    end_pos = len(animal)
-                    if end_pos >= len(after_x) or after_x[end_pos] in " \t":
-                        if not _is_animal_false_positive(animal, after_x):
-                            qualifiers = []
-                            remaining = after_x[len(animal):].strip()
-                            remaining_words = re.split(r"[\s]+", remaining)
-                            for qual in ANIMAL_QUALIFIERS:
-                                if qual in remaining_words:
-                                    qualifiers.append(qual)
-                            
-                            entries.append(AnimalEntry(
-                                count=1,  # Ensure unknown amounts count as at least 1
-                                animal=animal,
-                                qualifiers=qualifiers,
-                                raw=raw_line.strip(),
-                                damaged=True,
-                            ))
-                        break
+                if not after_x.startswith(animal):
+                    continue
+                end_pos = len(animal)
+                if end_pos < len(after_x) and after_x[end_pos] not in " \t":
+                    continue
+                if _is_animal_false_positive(animal, after_x):
+                    break
+                qualifiers = []
+                remaining = after_x[len(animal):].strip()
+                remaining_words = re.split(r"[\s]+", remaining)
+                for qual in ANIMAL_QUALIFIERS:
+                    if qual in remaining_words:
+                        qualifiers.append(qual)
+
+                entries.append(AnimalEntry(
+                    count=1,  # placeholder; real value imputed later if possible
+                    animal=animal,
+                    qualifiers=qualifiers,
+                    raw=raw_line.strip(),
+                    damaged=True,
+                ))
                 break
 
     return entries, has_summary, has_sza3
@@ -1445,6 +1454,75 @@ def parse_date_of_origin(date_str: str) -> tuple[str, int, int]:
     return ruler, regnal_year, month_num
 
 
+def apply_imputation(extraction: TabletExtraction) -> None:
+    """Deterministic imputation of damaged animal counts (lacunes).
+
+    Rationale: Ur III administrative tablets are self-balancing. When a
+    body line has a missing count [x] but the scribal grand total is intact,
+    the missing value can be derived as T - sum(known).
+
+    Sets these fields on the extraction:
+        total_animals_resolved : int   – sum after imputation; 0 if still NaN
+        total_animals_status   : str   – "complete" | "imputed" | "incomplete"
+        imputation_method      : str   – "" | "edge_total" | "szunigin"
+        imputation_target      : str   – animal term that received the value
+
+    Conditions for imputation:
+        – Exactly one damaged AnimalEntry on the tablet.
+        – A trustworthy reference total (edge_total preferred) is present.
+        – Reference total – sum(certain entries) ≥ 1.
+
+    Otherwise the record is flagged as "incomplete" so downstream summation
+    code can treat it as NaN (listwise deletion), while network-analysis
+    code can still consult source/receiver edges.
+    """
+    extraction.total_animals_resolved = extraction.total_animals
+    extraction.total_animals_status = "complete"
+    extraction.imputation_method = ""
+    extraction.imputation_target = ""
+
+    damaged = [a for a in extraction.animals if a.damaged]
+    if not damaged:
+        return
+
+    # When entries originate from the szu-nigin summary, the body counts are
+    # not individually extracted; imputing within the summary itself is not
+    # meaningful, so we only flag completeness.
+    if extraction.has_summary_line:
+        if any(a.damaged for a in extraction.animals):
+            extraction.total_animals_status = "incomplete"
+            extraction.total_animals_resolved = 0
+        return
+
+    if len(damaged) != 1:
+        extraction.total_animals_status = "incomplete"
+        extraction.total_animals_resolved = 0
+        return
+
+    reference = extraction.edge_total
+    if reference <= 0:
+        extraction.total_animals_status = "incomplete"
+        extraction.total_animals_resolved = 0
+        return
+
+    sum_certain = sum(a.count for a in extraction.animals if not a.damaged)
+    inferred = reference - sum_certain
+    if inferred < 1:
+        # Either the reference is wrong or there are extra unrecorded entries.
+        # Refuse to fabricate a value.
+        extraction.total_animals_status = "incomplete"
+        extraction.total_animals_resolved = 0
+        return
+
+    target = damaged[0]
+    target.imputed_count = inferred
+    target.is_imputed = True
+    extraction.imputation_method = "edge_total"
+    extraction.imputation_target = target.animal
+    extraction.total_animals_resolved = sum_certain + inferred
+    extraction.total_animals_status = "imputed"
+
+
 def _extract_edge_total(transliteration: str) -> int:
     """Extract scribe's total from the @left edge section of the tablet.
 
@@ -1532,6 +1610,10 @@ def extract_tablet(
     if result.month_number == 0 and result.month:
         result.month_number = MONTH_NAMES.get(result.month, 0)
 
+    # Deterministic imputation of damaged animal counts from edge totals.
+    # Must run after edge_total and animals are populated.
+    apply_imputation(result)
+
     return result
 
 
@@ -1562,6 +1644,8 @@ def process_database(
             "source_office", "receiver_office",
             "animals_detail", "total_animals",
             "total_animals_certain", "total_animals_uncertain",
+            "total_animals_resolved", "total_animals_status",
+            "imputation_method", "imputation_target",
             "edge_total",
             "has_summary_line", "has_sza3_bi_ta",
             "divine_recipients", "destination", "destination_category",
@@ -1597,11 +1681,16 @@ def process_database(
                 if p.title:
                     titles_by_role[p.role].append(p.title)
 
-            # Format animals as compact string: "3×udu-niga, 1×sila4-ga"
+            # Format animals as compact string: "3×udu-niga, 1×sila4-ga".
+            # An imputed entry is rendered as "[imp:7]×animal" so the source
+            # of the count remains visible in the CSV.
             animal_parts = []
             for a in extraction.animals:
                 quals = "-".join(a.qualifiers) if a.qualifiers else ""
-                label = f"{a.count}×{a.animal}"
+                if a.is_imputed:
+                    label = f"[imp:{a.imputed_count}]×{a.animal}"
+                else:
+                    label = f"{a.count}×{a.animal}"
                 if quals:
                     label += f"-{quals}"
                 animal_parts.append(label)
@@ -1636,6 +1725,15 @@ def process_database(
                 "total_animals": extraction.total_animals,
                 "total_animals_certain": extraction.total_animals_certain,
                 "total_animals_uncertain": extraction.total_animals_uncertain,
+                # NaN encoding: explicit string for tablets that could not be resolved.
+                # Listwise-deletion code can drop rows where this field == "NaN".
+                "total_animals_resolved": (
+                    "NaN" if extraction.total_animals_status == "incomplete"
+                    else extraction.total_animals_resolved
+                ),
+                "total_animals_status": extraction.total_animals_status,
+                "imputation_method": extraction.imputation_method,
+                "imputation_target": extraction.imputation_target,
                 "edge_total": extraction.edge_total or "",
                 "has_summary_line": "1" if extraction.has_summary_line else "0",
                 "has_sza3_bi_ta": "1" if extraction.has_sza3_bi_ta else "0",
@@ -1887,6 +1985,130 @@ def detect_issues(
 
 
 # ---------------------------------------------------------------------------
+# Record linkage / duplicate detection (Entity Resolution)
+# ---------------------------------------------------------------------------
+
+def _split_names(field: str) -> list[str]:
+    """Split a CSV person-field ('Nasa; Abba-saga') into normalized tokens."""
+    if not field:
+        return []
+    return [n.strip().lower() for n in field.split(";") if n.strip()]
+
+
+def _name_overlap(a: list[str], b: list[str]) -> bool:
+    """True if the two name lists share at least one token."""
+    if not a or not b:
+        return False
+    return bool(set(a) & set(b))
+
+
+def find_linked_records(extracted_path: Path, output_path: Path) -> int:
+    """Identify double-entry tablets via composite-key record linkage.
+
+    A linked pair (A, B) shares:
+        – Temporal anchor:    same ruler, regnal year, month, day
+        – Quantitative anchor: same resolved animal total (status != incomplete)
+        – Network anchor:      source OR receiver name overlap (normalized)
+
+    The same historical event is often booked twice — once at Puzriš-Dagan
+    and once at the partner archive (Umma, Nippur, the disbursing office) —
+    so these pairs validate the transaction across the network. They are
+    flagged, not deduplicated.
+
+    Returns the number of linked pairs written.
+    """
+    rows = []
+    with open(extracted_path, "r", encoding="utf-8") as infile:
+        for row in csv.DictReader(infile):
+            # Skip rows we cannot anchor in time, count, or network
+            ruler = row.get("ruler", "").strip()
+            year = row.get("regnal_year", "").strip()
+            month = row.get("month_number", "").strip()
+            day = row.get("day", "").strip()
+            total = row.get("total_animals_resolved", "").strip()
+            status = row.get("total_animals_status", "complete")
+            if not ruler or not year or not month or not day:
+                continue
+            if status == "incomplete" or total in ("", "NaN", "0"):
+                continue
+            try:
+                total_int = int(total)
+            except ValueError:
+                continue
+            rows.append({
+                "id": row["tablet_id"],
+                "designation": row.get("designation", ""),
+                "ruler": ruler,
+                "year": year,
+                "month": month,
+                "day": day,
+                "total": total_int,
+                "source": _split_names(row.get("source_normalized", "")),
+                "receiver": _split_names(row.get("receiver_normalized", "")),
+                "tx": row.get("transaction_type", ""),
+            })
+
+    # Bucket by (date, total). Within each bucket, compare names.
+    buckets: dict[tuple, list[dict]] = {}
+    for r in rows:
+        key = (r["ruler"], r["year"], r["month"], r["day"], r["total"])
+        buckets.setdefault(key, []).append(r)
+
+    pairs = []
+    for key, group in buckets.items():
+        if len(group) < 2:
+            continue
+        for i in range(len(group)):
+            for j in range(i + 1, len(group)):
+                a, b = group[i], group[j]
+                src_match = _name_overlap(a["source"], b["source"])
+                rcv_match = _name_overlap(a["receiver"], b["receiver"])
+                # Network anchor: at least one of source/receiver must match.
+                # An exact same-day same-total coincidence with no name link
+                # is statistically common in this corpus and not informative.
+                if not (src_match or rcv_match):
+                    continue
+                anchors = ["date", "quantity"]
+                if src_match: anchors.append("source")
+                if rcv_match: anchors.append("receiver")
+                pairs.append({
+                    "tablet_a": a["id"],
+                    "tablet_b": b["id"],
+                    "designation_a": a["designation"],
+                    "designation_b": b["designation"],
+                    "ruler": a["ruler"],
+                    "regnal_year": a["year"],
+                    "month": a["month"],
+                    "day": a["day"],
+                    "total_animals": a["total"],
+                    "tx_a": a["tx"],
+                    "tx_b": b["tx"],
+                    "source_match": "1" if src_match else "0",
+                    "receiver_match": "1" if rcv_match else "0",
+                    "anchors_matched": "|".join(anchors),
+                    "match_strength": len(anchors),
+                })
+
+    pairs.sort(key=lambda p: (-p["match_strength"], p["tablet_a"]))
+
+    fields = [
+        "tablet_a", "tablet_b", "designation_a", "designation_b",
+        "ruler", "regnal_year", "month", "day", "total_animals",
+        "tx_a", "tx_b",
+        "source_match", "receiver_match",
+        "anchors_matched", "match_strength",
+    ]
+    with open(output_path, "w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        for p in pairs:
+            writer.writerow(p)
+
+    print(f"Found {len(pairs)} linked record pairs → {output_path}")
+    return len(pairs)
+
+
+# ---------------------------------------------------------------------------
 # CLI entry point
 # ---------------------------------------------------------------------------
 
@@ -1895,4 +2117,8 @@ if __name__ == "__main__":
     process_database(
         input_path=base / "drehem_database.csv",
         output_path=base / "drehem_extracted.csv",
+    )
+    find_linked_records(
+        extracted_path=base / "drehem_extracted.csv",
+        output_path=base / "drehem_linked_records.csv",
     )

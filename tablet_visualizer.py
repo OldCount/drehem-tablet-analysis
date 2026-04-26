@@ -18,7 +18,7 @@ from pathlib import Path
 
 from drehem_extract import (
     extract_tablet, extract_content_lines, detect_issues,
-    strip_atf_damage, parse_numeral, compute_confidence,
+    strip_atf_damage, parse_numeral, compute_extraction_score,
     ANIMAL_TERMS, MEASURE_TERMS, NON_ANIMAL_LINE_MARKERS,
     NUMERAL_PATTERN, OFFICIALS_TO_OFFICE, MONTH_NAMES,
     _extract_edge_total,
@@ -409,7 +409,7 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
     """Produce token-level annotations for visualization."""
     result = extract_tablet(tablet_id, transliteration, date_of_origin)
     issues = detect_issues(tablet_id, transliteration, result)
-    confidence = compute_confidence(result, True)
+    confidence = compute_extraction_score(result, True)
     edge_total = _extract_edge_total(transliteration)
 
     # Build person name lookup
@@ -991,7 +991,7 @@ def build_tablet_index():
                     "date": row.get("date_of_origin", ""),
                     "tx": row.get("transaction_type", ""),
                     "animals": int(row.get("total_animals", 0)),
-                    "confidence": row.get("extraction_confidence", ""),
+                    "confidence": row.get("extraction_score", ""),
                 })
     return index
 
@@ -1000,6 +1000,7 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
     tablets = None
     tablet_index = None
     _corpus_stats = None
+    _timeline = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(BASE_DIR), **kwargs)
@@ -1031,6 +1032,8 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
             self.send_json(data)
         elif self.path == "/api/stats":
             self.send_json(self._corpus_stats)
+        elif self.path == "/api/timeline":
+            self.send_json(self._timeline)
         else:
             super().do_GET()
 
@@ -1064,12 +1067,180 @@ def compute_corpus_stats(index):
     }
 
 
+# ---------------------------------------------------------------------------
+# Timeline / officials activity
+# ---------------------------------------------------------------------------
+
+# Reign sequence for the corpus span. The y-axis "absolute year" is computed
+# as ruler_offset[ruler] + regnal_year. Šulgi data here only covers his last
+# years (42–48) since Puzriš-Dagan was founded in Š.39.
+RULER_ORDER = [
+    ("Šulgi",      "Š",  48),    # 48-year reign
+    ("Amar-Suen",  "AS",  9),    # 9 years
+    ("Šū-Suen",    "ŠS",  9),    # 9 years
+    ("Ibbi-Suen",  "IS", 24),    # 24 years (corpus only reaches IS.02)
+]
+
+
+def _ruler_index(ruler: str) -> int:
+    for i, (name, _abbr, _len) in enumerate(RULER_ORDER):
+        if name == ruler:
+            return i
+    return -1
+
+
+def _period_label(ruler: str, year: int) -> str:
+    for name, abbr, _len in RULER_ORDER:
+        if name == ruler:
+            return f"{abbr}.{year:02d}"
+    return f"{ruler}.{year}"
+
+
+def _split_persons(field: str) -> list[str]:
+    if not field:
+        return []
+    return [n.strip() for n in field.split(";") if n.strip()]
+
+
+def compute_timeline_data():
+    """Build per-official activity grid + transaction edges.
+
+    For each known official (member of OFFICIALS_TO_OFFICE):
+        – tablets per regnal-year period
+        – total tablets
+        – outgoing edges (this official → receiver) and incoming
+          (source → this official) when both ends are recognised officials.
+    """
+    from collections import defaultdict, Counter
+
+    OFFICE_LABELS = {
+        "C": "Chief Official",
+        "D": "Disbursal Office",
+        "S": "Shepherds Office",
+        "X": "Dead Animals Office",
+    }
+
+    officials = {}   # name -> dict
+    for name, (office, sub) in OFFICIALS_TO_OFFICE.items():
+        officials[name] = {
+            "name": name,
+            "office": office,
+            "office_label": OFFICE_LABELS.get(office, office),
+            "sub_office": sub,
+            "by_period": Counter(),
+            "first_period": None,
+            "last_period": None,
+            "first_year_idx": 10**9,
+            "last_year_idx": -1,
+            "total_tablets": 0,
+            "as_source": 0,
+            "as_receiver": 0,
+            "as_intermediary": 0,
+        }
+
+    edges = Counter()   # (source, receiver) -> tablet count
+    periods_seen = set()
+
+    with open(EXTRACTED, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            ruler = row.get("ruler", "")
+            r_idx = _ruler_index(ruler)
+            if r_idx < 0:
+                continue
+            try:
+                year = int(row.get("regnal_year") or 0)
+            except ValueError:
+                year = 0
+            if year <= 0:
+                continue
+
+            label = _period_label(ruler, year)
+            year_idx = sum(rl[2] for rl in RULER_ORDER[:r_idx]) + year
+            periods_seen.add((year_idx, label))
+
+            sources = _split_persons(row.get("source", ""))
+            receivers = _split_persons(row.get("receiver", ""))
+            intermediaries = _split_persons(row.get("intermediary", ""))
+
+            # Track per-official activity (any role hit counts the tablet once
+            # per official — a multi-role person on the same tablet still gets
+            # counted once via the set below).
+            present = set()
+            for s in sources:
+                if s in officials:
+                    present.add(s)
+                    officials[s]["as_source"] += 1
+            for r in receivers:
+                if r in officials:
+                    present.add(r)
+                    officials[r]["as_receiver"] += 1
+            for m in intermediaries:
+                if m in officials:
+                    present.add(m)
+                    officials[m]["as_intermediary"] += 1
+
+            for name in present:
+                o = officials[name]
+                o["by_period"][label] += 1
+                o["total_tablets"] += 1
+                if year_idx < o["first_year_idx"]:
+                    o["first_year_idx"] = year_idx
+                    o["first_period"] = label
+                if year_idx > o["last_year_idx"]:
+                    o["last_year_idx"] = year_idx
+                    o["last_period"] = label
+
+            # Network edges: source → receiver pairs of known officials.
+            for s in sources:
+                if s not in officials:
+                    continue
+                for r in receivers:
+                    if r in officials and r != s:
+                        edges[(s, r)] += 1
+
+    periods = [label for _idx, label in sorted(periods_seen)]
+
+    # Convert Counters to dicts and drop officials with zero activity
+    out_officials = []
+    for o in officials.values():
+        if o["total_tablets"] == 0:
+            continue
+        o["by_period"] = dict(o["by_period"])
+        if o["first_year_idx"] == 10**9:
+            o["first_year_idx"] = None
+            o["last_year_idx"] = None
+        out_officials.append(o)
+
+    # Sort officials: by office then by first-active period
+    office_rank = {"C": 0, "D": 1, "S": 2, "X": 3}
+    out_officials.sort(key=lambda o: (
+        office_rank.get(o["office"], 99),
+        o["sub_office"],
+        o["first_year_idx"] or 0,
+        o["name"],
+    ))
+
+    out_edges = [
+        {"source": s, "target": t, "count": c}
+        for (s, t), c in edges.most_common()
+    ]
+
+    return {
+        "periods": periods,
+        "officials": out_officials,
+        "edges": out_edges,
+        "office_labels": OFFICE_LABELS,
+    }
+
+
 def serve(port=8585):
     print("Loading tablets...")
     VisualizerHandler.tablets = load_database()
     VisualizerHandler.tablet_index = build_tablet_index()
     VisualizerHandler._corpus_stats = compute_corpus_stats(VisualizerHandler.tablet_index)
-    print(f"Loaded {len(VisualizerHandler.tablets)} tablets")
+    VisualizerHandler._timeline = compute_timeline_data()
+    print(f"Loaded {len(VisualizerHandler.tablets)} tablets, "
+          f"{len(VisualizerHandler._timeline['officials'])} active officials")
 
     server = HTTPServer(("", port), VisualizerHandler)
     print(f"\nTablet Visualizer running on http://localhost:{port}/tablet_vis.html")

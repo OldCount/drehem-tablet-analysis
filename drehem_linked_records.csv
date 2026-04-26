@@ -1,0 +1,316 @@
+tablet_a,tablet_b,designation_a,designation_b,ruler,regnal_year,month,day,total_animals,tx_a,tx_b,source_match,receiver_match,anchors_matched,match_strength
+102261,105919,"ASJ 08, 307 2","BIN 03, 113",Amar-Suen,5,2,1,8,transfer,transfer,1,1,date|quantity|source|receiver,4
+102953,109673,"AUCT 1, 107",Hirose 202,Amar-Suen,5,6,7,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+103104,211344,"AUCT 1, 259","BPOA 07, 1945",Amar-Suen,6,11,4,14,transfer,transfer,1,1,date|quantity|source|receiver,4
+103310,389867,"AUCT 1, 465",LB 2242,Amar-Suen,3,10,13,12,transfer,transfer,1,1,date|quantity|source|receiver,4
+103411,105152,"AUCT 1, 566","BCT 1, 050",Amar-Suen,8,2,21,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+103422,390100,"AUCT 1, 577",LB 3032,Amar-Suen,1,12,9,52,transfer,transfer,1,1,date|quantity|source|receiver,4
+103441,126344,"AUCT 1, 596","PDT 2, 0999",Amar-Suen,7,8,16,14,transfer,transfer,1,1,date|quantity|source|receiver,4
+103518,142431,"AUCT 1, 673","YOS 18, 037",Amar-Suen,4,12,12,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+103551,320907,"AUCT 1, 706","Nisaba 08, 313",Amar-Suen,4,12,18,13,transfer,transfer,1,1,date|quantity|source|receiver,4
+103654,126590,"AUCT 1, 809","PDT 2, 1262",Amar-Suen,4,1,25,6,transfer,transfer,1,1,date|quantity|source|receiver,4
+103677,464283,"AUCT 1, 832","AuOr 31, 232 03",Amar-Suen,5,3,15,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+103680,519457,"AUCT 1, 835","Akkadica 140, 073-098 11",Amar-Suen,2,8,11,4,transfer,transfer,1,1,date|quantity|source|receiver,4
+103990,123879,"AUCT 2, 172","OIP 121, 149",Amar-Suen,4,1,3,12,transfer,transfer,1,1,date|quantity|source|receiver,4
+105153,407587,"BCT 1, 051","HSS 68, 616",Amar-Suen,8,4,17,10,transfer,transfer,1,1,date|quantity|source|receiver,4
+105837,389879,"BIN 03, 030",LB 2259,Amar-Suen,1,10,10,22,transfer,transfer,1,1,date|quantity|source|receiver,4
+105841,145560,"BIN 03, 034",Ripon 4,Amar-Suen,1,5,5,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+105865,389885,"BIN 03, 059",LB 2266,Amar-Suen,2,7,21,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+105900,127451,"BIN 03, 094","RA 009, 049 SA 117",Amar-Suen,4,4,25,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+105906,143993,"BIN 03, 100","SAT 2, 0793",Amar-Suen,4,8,5,5,transfer,transfer,1,1,date|quantity|source|receiver,4
+105918,143113,"BIN 03, 112","MVN 20, 180",Amar-Suen,5,7,16,15,transfer,transfer,1,1,date|quantity|source|receiver,4
+105931,210431,"BIN 03, 125","BPOA 06, 0651",Amar-Suen,5,9,28,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+106092,303610,"BIN 03, 286","BPOA 07, 2827",Amar-Suen,6,3,27,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+106134,106265,"BIN 03, 328","BIN 03, 458",Šū-Suen,8,2,5,3,receipt,receipt,1,1,date|quantity|source|receiver,4
+107778,332545,CST 264,"PDT 2, 0858",Amar-Suen,3,1,11,118,transfer,transfer,1,1,date|quantity|source|receiver,4
+107802,407610,CST 288,"HSS 68, 639",Amar-Suen,4,7,8,6,transfer,transfer,1,1,date|quantity|source|receiver,4
+108711,128803,"CTMMA 1, 026","SACT 1, 048",Amar-Suen,7,11,1,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+109267,127573,DoCu 311,"RA 009, 055 SA 229",Amar-Suen,5,8,30,50,transfer,transfer,1,1,date|quantity|source|receiver,4
+109577,407296,Hirose 106,"HSS 68, 364",Amar-Suen,1,12,17,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+109586,330667,Hirose 115,"AAICAB 1/4, TCICA 15",Amar-Suen,2,5,22,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+109648,144100,Hirose 177,"SAT 2, 0900",Amar-Suen,5,1,1,7,transfer,transfer,1,1,date|quantity|source|receiver,4
+109675,123956,Hirose 204,"OIP 121, 226",Amar-Suen,5,6,20,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+109691,124657,Hirose 220,"Orient 16, 047 30",Amar-Suen,6,1,29,7,transfer,transfer,1,1,date|quantity|source|receiver,4
+111786,132012,"JANES 21, 77 10",Tavolette 226,Amar-Suen,1,12,4,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+111985,133890,"JCS 23, 114 27",TCND 160,Amar-Suen,6,7,28,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+112166,124504,"JCS 35, 206 2","Ontario 1, 091",Amar-Suen,4,10,12,87,transfer,transfer,1,1,date|quantity|source|receiver,4
+112265,320515,"JEOL 26, 49 02","Nisaba 08, 095",Amar-Suen,5,9,14,4,transfer,transfer,1,1,date|quantity|source|receiver,4
+113602,126690,"MVN 02, 303","Princeton 1, 001",Amar-Suen,5,2,21,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+114351,250455,"MVN 05, 131","CUSAS 39, 095",Ibbi-Suen,1,6,22,30,transfer,transfer,1,1,date|quantity|source|receiver,4
+115436,142430,"MVN 08, 045","YOS 18, 036",Amar-Suen,4,4,2,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+115437,127450,"MVN 08, 046","RA 009, 049 SA 116",Amar-Suen,4,4,8,6,transfer,transfer,1,1,date|quantity|source|receiver,4
+115456,124061,"MVN 08, 065","OIP 121, 331",Amar-Suen,6,8,9,10,transfer,transfer,1,1,date|quantity|source|receiver,4
+115462,332544,"MVN 08, 071","PDT 2, 0839",Amar-Suen,6,11,3,75,transfer,transfer,1,1,date|quantity|source|receiver,4
+117217,134824,"MVN 13, 444",TRU 060,Amar-Suen,3,11,20,86,transfer,transfer,1,1,date|quantity|source|receiver,4
+117228,126710,"MVN 13, 455","Princeton 1, 021",Amar-Suen,5,4,8,27,transfer,transfer,1,1,date|quantity|source|receiver,4
+122761,122783,NYPL 223,NYPL 245,Amar-Suen,1,7,3,25,transfer,transfer,1,1,date|quantity|source|receiver,4
+123856,210376,"OIP 121, 126","BPOA 06, 0598",Amar-Suen,2,8,19,6,transfer,transfer,1,1,date|quantity|source|receiver,4
+123861,210364,"OIP 121, 131","BPOA 06, 0584",Amar-Suen,2,11,30,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+123946,125539,"OIP 121, 216","PDT 1, 0122",Amar-Suen,5,5,29,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+124654,389856,"Orient 16, 046 27",LB 2222,Amar-Suen,4,2,9,5,transfer,transfer,1,1,date|quantity|source|receiver,4
+125540,128788,"PDT 1, 0123","SACT 1, 031",Amar-Suen,5,5,14,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+125559,211651,"PDT 1, 0142","Hermitage 3, 270",Amar-Suen,5,7,18,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+125565,320905,"PDT 1, 0148","Nisaba 08, 311",Amar-Suen,5,3,5,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+125566,210434,"PDT 1, 0149","BPOA 06, 0654",Amar-Suen,5,1,23,8,transfer,transfer,1,1,date|quantity|source|receiver,4
+126079,210414,"PDT 1, 0663","BPOA 06, 0637",Amar-Suen,1,10,26,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+126203,200576,"PDT 2, 0842",TCND 102,Amar-Suen,4,10,5,46,transfer,transfer,1,1,date|quantity|source|receiver,4
+126245,389904,"PDT 2, 0885",LB 2299,Amar-Suen,3,11,6,434,transfer,transfer,1,1,date|quantity|source|receiver,4
+126345,212050,"PDT 2, 1000","Hermitage 3, 272",Amar-Suen,5,7,21,4,transfer,transfer,1,1,date|quantity|source|receiver,4
+126433,128135,"PDT 2, 1095",Rochester 030,Amar-Suen,1,12,17,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+128103,129431,"RO 11, 99 10",SET 021,Amar-Suen,5,12,13,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+128139,389881,Rochester 034,LB 2262,Amar-Suen,2,5,14,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+128172,128798,Rochester 067,"SACT 1, 043",Amar-Suen,6,11,19,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+128586,128640,SA 048a,SA 008c,Amar-Suen,5,5,4,20,transfer,transfer,1,1,date|quantity|source|receiver,4
+128588,320615,SA 008a,"Nisaba 08, 196",Amar-Suen,5,6,20,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+128603,320598,SA 025,"Nisaba 08, 179",Amar-Suen,5,7,24,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+128805,131707,"SACT 1, 050","TCL 02, 5618",Amar-Suen,4,6,19,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+131870,320600,Tavolette 085,"Nisaba 08, 181",Amar-Suen,5,12,25,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+131979,212217,Tavolette 193,"Hermitage 3, 225",Amar-Suen,4,1,25,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+132053,303497,Tavolette 268,"BPOA 07, 2726",Amar-Suen,2,11,18,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+133887,320626,TCND 153,"Nisaba 08, 207",Amar-Suen,5,12,4,4,transfer,transfer,1,1,date|quantity|source|receiver,4
+134816,212160,TRU 052,"Hermitage 3, 310",Amar-Suen,6,2,21,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+134915,407613,TRU 151,"HSS 68, 642",Amar-Suen,6,1,13,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+136048,320594,"UCP 09-02-2, 044","Nisaba 08, 175",Amar-Suen,5,4,12,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+142813,102316,"AAICAB 1/1, pl. 059, 1924-0555","ASJ 09, 255 40",Amar-Suen,3,11,28,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+142857,126199,"AAICAB 1/1, pl. 078, 1924-1788","PDT 2, 0837",Amar-Suen,6,9,16,1,transfer,transfer,1,1,date|quantity|source|receiver,4
+143123,212138,"MVN 20, 190","Hermitage 3, 296",Amar-Suen,5,10,30,47,transfer,transfer,1,1,date|quantity|source|receiver,4
+143978,320529,"SAT 2, 0778","Nisaba 08, 110",Amar-Suen,4,11,9,11,transfer,transfer,1,1,date|quantity|source|receiver,4
+210480,392642,"BPOA 06, 0703","CDLB 2016/001, §2.2.4",Amar-Suen,2,3,10,19,transfer,transfer,1,1,date|quantity|source|receiver,4
+211944,212081,"Hermitage 3, 285","Hermitage 3, 286",Amar-Suen,5,9,21,42,transfer,transfer,1,1,date|quantity|source|receiver,4
+211970,212223,"Hermitage 3, 280","Hermitage 3, 281",Amar-Suen,5,9,8,4,transfer,transfer,1,1,date|quantity|source|receiver,4
+212118,320576,"Hermitage 3, 275","Nisaba 08, 157",Amar-Suen,5,8,14,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+212168,332363,"Hermitage 3, 257","Nisaba 30, 34",Amar-Suen,5,4,2,11,transfer,transfer,1,1,date|quantity|source|receiver,4
+303454,407136,"BPOA 07, 2685","HSS 68, 238",Amar-Suen,4,4,7,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+303783,390778,"BPOA 07, 2982","BPOA 06, 0155",Amar-Suen,4,8,24,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+320563,482028,"Nisaba 08, 144",FCC —,Amar-Suen,6,9,30,10,transfer,transfer,1,1,date|quantity|source|receiver,4
+320882,407135,"Nisaba 08, 307","HSS 68, 237",Amar-Suen,4,8,8,4,transfer,transfer,1,1,date|quantity|source|receiver,4
+330668,480067,"AAICAB 1/4, TCICA 16","Akkadica 135/1, 078-079 03",Amar-Suen,2,8,21,2,transfer,transfer,1,1,date|quantity|source|receiver,4
+389842,497974,LB 2196,Anonymous 497974,Amar-Suen,7,2,28,3,transfer,transfer,1,1,date|quantity|source|receiver,4
+389851,407947,LB 2212,"HSS 68, 662",Amar-Suen,3,10,22,78,transfer,transfer,1,1,date|quantity|source|receiver,4
+407503,407504,"HSS 68, 533","HSS 68, 534",Šū-Suen,9,10,12,22,transfer,transfer,1,1,date|quantity|source|receiver,4
+100230,320989,"Aegyptus 19, 237 08","Nisaba 08, 355",Amar-Suen,8,12,16,1,expenditure,receipt,1,0,date|quantity|source,3
+101418,109545,"AnOr 07, 123",Hirose 074,Šulgi,47,7,11,1,receipt,receipt,0,1,date|quantity|receiver,3
+101845,134935,"AR RIM 08, 55 07",TRU 171,Amar-Suen,7,1,13,2,transfer,transfer,1,0,date|quantity|source,3
+102261,109652,"ASJ 08, 307 2",Hirose 181,Amar-Suen,5,2,1,8,transfer,transfer,1,0,date|quantity|source,3
+102261,127470,"ASJ 08, 307 2","RA 009, 049 SA 136",Amar-Suen,5,2,1,8,transfer,transfer,1,0,date|quantity|source,3
+102320,407597,"ASJ 09, 257 44","HSS 68, 626",Amar-Suen,4,10,10,1,transfer,transfer,1,0,date|quantity|source,3
+102347,407611,"ASJ 09, 267 71","HSS 68, 640",Amar-Suen,2,4,27,6,expenditure,transfer,1,0,date|quantity|source,3
+102460,109762,"ASJ 11, 327 22",Hirose 291,Amar-Suen,8,12,17,2,expenditure,receipt,1,0,date|quantity|source,3
+102710,134837,"ASJ 19, 206 19",TRU 073,Amar-Suen,6,4,16,8,transfer,transfer,1,0,date|quantity|source,3
+102864,124652,"AUCT 1, 018","Orient 16, 046 25",Amar-Suen,3,1,25,3,transfer,transfer,1,0,date|quantity|source,3
+102877,103447,"AUCT 1, 031","AUCT 1, 602",Amar-Suen,7,9,20,38,transfer,transfer,1,0,date|quantity|source,3
+102880,105888,"AUCT 1, 034","BIN 03, 082",Amar-Suen,4,10,2,2,expenditure,transfer,1,0,date|quantity|source,3
+102881,406897,"AUCT 1, 035","HSS 68, 128",Amar-Suen,6,6,1,5,expenditure,receipt,1,0,date|quantity|source,3
+102991,127448,"AUCT 1, 145","RA 009, 049 SA 114",Amar-Suen,4,2,7,11,transfer,transfer,1,0,date|quantity|source,3
+103093,406870,"AUCT 1, 248","HSS 68, 102",Amar-Suen,8,9,1,1,transfer,transfer,1,0,date|quantity|source,3
+103209,124519,"AUCT 1, 364","Ontario 1, 106",Amar-Suen,8,9,18,1,expenditure,transfer,1,0,date|quantity|source,3
+103254,105886,"AUCT 1, 409","BIN 03, 080",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,105892,"AUCT 1, 409","BIN 03, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,105893,"AUCT 1, 409","BIN 03, 087",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,124971,"AUCT 1, 409","OrSP 47-49, 083",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,124972,"AUCT 1, 409","OrSP 47-49, 084",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,124973,"AUCT 1, 409","OrSP 47-49, 085",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,124974,"AUCT 1, 409","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103254,131673,"AUCT 1, 409","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+103309,124892,"AUCT 1, 464","OrSP 47-49, 004",Amar-Suen,1,1,2,1,transfer,expenditure,1,0,date|quantity|source,3
+103315,407960,"AUCT 1, 470","HSS 68, 675",Amar-Suen,6,3,12,7,transfer,transfer,1,0,date|quantity|source,3
+103345,210444,"AUCT 1, 500","BPOA 06, 0664",Amar-Suen,7,5,2,4,transfer,transfer,1,0,date|quantity|source,3
+103389,303667,"AUCT 1, 544","BPOA 07, 2874",Amar-Suen,4,6,18,5,transfer,expenditure,1,0,date|quantity|source,3
+103398,115479,"AUCT 1, 553","MVN 08, 088",Amar-Suen,4,2,20,2,expenditure,transfer,1,0,date|quantity|source,3
+103399,115465,"AUCT 1, 554","MVN 08, 074",Amar-Suen,6,11,24,1,transfer,transfer,1,0,date|quantity|source,3
+103418,131720,"AUCT 1, 573","TCL 02, 5631",Amar-Suen,2,9,24,70,transfer,transfer,1,0,date|quantity|source,3
+103448,125607,"AUCT 1, 603","PDT 1, 0190",Amar-Suen,4,9,21,33,transfer,transfer,1,0,date|quantity|source,3
+103452,320815,"AUCT 1, 607","Nisaba 08, 271",Amar-Suen,1,9,7,7,transfer,transfer,0,1,date|quantity|receiver,3
+103456,103651,"AUCT 1, 611","AUCT 1, 806",Amar-Suen,8,4,10,10,transfer,transfer,1,0,date|quantity|source,3
+103459,407068,"AUCT 1, 614","HSS 68, 172",Amar-Suen,8,10,24,2,transfer,transfer,1,0,date|quantity|source,3
+103460,106082,"AUCT 1, 615","BIN 03, 276",Amar-Suen,6,10,22,150,transfer,transfer,1,0,date|quantity|source,3
+103464,115430,"AUCT 1, 619","MVN 08, 039",Amar-Suen,2,9,22,2,transfer,transfer,1,0,date|quantity|source,3
+103468,134936,"AUCT 1, 623",TRU 172,Amar-Suen,7,2,1,2,transfer,transfer,1,0,date|quantity|source,3
+103474,105969,"AUCT 1, 629","BIN 03, 163",Amar-Suen,8,10,16,2,transfer,transfer,1,0,date|quantity|source,3
+103474,210301,"AUCT 1, 629","BPOA 06, 0516",Amar-Suen,8,10,16,2,transfer,transfer,1,0,date|quantity|source,3
+103488,210395,"AUCT 1, 643","BPOA 06, 0618",Amar-Suen,2,1,21,2,transfer,transfer,1,0,date|quantity|source,3
+103630,125771,"AUCT 1, 785","PDT 1, 0355",Amar-Suen,4,10,20,4,transfer,expenditure,1,0,date|quantity|source,3
+103669,128800,"AUCT 1, 824","SACT 1, 045",Amar-Suen,7,2,2,2,transfer,transfer,1,0,date|quantity|source,3
+103675,105999,"AUCT 1, 830","BIN 03, 193",Amar-Suen,8,7,19,2,transfer,transfer,1,0,date|quantity|source,3
+103692,128146,"AUCT 1, 847",Rochester 041,Amar-Suen,3,10,28,1,transfer,transfer,1,0,date|quantity|source,3
+103729,210119,"AUCT 1, 884","BPOA 06, 0049",Amar-Suen,6,4,13,10,transfer,transfer,1,0,date|quantity|source,3
+103778,126553,"AUCT 1, 933","PDT 2, 1223",Amar-Suen,8,1,9,200,transfer,transfer,1,0,date|quantity|source,3
+103778,467617,"AUCT 1, 933","OrNS 81, 288 09",Amar-Suen,8,1,9,200,transfer,transfer,1,0,date|quantity|source,3
+103891,126197,"AUCT 2, 073","PDT 2, 0835",Amar-Suen,7,5,6,1,expenditure,transfer,1,0,date|quantity|source,3
+103893,144110,"AUCT 2, 075","SAT 2, 0910",Amar-Suen,6,8,12,1,transfer,transfer,1,0,date|quantity|source,3
+104002,126403,"AUCT 2, 184","PDT 2, 1064",Amar-Suen,5,2,2,22,transfer,transfer,1,0,date|quantity|source,3
+104042,131694,"AUCT 2, 224","TCL 02, 5605",Amar-Suen,8,4,27,1,expenditure,transfer,1,0,date|quantity|source,3
+104073,105961,"AUCT 2, 255","BIN 03, 155",Amar-Suen,8,4,13,2,transfer,transfer,1,0,date|quantity|source,3
+104104,212156,"AUCT 2, 286","Hermitage 3, 240",Amar-Suen,4,10,22,2,expenditure,expenditure,1,0,date|quantity|source,3
+104427,117171,"AUCT 3, 206","MVN 13, 399",Ibbi-Suen,2,12,23,3,expenditure,expenditure,1,0,date|quantity|source,3
+104660,109750,"AUCT 3, 452",Hirose 279,Amar-Suen,8,1,25,4,expenditure,expenditure,1,0,date|quantity|source,3
+105122,303594,"BCT 1, 020","BPOA 07, 2813",Šū-Suen,1,12,16,5,receipt,expenditure,1,0,date|quantity|source,3
+105147,143112,"BCT 1, 045","MVN 20, 179",Amar-Suen,5,7,23,4,transfer,transfer,1,0,date|quantity|source,3
+105204,144767,"BCT 1, 102","SAT 3, 1567",Šū-Suen,5,2,18,60,expenditure,expenditure,1,0,date|quantity|source,3
+105886,105892,"BIN 03, 080","BIN 03, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105886,105893,"BIN 03, 080","BIN 03, 087",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105886,124971,"BIN 03, 080","OrSP 47-49, 083",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105886,124972,"BIN 03, 080","OrSP 47-49, 084",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105886,124973,"BIN 03, 080","OrSP 47-49, 085",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105886,124974,"BIN 03, 080","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105886,131673,"BIN 03, 080","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105892,105893,"BIN 03, 086","BIN 03, 087",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105892,124971,"BIN 03, 086","OrSP 47-49, 083",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105892,124972,"BIN 03, 086","OrSP 47-49, 084",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105892,124973,"BIN 03, 086","OrSP 47-49, 085",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105892,124974,"BIN 03, 086","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105892,131673,"BIN 03, 086","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105893,124971,"BIN 03, 087","OrSP 47-49, 083",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105893,124972,"BIN 03, 087","OrSP 47-49, 084",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105893,124973,"BIN 03, 087","OrSP 47-49, 085",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105893,124974,"BIN 03, 087","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105893,131673,"BIN 03, 087","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+105900,134825,"BIN 03, 094",TRU 061,Amar-Suen,4,4,25,3,transfer,transfer,1,0,date|quantity|source,3
+105908,113401,"BIN 03, 102","MVN 02, 102",Amar-Suen,4,9,13,1,transfer,transfer,1,0,date|quantity|source,3
+105912,200547,"BIN 03, 106","JEOL 26, 49 06",Amar-Suen,5,3,2,3,transfer,transfer,1,0,date|quantity|source,3
+105917,125489,"BIN 03, 111","PDT 1, 0073",Amar-Suen,5,4,7,4,transfer,transfer,1,0,date|quantity|source,3
+105919,109652,"BIN 03, 113",Hirose 181,Amar-Suen,5,2,1,8,transfer,transfer,1,0,date|quantity|source,3
+105919,127470,"BIN 03, 113","RA 009, 049 SA 136",Amar-Suen,5,2,1,8,transfer,transfer,1,0,date|quantity|source,3
+105948,122768,"BIN 03, 142",NYPL 230,Amar-Suen,7,8,24,35,transfer,transfer,1,0,date|quantity|source,3
+105958,201035,"BIN 03, 152","Princeton 2, 037",Amar-Suen,8,3,29,1,expenditure,transfer,1,0,date|quantity|source,3
+105963,407588,"BIN 03, 157","HSS 68, 617",Amar-Suen,8,2,3,1,expenditure,transfer,1,0,date|quantity|source,3
+105964,124922,"BIN 03, 158","OrSP 47-49, 034",Amar-Suen,8,2,16,1,transfer,expenditure,1,0,date|quantity|source,3
+105969,210301,"BIN 03, 163","BPOA 06, 0516",Amar-Suen,8,10,16,2,transfer,transfer,1,0,date|quantity|source,3
+105973,124661,"BIN 03, 167","Orient 16, 049 34",Amar-Suen,8,8,20,1,transfer,transfer,1,0,date|quantity|source,3
+105990,115974,"BIN 03, 184","MVN 10, 207",Amar-Suen,8,10,17,7,transfer,transfer,1,0,date|quantity|source,3
+106002,131676,"BIN 03, 196","TCL 02, 5587",Amar-Suen,8,8,19,20,transfer,transfer,1,0,date|quantity|source,3
+106072,115458,"BIN 03, 266","MVN 08, 067",Amar-Suen,6,9,20,2,transfer,transfer,1,0,date|quantity|source,3
+106077,210366,"BIN 03, 271","BPOA 06, 0586",Amar-Suen,6,9,25,20,transfer,transfer,1,0,date|quantity|source,3
+106084,211670,"BIN 03, 278","Hermitage 3, 314",Amar-Suen,6,4,11,2,transfer,transfer,1,0,date|quantity|source,3
+106106,126164,"BIN 03, 300","PDT 2, 0799",Amar-Suen,2,1,29,3,transfer,transfer,1,0,date|quantity|source,3
+106242,125667,"BIN 03, 435","PDT 1, 0251",Šū-Suen,1,5,3,2,expenditure,expenditure,1,0,date|quantity|source,3
+106316,106321,"BIN 03, 509","BIN 03, 514",Šulgi,47,5,10,8,expenditure,expenditure,1,0,date|quantity|source,3
+106344,123814,"BIN 03, 537","OIP 121, 084",Amar-Suen,5,3,29,6,transfer,transfer,0,1,date|quantity|receiver,3
+107596,109504,CST 084,Hirose 033,Šulgi,45,1,18,2,receipt,receipt,0,1,date|quantity|receiver,3
+107618,123500,CST 106,"OIP 115, 405",Šulgi,46,4,23,11,receipt,receipt,0,1,date|quantity|receiver,3
+107687,128833,CST 175,"SACT 1, 078",Šulgi,47,5,13,2,receipt,receipt,0,1,date|quantity|receiver,3
+107826,122182,CST 311,"Nik 2, 499",Amar-Suen,5,4,22,1,transfer,transfer,1,0,date|quantity|source,3
+107831,134826,CST 316,TRU 062,Amar-Suen,5,5,7,2,expenditure,transfer,1,0,date|quantity|source,3
+107833,123946,CST 318,"OIP 121, 216",Amar-Suen,5,5,29,1,transfer,transfer,1,0,date|quantity|source,3
+107833,125539,CST 318,"PDT 1, 0122",Amar-Suen,5,5,29,1,transfer,transfer,1,0,date|quantity|source,3
+107845,210400,CST 330,"BPOA 06, 0623",Amar-Suen,5,8,20,10,transfer,transfer,1,0,date|quantity|source,3
+107893,109756,CST 378,Hirose 285,Amar-Suen,8,5,5,2,receipt,receipt,0,1,date|quantity|receiver,3
+107894,126762,CST 379,"Princeton 1, 073",Amar-Suen,8,5,15,2,receipt,expenditure,1,0,date|quantity|source,3
+107916,144358,CST 401,"SAT 2, 1158",Amar-Suen,9,12,8,7,expenditure,expenditure,1,0,date|quantity|source,3
+107991,107992,CST 476,CST 477,Šulgi,45,9,2,4,receipt,expenditure,1,0,date|quantity|source,3
+108000,211596,CST 485,"Hermitage 3, 138",Šulgi,45,11,26,8,receipt,expenditure,1,0,date|quantity|source,3
+108016,126442,CST 500,"PDT 2, 1104",Šulgi,46,5,5,5,receipt,receipt,0,1,date|quantity|receiver,3
+108713,136262,"CTMMA 1, 028",UDT 128,Amar-Suen,8,1,29,1,transfer,transfer,1,0,date|quantity|source,3
+108746,134991,CTNMC 15,TRU 227,Amar-Suen,5,12,27,2,receipt,receipt,0,1,date|quantity|receiver,3
+109249,134862,DoCu 292,TRU 098,Amar-Suen,2,3,11,6,expenditure,transfer,1,0,date|quantity|source,3
+109499,303489,Hirose 028,"BPOA 07, 2718",Šulgi,44,4,28,1,receipt,receipt,0,1,date|quantity|receiver,3
+109516,128615,Hirose 045,SA 001b,Šulgi,45,12,12,2,receipt,receipt,0,1,date|quantity|receiver,3
+109639,135091,Hirose 168,TRU 327,Amar-Suen,4,10,5,1,receipt,expenditure,1,0,date|quantity|source,3
+109644,115445,Hirose 173,"MVN 08, 054",Amar-Suen,4,11,17,1,transfer,transfer,1,0,date|quantity|source,3
+109652,127470,Hirose 181,"RA 009, 049 SA 136",Amar-Suen,5,2,1,8,transfer,transfer,1,0,date|quantity|source,3
+109662,211932,Hirose 191,"Hermitage 3, 258",Amar-Suen,5,4,4,7,transfer,transfer,1,0,date|quantity|source,3
+109662,212054,Hirose 191,"Hermitage 3, 260",Amar-Suen,5,4,4,7,transfer,transfer,1,0,date|quantity|source,3
+109665,136048,Hirose 194,"UCP 09-02-2, 044",Amar-Suen,5,4,12,2,transfer,transfer,1,0,date|quantity|source,3
+109665,320594,Hirose 194,"Nisaba 08, 175",Amar-Suen,5,4,12,2,transfer,transfer,1,0,date|quantity|source,3
+109681,115584,Hirose 210,"MVN 08, 194",Amar-Suen,5,8,13,108,transfer,transfer,1,0,date|quantity|source,3
+109695,124185,Hirose 224,"OIP 121, 455",Amar-Suen,6,2,29,1,receipt,receipt,0,1,date|quantity|receiver,3
+109711,320979,Hirose 240,"Nisaba 08, 348",Amar-Suen,6,10,27,1,receipt,receipt,0,1,date|quantity|receiver,3
+109742,116853,Hirose 271,"MVN 13, 081",Amar-Suen,7,11,11,1,receipt,receipt,0,1,date|quantity|receiver,3
+111982,303409,"JCS 23, 113 24","BPOA 07, 2645",Amar-Suen,5,3,2,30,transfer,transfer,1,0,date|quantity|source,3
+112270,116830,"JEOL 26, 49 07","MVN 13, 058",Šulgi,47,5,23,1,receipt,receipt,0,1,date|quantity|receiver,3
+112327,405504,"JMEOS 12, 45 3507","Orient 16, 050 40",Šū-Suen,2,9,15,3,expenditure,expenditure,1,0,date|quantity|source,3
+113467,332365,"MVN 02, 168","Nisaba 30, 36",Amar-Suen,5,11,22,110,transfer,transfer,1,0,date|quantity|source,3
+114324,143685,"MVN 05, 104","SAT 2, 0485",Šulgi,46,9,15,1,delivery,delivery,1,0,date|quantity|source,3
+115418,116837,"MVN 08, 027","MVN 13, 065",Amar-Suen,1,10,18,3,transfer,receipt,0,1,date|quantity|receiver,3
+115424,134860,"MVN 08, 033",TRU 096,Amar-Suen,2,2,11,10,transfer,transfer,1,0,date|quantity|source,3
+115440,499217,"MVN 08, 049",01.IS.67,Amar-Suen,4,9,15,3,transfer,expenditure,1,0,date|quantity|source,3
+115463,407576,"MVN 08, 072","HSS 68, 605",Amar-Suen,6,11,13,1,transfer,transfer,1,0,date|quantity|source,3
+115985,320671,"MVN 10, 218","Nisaba 08, 227",Amar-Suen,6,10,12,8,receipt,receipt,0,1,date|quantity|receiver,3
+117156,126454,"MVN 13, 384","PDT 2, 1119",Šū-Suen,1,12,10,10,transfer,expenditure,1,0,date|quantity|source,3
+117172,201107,"MVN 13, 400","Princeton 2, 109",Šū-Suen,1,5,25,3,expenditure,expenditure,1,0,date|quantity|source,3
+118392,123325,"MVN 15, 112","OIP 115, 307",Šulgi,46,4,13,1,receipt,receipt,0,1,date|quantity|receiver,3
+122191,499192,"Nik 2, 508",01.IS.42,Amar-Suen,5,10,11,1,transfer,expenditure,1,0,date|quantity|source,3
+122659,128828,NYPL 123,"SACT 1, 073",Šulgi,46,4,17,4,expenditure,receipt,1,0,date|quantity|source,3
+122767,125852,NYPL 229,"PDT 1, 0436",Amar-Suen,8,1,18,30,expenditure,expenditure,1,0,date|quantity|source,3
+123906,406830,"OIP 121, 176","HSS 68, 064",Amar-Suen,5,1,30,1,transfer,transfer,1,0,date|quantity|source,3
+124064,407944,"OIP 121, 334","HSS 68, 659",Amar-Suen,6,9,1,3,transfer,transfer,1,0,date|quantity|source,3
+124262,389882,"OIP 121, 532",LB 2263,Amar-Suen,9,11,3,1,expenditure,expenditure,1,0,date|quantity|source,3
+124264,126451,"OIP 121, 534","PDT 2, 1116",Amar-Suen,6,6,24,1,receipt,receipt,0,1,date|quantity|receiver,3
+124971,124972,"OrSP 47-49, 083","OrSP 47-49, 084",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124971,124973,"OrSP 47-49, 083","OrSP 47-49, 085",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124971,124974,"OrSP 47-49, 083","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124971,131673,"OrSP 47-49, 083","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124972,124973,"OrSP 47-49, 084","OrSP 47-49, 085",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124972,124974,"OrSP 47-49, 084","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124972,131673,"OrSP 47-49, 084","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124973,124974,"OrSP 47-49, 085","OrSP 47-49, 086",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124973,131673,"OrSP 47-49, 085","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124974,131673,"OrSP 47-49, 086","TCL 02, 5584",Amar-Suen,4,12,29,10,transfer,transfer,1,0,date|quantity|source,3
+124981,134828,"OrSP 47-49, 092",TRU 064,Amar-Suen,6,8,13,1,transfer,transfer,1,0,date|quantity|source,3
+124989,129745,"OrSP 47-49, 100",SCT 006,Amar-Suen,6,12,24,7,transfer,transfer,1,0,date|quantity|source,3
+124998,234954,"OrSP 47-49, 109",KM 89174,Amar-Suen,7,8,7,2,transfer,transfer,1,0,date|quantity|source,3
+125422,127497,"PDT 1, 0006","RA 009, 050 SA 161",Amar-Suen,6,11,22,1,receipt,receipt,0,1,date|quantity|receiver,3
+125464,390251,"PDT 1, 0048",LB 3190,Amar-Suen,5,2,5,2,transfer,transfer,1,0,date|quantity|source,3
+125488,431294,"PDT 1, 0072",Anonymous 431294,Amar-Suen,5,4,18,2,transfer,transfer,1,0,date|quantity|source,3
+125532,235928,"PDT 1, 0116",HS 2292,Amar-Suen,5,11,15,68,transfer,transfer,1,0,date|quantity|source,3
+125542,133882,"PDT 1, 0125",TCND 138,Amar-Suen,5,8,19,1,expenditure,transfer,1,0,date|quantity|source,3
+125560,406831,"PDT 1, 0143","HSS 68, 065",Amar-Suen,5,6,12,1,expenditure,transfer,1,0,date|quantity|source,3
+125567,126249,"PDT 1, 0150","PDT 2, 0889",Amar-Suen,3,11,29,10,transfer,transfer,1,0,date|quantity|source,3
+125595,144260,"PDT 1, 0178","SAT 2, 1060",Amar-Suen,7,5,9,1,transfer,transfer,1,0,date|quantity|source,3
+125618,320532,"PDT 1, 0202","Nisaba 08, 113",Amar-Suen,6,5,22,16,transfer,transfer,1,0,date|quantity|source,3
+125626,407593,"PDT 1, 0210","HSS 68, 622",Amar-Suen,8,9,11,30,transfer,transfer,1,0,date|quantity|source,3
+126066,131668,"PDT 1, 0650","TCL 02, 5579",Amar-Suen,8,1,9,5,transfer,expenditure,1,0,date|quantity|source,3
+126072,407565,"PDT 1, 0656","HSS 68, 594",Amar-Suen,8,4,14,8,transfer,transfer,1,0,date|quantity|source,3
+126096,303411,"PDT 1, 0680","BPOA 07, 2647",Šū-Suen,3,7,10,1,transfer,expenditure,1,0,date|quantity|source,3
+126186,210631,"PDT 2, 0823","BPOA 06, 0867",Amar-Suen,4,4,11,2,transfer,transfer,1,0,date|quantity|source,3
+126200,132024,"PDT 2, 0838",Tavolette 238,Amar-Suen,3,1,15,1,transfer,transfer,1,0,date|quantity|source,3
+126205,330674,"PDT 2, 0844","AAICAB 1/4, TCICA 22",Amar-Suen,7,1,11,6,transfer,transfer,1,0,date|quantity|source,3
+126210,134722,"PDT 2, 0849",Trouvaille 49,Amar-Suen,4,8,6,3,transfer,transfer,1,0,date|quantity|source,3
+126460,407069,"PDT 2, 1125","HSS 68, 173",Amar-Suen,2,4,16,13,transfer,transfer,1,0,date|quantity|source,3
+126519,452225,"PDT 2, 1185",Davidson 08,Amar-Suen,2,3,26,2,transfer,transfer,0,1,date|quantity|receiver,3
+126553,467617,"PDT 2, 1223","OrNS 81, 288 09",Amar-Suen,8,1,9,200,transfer,transfer,1,0,date|quantity|source,3
+126614,131729,"PDT 2, 1289","TCL 02, 5640",Amar-Suen,4,10,1,1,transfer,transfer,1,0,date|quantity|source,3
+126614,134692,"PDT 2, 1289",Trouvaille 19,Amar-Suen,4,10,1,1,transfer,expenditure,1,0,date|quantity|source,3
+126777,145558,"Princeton 1, 088",Ripon 2,Amar-Suen,4,1,29,3,expenditure,expenditure,1,0,date|quantity|source,3
+127451,134825,"RA 009, 049 SA 117",TRU 061,Amar-Suen,4,4,25,3,transfer,transfer,1,0,date|quantity|source,3
+127467,133870,"RA 009, 049 SA 133",TCND 104,Amar-Suen,5,1,11,6,transfer,transfer,1,0,date|quantity|source,3
+127499,390920,"RA 009, 050 SA 163 (pl. 4)","BPOA 06, 0727",Amar-Suen,6,5,23,4,expenditure,receipt,1,0,date|quantity|source,3
+127500,212148,"RA 009, 050 SA 164","Hermitage 3, 324",Amar-Suen,7,1,25,1,receipt,receipt,0,1,date|quantity|receiver,3
+127538,320674,"RA 009, 051 SA 199","Nisaba 08, 229",Amar-Suen,4,10,8,1,receipt,receipt,0,1,date|quantity|receiver,3
+127578,132017,"RA 009, 055 SA 234",Tavolette 231,Amar-Suen,5,11,23,1,transfer,expenditure,1,0,date|quantity|source,3
+128161,135078,Rochester 056,TRU 314,Amar-Suen,6,1,15,2,transfer,expenditure,1,0,date|quantity|source,3
+128179,321018,Rochester 074,"Nisaba 08, 368",Amar-Suen,8,4,1,21,transfer,transfer,0,1,date|quantity|receiver,3
+128624,133887,SA 023,TCND 153,Amar-Suen,5,12,4,4,transfer,transfer,1,0,date|quantity|source,3
+128624,320626,SA 023,"Nisaba 08, 207",Amar-Suen,5,12,4,4,transfer,transfer,1,0,date|quantity|source,3
+128776,407105,"SACT 1, 019","HSS 68, 207",Amar-Suen,4,8,3,20,transfer,transfer,1,0,date|quantity|source,3
+128830,134275,"SACT 1, 075","TLB 03, 134",Šulgi,46,8,16,6,receipt,receipt,0,1,date|quantity|receiver,3
+128835,320994,"SACT 1, 080","Nisaba 08, 359",Amar-Suen,1,7,26,1,receipt,receipt,0,1,date|quantity|receiver,3
+129443,132034,SET 033,Tavolette 249,Amar-Suen,7,10,26,3,receipt,receipt,0,1,date|quantity|receiver,3
+131729,134692,"TCL 02, 5640",Trouvaille 19,Amar-Suen,4,10,1,1,transfer,expenditure,1,0,date|quantity|source,3
+131923,407082,Tavolette 137,"HSS 68, 186",Amar-Suen,1,9,16,22,transfer,transfer,0,1,date|quantity|receiver,3
+132116,407559,Tavolette 332,"HSS 68, 589",Amar-Suen,4,1,11,8,,transfer,1,0,date|quantity|source,3
+133889,211937,TCND 155,"Hermitage 3, 304",Amar-Suen,5,12,12,2,transfer,transfer,1,0,date|quantity|source,3
+134850,407959,TRU 086,"HSS 68, 674",Amar-Suen,7,4,3,40,transfer,transfer,1,0,date|quantity|source,3
+135124,212169,TRU 360,"Hermitage 3, 388",Šū-Suen,7,11,3,1,expenditure,expenditure,1,0,date|quantity|source,3
+136275,407566,UDT 141,"HSS 68, 595",Amar-Suen,8,2,25,3,transfer,transfer,1,0,date|quantity|source,3
+136286,407288,UDT 152,"HSS 68, 356",Amar-Suen,8,1,12,1,transfer,expenditure,1,0,date|quantity|source,3
+143111,407264,"MVN 20, 178","HSS 68, 334",Amar-Suen,9,2,27,9,transfer,transfer,1,0,date|quantity|source,3
+143873,320825,"SAT 2, 0673","Nisaba 08, 278",Amar-Suen,1,9,21,2,transfer,transfer,1,0,date|quantity|source,3
+144089,235606,"SAT 2, 0889",USC 6795,Amar-Suen,5,4,24,1,transfer,transfer,1,0,date|quantity|source,3
+144267,144316,"SAT 2, 1067","SAT 2, 1116",Amar-Suen,8,5,2,32,expenditure,expenditure,1,0,date|quantity|source,3
+210401,407574,"BPOA 06, 0624","HSS 68, 603",Amar-Suen,6,9,9,1,transfer,expenditure,1,0,date|quantity|source,3
+211664,212165,"Hermitage 3, 329","Hermitage 3, 331",Amar-Suen,7,4,18,1,transfer,transfer,1,0,date|quantity|source,3
+211696,289528,"Hermitage 3, 356","JCS 57, 027 03",Amar-Suen,9,9,3,4,expenditure,expenditure,1,0,date|quantity|source,3
+211932,212054,"Hermitage 3, 258","Hermitage 3, 260",Amar-Suen,5,4,4,7,transfer,transfer,1,0,date|quantity|source,3
+212171,406780,"Hermitage 3, 390","HSS 68, 014",Šū-Suen,8,4,4,1,expenditure,expenditure,1,0,date|quantity|source,3
+273487,330661,"RA 101, 38 03","AAICAB 1/4, TCICA 09",Šulgi,47,7,15,20,expenditure,expenditure,1,0,date|quantity|source,3
+273488,330660,"RA 101, 37 02","AAICAB 1/4, TCICA 08",Šulgi,47,6,25,15,expenditure,expenditure,1,0,date|quantity|source,3
+303434,393060,"BPOA 07, 2666",PH 016,Amar-Suen,4,11,1,2,receipt,expenditure,1,0,date|quantity|source,3
+303440,407121,"BPOA 07, 2673","HSS 68, 223",Amar-Suen,4,10,13,5,transfer,transfer,1,0,date|quantity|source,3
+303506,303577,"BPOA 07, 2734","BPOA 07, 2798",Šulgi,46,1,16,5,receipt,receipt,0,1,date|quantity|receiver,3
+303812,332517,"BPOA 07, 3011",NABU 2001/104,Amar-Suen,4,5,16,1,transfer,transfer,1,0,date|quantity|source,3
+320831,320919,"Nisaba 08, 282","Nisaba 08, 323",Amar-Suen,6,11,5,2,receipt,receipt,0,1,date|quantity|receiver,3
+389855,407249,LB 2220,"HSS 68, 321",Amar-Suen,7,7,15,1,transfer,expenditure,1,0,date|quantity|source,3
+390935,406882,"BPOA 06, 0868","HSS 68, 114",Amar-Suen,5,8,11,1,transfer,transfer,1,0,date|quantity|source,3
+407083,407272,"HSS 68, 187","HSS 68, 342",Amar-Suen,7,3,25,2,transfer,transfer,1,0,date|quantity|source,3
+407612,407951,"HSS 68, 641","HSS 68, 666",Amar-Suen,2,5,9,2,transfer,transfer,1,0,date|quantity|source,3
