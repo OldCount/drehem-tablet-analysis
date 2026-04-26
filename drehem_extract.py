@@ -44,47 +44,103 @@ OFFICIAL_TITLES = [
 
 # Officials → office mapping (based on Tsouparopoulou 2013 and Liu)
 # C = Chief Official, D = Disbursal Office, S = Shepherds Office, X = Dead Animals
+#
+# Sub-bureau labels follow Tsouparopoulou's branch reconstruction:
+#   Disbursal-NakabtumA/B, Disbursal-Tummal, Disbursal-NippurUr,
+#   Disbursal-RoyalCourt, Disbursal-ExoticAnimals
+#   Shepherds-LuNingirsu, Shepherds-Enlila, Shepherds (shepherd specialists)
+#   DeadAnimals-Kitchen, DeadAnimals-Hides
+#
+# KNOWN CONFLICTS — cannot be resolved by name alone:
+#   in-ta-e3-a: served S (Shepherds-LuNingirsu, AS.03–09) before becoming
+#     C (Chief Official, AS.09–IS.02). Mapped to C (later, higher role).
+#     Tablets from AS.03–09 will be mis-assigned to C.
+#   lu2-dingir-ra: two distinct officials share this ATF name:
+#     (1) Lu-dingira son of Inim-Šara → Disbursal-NakabtumB (Š.45–AS.03)
+#     (2) Lu-dingira son of Urdu-Hula → Disbursal-ExoticAnimals (Š.43–AS.09)
+#     Mapped to NakabtumB (primary usage). Exotic-animals tablets will be
+#     mis-assigned. Prosopographic disambiguation requires filiation data.
+#   na-lu: active in both Tummal (Š.44) and Nippur/Ur branches (Š.28–ŠS.05).
+#     Mapped to Tummal; Nippur/Ur tablets by Nalu will be mis-assigned.
 OFFICIALS_TO_OFFICE = {
-    # Chief Officials (C)
-    "na-sa6":              ("C", "Chief Official"),
-    "ab-ba-sa6-ga":        ("C", "Chief Official"),
-    "lugal-amar-ku":       ("C", "Chief Official"),
-    "in-ta-e3-a":          ("C", "Chief Official"),
-    # Disbursal Office – Nakabtum A
-    "a-hu-ni":             ("D", "Disbursal-NakabtumA"),
-    "{d}szul-gi-a-a-gu":   ("D", "Disbursal-NakabtumA"),
-    "szu-ma-ma":           ("D", "Disbursal-NakabtumA"),
-    "zu-ba-ga":            ("D", "Disbursal-NakabtumA"),
-    # Disbursal Office – Nakabtum B
-    "lu2-dingir-ra":       ("D", "Disbursal-NakabtumB"),
-    "a-hu-we-er":          ("D", "Disbursal-NakabtumB"),
-    "igi-{d}en-lil2-sze3": ("D", "Disbursal-NakabtumB"),
-    # Disbursal Office – Tummal
-    "asz-ni-u3":           ("D", "Disbursal-Tummal"),
-    "na-lu":               ("D", "Disbursal-Tummal"),
-    "en-dingir-gu":        ("D", "Disbursal-Tummal"),
-    # Disbursal Office – Nippur/Ur
-    "a-ba-{d}en-lil2-gin7": ("D", "Disbursal-NippurUr"),
-    # Disbursal Office – Royal Court
-    "tu-ra-am-{d}da-gan":  ("D", "Disbursal-RoyalCourt"),
-    "uta-mi-szar-am":      ("D", "Disbursal-RoyalCourt"),
-    "{d}szul-gi-a-a-mu":   ("D", "Disbursal"),
-    "puzur4-{d}en-lil2":   ("D", "Disbursal"),
-    # Shepherds Office (S)
-    "ur-ku3-nun-na":       ("S", "Shepherds"),
-    "du-ga":               ("S", "Shepherds"),
-    "ab-ba-kal-la":        ("S", "Shepherds"),
-    "en-lil2-la":          ("S", "Shepherds"),
-    "lugal-me-lam2":       ("S", "Shepherds"),
-    "lugal-he2-gal2":      ("S", "Shepherds"),
-    "ur-sa6-ga":           ("S", "Shepherds"),
-    # Dead Animals Office (X)
-    "ur-nigar{gar}":       ("X", "DeadAnimals"),
-    "ur-nigar":            ("X", "DeadAnimals"),
-    "{d}szul-gi-iri-mu":   ("X", "DeadAnimals"),
-    "be-li2-a-ri-ik":      ("X", "DeadAnimals"),
-    "nur-{d}suen":         ("X", "DeadAnimals-Hides"),
-    "lu2-kal-la":          ("X", "DeadAnimals-Hides"),
+    # ── Chief Officials (C) ───────────────────────────────────────────────────
+    "na-sa6":                  ("C", "Chief Official"),   # Nasa,         Š.42–AS.02
+    "ab-ba-sa6-ga":            ("C", "Chief Official"),   # Abba-saga,    AS.02–AS.09
+    "lugal-amar-ku":           ("C", "Chief Official"),   # Lugal-amar-ku, AS.08 temp
+    "in-ta-e3-a":              ("C", "Chief Official"),   # Intaea,       AS.09–IS.02 (also S AS.03–09; see conflict note)
+
+    # ── Disbursal Office – Nakabtum A (D) ────────────────────────────────────
+    "a-hu-ni":                 ("D", "Disbursal-NakabtumA"),  # AHuni,       Š.42–AS.02
+    "{d}szul-gi-a-a-gu":       ("D", "Disbursal-NakabtumA"),  # Šulgi-ayaĝu, Š.44–AS.06
+    "szu-ma-ma":               ("D", "Disbursal-NakabtumA"),  # Šu-Mama,     AS.06–AS.08
+    "zu-ba-ga":                ("D", "Disbursal-NakabtumA"),  # Zubaga,      AS.08–ŠS.01
+    "ur-{d}nanna":             ("D", "Disbursal-NakabtumA"),  # Ur-Nanna,    successor
+    "du-du":                   ("D", "Disbursal-NakabtumA"),  # Du'udu,      successor
+    "puzur4-{d}en-lil2":       ("D", "Disbursal-NakabtumA"),  # Puzur-Enlil, successor
+
+    # ── Disbursal Office – Nakabtum B (D) ────────────────────────────────────
+    "lu2-dingir-ra":           ("D", "Disbursal-NakabtumB"),  # Lu-dingira (son of Inim-Šara), Š.45–AS.03 (see conflict note)
+    "a-hu-we-er":              ("D", "Disbursal-NakabtumB"),  # AHu-Wer,     AS.03–AS.08; ŠS.02–07
+    "igi-{d}en-lil2-sze3":     ("D", "Disbursal-NakabtumB"),  # Igi-Enlilše, AS.08–ŠS.02
+    "ib-ni-{d}suen":           ("D", "Disbursal-NakabtumB"),  # Ibni-Suen,   successor
+    "{d}szul-gi-i-li2":        ("D", "Disbursal-NakabtumB"),  # Šulgi-ilī,   successor (ATF uncertain)
+
+    # ── Disbursal Office – Tummal Branch (D) ─────────────────────────────────
+    "asz-ni-u3":               ("D", "Disbursal-Tummal"),     # Ašniu,       Š.39–Š.44
+    "na-lu":                   ("D", "Disbursal-Tummal"),     # Nalu,        Š.44; also Nippur/Ur (see conflict note)
+    "en-dingir-gu":            ("D", "Disbursal-Tummal"),     # En-dingirgu, Š.45–AS.09
+    "en-lil2-zi-sza3-gal":     ("D", "Disbursal-Tummal"),     # Enlil-zi-ša-ĝal (ATF uncertain)
+    "{d}szul-gi-si-sa2":       ("D", "Disbursal-Tummal"),     # Šulgi-sisa   (ATF uncertain)
+    "lu2-sa3-ga":              ("D", "Disbursal-Tummal"),     # Lu-saga      (ATF uncertain)
+    "ku-ru-ub-i-la-ak":        ("D", "Disbursal-Tummal"),     # Kurub-ilak   (Akkadian name; ATF uncertain)
+
+    # ── Disbursal Office – Nippur/Ur Branch (D) ──────────────────────────────
+    "a-ba-{d}en-lil2-gin7":    ("D", "Disbursal-NippurUr"),   # Aba-Enlilgin, ŠS.06–IS.02
+
+    # ── Disbursal Office – Royal Court Branch (D) ────────────────────────────
+    "tu-ra-am-{d}da-gan":      ("D", "Disbursal-RoyalCourt"), # Turam-Dagan,  AS.04–AS.07
+    "uta-mi-szar-am":          ("D", "Disbursal-RoyalCourt"), # Uta-mišaram,  AS.04–AS.08
+    "ta-hi-isz-a-tal":         ("D", "Disbursal-RoyalCourt"), # Tahiš-atal,   AS.04–ŠS.06 (Akkadian name; ATF uncertain)
+
+    # ── Disbursal Office – Rare/Exotic Animals Branch (D) ────────────────────
+    "su-ka-li":                ("D", "Disbursal-ExoticAnimals"),  # Sukalli, Š.38–AS.02; ŠS.03–IS.02 (ATF uncertain)
+
+    # ── Disbursal – branch uncertain ─────────────────────────────────────────
+    "{d}szul-gi-a-a-mu":       ("D", "Disbursal"),            # Šulgi-a'amu (branch not established)
+
+    # ── Shepherds Office – Family of Lu-Ningirsu (S) ─────────────────────────
+    "ur-ku3-nun-na":           ("S", "Shepherds-LuNingirsu"), # Ur-ku-nuna, Š.41–AS.08; ŠS.04–IS.02
+    "du-ga":                   ("S", "Shepherds-LuNingirsu"), # Duga,       AS.04–IS.02
+    "ab-ba-kal-la":            ("S", "Shepherds-LuNingirsu"), # Abba-kala,  ŠS.02–IS.02
+    # in-ta-e3-a served this family AS.03–09 before becoming Chief Official (mapped to C above)
+
+    # ── Shepherds Office – Family of Enlila (S) ──────────────────────────────
+    "en-lil2-la":              ("S", "Shepherds-Enlila"),     # Enlila (son of Ikalla), Š.41–ŠS.02
+    "lugal-me-lam2":           ("S", "Shepherds-Enlila"),     # Lugal-melam,   ŠS.03–IS.01
+    "lugal-he2-gal2":          ("S", "Shepherds-Enlila"),     # Lugal-hegal,   Š.47–AS.07
+    "ur-sa6-ga":               ("S", "Shepherds-Enlila"),     # Ur-saga,       from Š.42
+    "ur-szu-ga-lam-ma":        ("S", "Shepherds-Enlila"),     # Ur-šugalama,   AS.01–ŠS.07
+    "lu2-{d}nin-gir2-su":      ("S", "Shepherds-Enlila"),     # Lu-Ningirsu,   ŠS.07–IS.01
+    "lu2-{d}suen":             ("S", "Shepherds-Enlila"),     # Lu-Suen,       ŠS.08–IS.02
+
+    # ── Shepherds Office – Shepherd Specialists (S) ───────────────────────────
+    "ur-mes":                  ("S", "Shepherds"),            # Ur-mes (family of Lana)
+    "u3-de3-nig2-sa2-ga":      ("S", "Shepherds"),            # Ude-nig-saga   (ATF uncertain)
+    "a-a-la-gu3":              ("S", "Shepherds"),            # A'alaĝu (son of Lana; ATF uncertain)
+    "a-ia3-dingir":            ("S", "Shepherds"),            # Aya-dingir
+    "za-zi":                   ("S", "Shepherds"),            # Zazi,          AS.08–IS.02
+    "lugal-ezem":              ("S", "Shepherds"),            # Lugal-ezem,    AS.03–IS.01
+    "a-ha-ni-szu":             ("S", "Shepherds"),            # Aha-nišu,      AS.06–ŠS.03
+
+    # ── Dead Animals Office – Kitchen Department (X) ─────────────────────────
+    "be-li2-a-ri-ik":          ("X", "DeadAnimals-Kitchen"),  # Beli-arik,    Š.42–Š.43
+    "ur-nigar{gar}":           ("X", "DeadAnimals-Kitchen"),  # Ur-niĝar,     Š.43–AS.03
+    "ur-nigar":                ("X", "DeadAnimals-Kitchen"),  # variant spelling
+    "{d}szul-gi-iri-mu":       ("X", "DeadAnimals-Kitchen"),  # Šulgi-iriĝu,  AS.03–IS.02
+
+    # ── Dead Animals Office – Hides & Carcasses Department (X) ───────────────
+    "nur-{d}suen":             ("X", "DeadAnimals-Hides"),    # Nur-Suen,     AS.02–ŠS.03
+    "lu2-kal-la":              ("X", "DeadAnimals-Hides"),    # Lukalla,      ŠS.04–ŠS.09
 }
 
 # Known deities that appear as recipients in offering texts
@@ -193,6 +249,21 @@ NON_ANIMAL_LINE_MARKERS = {
     "kusz",                            # leather/hide
     "kusze",                           # leather container
 }
+
+# Derived-commodity suppression: when one of these tokens appears *immediately*
+# after a matched animal name (e.g. "gu4 siki"), the line records a product
+# derived from that animal, NOT a live-animal count.  The entry is skipped.
+DERIVED_COMMODITY_MARKERS = {
+    "siki",       # wool (e.g. "gu4 siki" = wool of oxen)
+    "siki-bi",    # its wool
+    "kusz",       # hide / leather
+    "kusze",      # leather container
+}
+
+# Carcass markers: appear *between* the numeral and the animal name.
+# "3(disz) ad7 gu4" = 3 dead/carcass oxen.  Skip the marker and still count
+# the animal; add qualifier "ba-usz2" (dead) automatically.
+CARCASS_MARKERS = {"ad3", "ad6", "ad7"}
 
 # Drehem (Reichskalender) month names → month number
 MONTH_NAMES = {
@@ -496,9 +567,11 @@ def strip_atf_damage(text: str) -> str:
     Also normalises ATF komma notation: s, → s (represents the sibilant ṣ;
     the comma is a transliteration convention, not a separator).
     """
-    text = re.sub(r"\[([^\]]*)\]", r"\1", text)  # [x] → x
+    text = re.sub(r"<<[^>]*>>", "", text)        # <<...>> editorial corrections
+    text = re.sub(r"<([^>]*)>", r"\1", text)     # <x> → x  (supplied signs)
+    text = re.sub(r"\[([^\]]*)\]", r"\1", text)  # [x] → x  (reconstructed)
     text = text.replace("#", "").replace("?", "").replace("!", "")
-    text = re.sub(r"<<[^>]*>>", "", text)
+    text = re.sub(r"\s+", " ", text)             # collapse double spaces from removal
     # We do NOT replace "s," with "s", to preserve ATF "s," for exact matches with dictionary keys (te-s,i-in-ma-ma)
     return text.strip()
 
@@ -629,14 +702,26 @@ def extract_transaction_type(lines: list[str]) -> str:
     """Identify primary transaction type from content lines."""
     # Primary transaction keywords, checked against the last lines first
     primary_keywords = {
-        "szu ba-ti":  "to accept",
-        "ba-zi":      "expenditure",
-        "i3-dab5":    "transfer",
-        "mu-kux(DU)": "delivery",
+        "szu ba-ti":    "receipt",
+        "ba-zi":        "expenditure",
+        "ba-an-zi":     "expenditure",   # n-infix variant, common in bala texts
+        "i3-dab5":      "transfer",
+        "mu-kux(DU)":   "delivery",
         "mu-kux(DU)-ra-ta": "delivery",
         "mu-kux(DU)-ra": "delivery",
-        "mu-kux":     "delivery",
+        "mu-kux":       "delivery",
     }
+
+    # Bug fix: damaged mu-kux detection.
+    # strip_atf_damage removes bracket contents, so "mu-[kux(DU)...]" becomes
+    # "mu-" and is never matched.  Pre-check on raw lines before stripping.
+    _damaged_mukux = re.compile(r"mu-\[kux|mu-\[DU")
+    for line in reversed(lines):
+        if _damaged_mukux.search(line):
+            full_text = " ".join(lines)
+            if "mu-kux(DU) lugal" in full_text or "mu-kux lugal" in full_text:
+                return "royal_delivery"
+            return "delivery"
 
     # Scan lines in reverse: the last-occurring keyword is the primary transaction
     for line in reversed(lines):
@@ -1008,20 +1093,41 @@ def extract_animals(lines: list[str]) -> tuple[list[AnimalEntry], bool, bool]:
                 numeral_text = cleaned[num_start:num_end]
                 after_num = cleaned[num_end:].strip()
 
+                # Bug fix: carcass-marker handling.
+                # "N ad7 ANIMAL" → skip ad7/ad6/ad3, match animal, add qualifier ba-usz2
+                after_for_animal = after_num
+                carcass_qualifier = None
+                for _cm in CARCASS_MARKERS:
+                    if after_for_animal.startswith(_cm + " ") or after_for_animal == _cm:
+                        carcass_qualifier = "ba-usz2"
+                        after_for_animal = after_for_animal[len(_cm):].strip()
+                        break
+
                 animal_found = None
                 for animal in sorted_animals:
-                    if after_num.startswith(animal):
+                    if after_for_animal.startswith(animal):
                         end_pos = len(animal)
-                        if end_pos >= len(after_num) or after_num[end_pos] in " \t":
-                            if not _is_animal_false_positive(animal, after_num):
+                        if end_pos >= len(after_for_animal) or after_for_animal[end_pos] in " \t":
+                            if not _is_animal_false_positive(animal, after_for_animal):
                                 animal_found = animal
                             break
 
                 if animal_found:
                     count = parse_numeral(numeral_text)
-                    remaining = after_num[len(animal_found):].strip()
+                    remaining = after_for_animal[len(animal_found):].strip()
                     remaining_words = re.split(r"[\s]+", remaining)
+
+                    # Bug fix: derived-commodity suppression.
+                    # "N ANIMAL siki" = wool/hide derived from the animal, not a live animal.
+                    # Skip the entire entry; the line is a commodity record, not an animal record.
+                    first_remaining = remaining_words[0] if remaining_words and remaining_words[0] else ""
+                    if first_remaining in DERIVED_COMMODITY_MARKERS:
+                        pos = num_end + len(animal_found) + 1
+                        continue
+
                     qualifiers = []
+                    if carcass_qualifier:
+                        qualifiers.append(carcass_qualifier)
                     for qual in ANIMAL_QUALIFIERS:
                         if qual in remaining_words:
                             qualifiers.append(qual)
@@ -1232,7 +1338,7 @@ def extract_divine_recipients(
         # Skip lines with person-role markers
         if any(kw in cleaned for kw in [
             "ki ", "giri3 ", "kiszib3", "mu-kux", "maszkim",
-            "szu ba-ti", "i3-dab5", "ba-zi", "zi-ga",
+            "szu ba-ti", "i3-dab5", "ba-zi", "ba-an-zi", "zi-ga",
         ]):
             continue
 
@@ -1255,24 +1361,37 @@ def extract_divine_recipients(
 def classify_office(persons: list[Person]) -> tuple[str, str]:
     """
     Map known officials to their office branch.
-    Returns (source_office, receiver_office).
+    Returns (source_office, receiver_office) as "; "-joined strings when
+    multiple distinct offices appear on the same side (rare but real).
+
+    Roles considered:
+      source side  → role in ("source", "deliverer")
+      receiver side → role in ("receiver", "sealer")
+
+    Intermediaries and commissioners are not used for office assignment —
+    they supervise but do not own the transaction.
     """
-    source_office = ""
-    receiver_office = ""
+    source_offices: list[str] = []
+    receiver_offices: list[str] = []
+    seen_source: set[str] = set()
+    seen_receiver: set[str] = set()
 
     for person in persons:
-        name = person.name
-        office_info = OFFICIALS_TO_OFFICE.get(name)
+        office_info = OFFICIALS_TO_OFFICE.get(person.name)
         if not office_info:
             continue
+        _, branch = office_info
 
-        code, branch = office_info
-        if person.role == "source" and not source_office:
-            source_office = branch
-        elif person.role in ("receiver", "sealer") and not receiver_office:
-            receiver_office = branch
+        if person.role in ("source", "deliverer"):
+            if branch not in seen_source:
+                source_offices.append(branch)
+                seen_source.add(branch)
+        elif person.role in ("receiver", "sealer"):
+            if branch not in seen_receiver:
+                receiver_offices.append(branch)
+                seen_receiver.add(branch)
 
-    return source_office, receiver_office
+    return "; ".join(source_offices), "; ".join(receiver_offices)
 
 
 # ---------------------------------------------------------------------------
@@ -1447,7 +1566,7 @@ def process_database(
             "has_summary_line", "has_sza3_bi_ta",
             "divine_recipients", "destination", "destination_category",
             "month_name", "year_name",
-            "has_transliteration", "extraction_confidence",
+            "has_transliteration", "extraction_score",
             "preservation_score", "damaged_signs", "broken_signs",
         ]
         writer = csv.DictWriter(outfile, fieldnames=out_fields)
@@ -1487,8 +1606,7 @@ def process_database(
                     label += f"-{quals}"
                 animal_parts.append(label)
 
-            # Simple confidence score based on what was extracted
-            confidence = compute_confidence(extraction, bool(trans))
+            extraction_score = compute_extraction_score(extraction, bool(trans))
 
             writer.writerow({
                 "tablet_id": tid,
@@ -1527,7 +1645,7 @@ def process_database(
                 "month_name": extraction.month,
                 "year_name": extraction.year,
                 "has_transliteration": "1" if trans else "0",
-                "extraction_confidence": confidence,
+                "extraction_score": extraction_score,
                 "preservation_score": extraction.damage.preservation,
                 "damaged_signs": extraction.damage.damaged_signs,
                 "broken_signs": extraction.damage.broken_signs,
@@ -1540,8 +1658,15 @@ def process_database(
         print(f"Processed {count} tablets → {output_path}")
 
 
-def compute_confidence(extraction: TabletExtraction, has_trans: bool) -> str:
-    """Assign confidence label based on extraction reliability and preservation."""
+def compute_extraction_score(extraction: TabletExtraction, has_trans: bool) -> str:
+    """
+    Assign a data-quality label (high/medium/low/none) based on how complete
+    and well-preserved a tablet's extraction is.
+
+    This is NOT an accuracy score — it measures tablet legibility and field
+    coverage, not whether the extracted values are correct.  Use it to filter
+    tablets before analysis (e.g. drop 'low' and 'none').
+    """
     if not has_trans:
         return "none"
 

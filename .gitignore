@@ -22,8 +22,11 @@ __pycache__/
 # ORACC cache (downloaded on demand)
 .oracc_cache/
 
-# Validation outputs
-validation/
+# Validation: ignore generated outputs, track source files (ground_truth.json, known_issues.md)
+validation/test_report_*.json
+validation/regression_snapshot.json
+validation/sample_*.csv
+validation/sample_*.txt
 
 # Benchmark outputs
 benchmark/

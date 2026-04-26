@@ -1,0 +1,359 @@
+{
+  "_meta": {
+    "description": "Ground truth for drehem_extract.py accuracy testing",
+    "last_updated": "2026-04-01",
+    "sources": {
+      "manual_translation": "Manually translated in puzrish-dagan-vault/Ga maar vertalen/",
+      "cdli": "CDLI transliteration + philological consensus",
+      "edge_case": "Documented edge case from CLAUDE.md — known-hard patterns"
+    },
+    "fields_tested": [
+      "transaction_type",
+      "source",
+      "receiver",
+      "commissioner",
+      "total_animals",
+      "source_office",
+      "receiver_office",
+      "month_number",
+      "regnal_year",
+      "ruler",
+      "destination",
+      "destination_category",
+      "divine_recipients"
+    ]
+  },
+
+  "tablets": [
+
+    {
+      "id": "100189",
+      "designation": "AAS 211",
+      "source": "manual_translation",
+      "note": "Simple szu ba-ti receipt: dead animals from lu2-dingir-ra to ur-nigar. Clean ATF, no damage.",
+      "expected": {
+        "transaction_type": "receipt",
+        "source": "lu2-dingir-ra",
+        "receiver": "ur-nigar{gar}",
+        "commissioner": null,
+        "total_animals": 3,
+        "source_office": "Disbursal-NakabtumB",
+        "receiver_office": "DeadAnimals-Kitchen",
+        "month_number": 8,
+        "regnal_year": 46,
+        "ruler": "Šulgi",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": []
+      }
+    },
+
+    {
+      "id": "100190",
+      "designation": "AAS 212",
+      "source": "manual_translation",
+      "note": "ba-zi expenditure from na-sa6 with zabar-dab5 as maszkim (commissioner, NOT receiver). 10 animals on 2 sub-lines.",
+      "expected": {
+        "transaction_type": "expenditure",
+        "source": "na-sa6",
+        "receiver": null,
+        "commissioner": "zabar-dab5",
+        "total_animals": 10,
+        "source_office": "Chief Official",
+        "receiver_office": null,
+        "month_number": 7,
+        "regnal_year": 47,
+        "ruler": "Šulgi",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "100191",
+      "designation": "AAS 213",
+      "source": "manual_translation",
+      "note": "szu ba-ti with ONE animal: 1 masz2-gal niga a dara4! (fattened billy-goat with ibex blood). Known extractor bug: dara4! may be mis-parsed as a numeral, inflating count to 5.",
+      "expected": {
+        "transaction_type": "receipt",
+        "source": "lu2-dingir-ra",
+        "receiver": "ur-nigar{gar}",
+        "commissioner": null,
+        "total_animals": 1,
+        "source_office": "Disbursal-NakabtumB",
+        "receiver_office": "DeadAnimals-Kitchen",
+        "month_number": 3,
+        "regnal_year": 1,
+        "ruler": "Amar-Suen",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": []
+      }
+    },
+
+    {
+      "id": "100211",
+      "designation": "ActSocHun Or 5-12, 156 2",
+      "source": "manual_translation",
+      "note": "szu ba-ti with 7 animals. Includes 'a? x saga?' on line 1 (damaged). Tests damage handling.",
+      "expected": {
+        "transaction_type": "receipt",
+        "source": "lu2-dingir-ra",
+        "receiver": "ur-nigar{gar}",
+        "commissioner": null,
+        "total_animals": 7,
+        "source_office": "Disbursal-NakabtumB",
+        "receiver_office": "DeadAnimals-Kitchen",
+        "month_number": 12,
+        "regnal_year": 1,
+        "ruler": "Amar-Suen",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": []
+      }
+    },
+
+    {
+      "id": "104083",
+      "designation": "AUCT 2, 265",
+      "source": "edge_case",
+      "note": "EDGE CASE: zabar-dab5 as receiver with split lines (name on line 6, i3-dab5 verb on line 7). Extractor must carry name forward across lines.",
+      "expected": {
+        "transaction_type": "transfer",
+        "source": "na-ra-am-i3-li2",
+        "receiver": "zabar-dab5",
+        "commissioner": null,
+        "total_animals": 3,
+        "source_office": null,
+        "receiver_office": null,
+        "month_number": null,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "104731",
+      "designation": "AuOr 10, 087 1",
+      "source": "edge_case",
+      "note": "EDGE CASE: zabar-dab5 genitive chain — 'zabar-dab5 ensi2 iri-sa12-rig7{ki} i3-dab5'. Full genitive phrase before i3-dab5 is one nominal. Source = ab-ba-sa6-ga.",
+      "expected": {
+        "transaction_type": "transfer",
+        "source": "ab-ba-sa6-ga",
+        "receiver": "zabar-dab5",
+        "commissioner": null,
+        "total_animals": 880,
+        "source_office": "Chief Official",
+        "receiver_office": null,
+        "month_number": null,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "123441",
+      "designation": "OIP 115, 271",
+      "source": "edge_case",
+      "note": "EDGE CASE: zabar-dab5 as SOURCE (ki zabar-dab5-ta). Receiver = na-sa6 via i3-dab5. Tests disambiguation of zabar-dab5 role.",
+      "expected": {
+        "transaction_type": "transfer",
+        "source": "zabar-dab5",
+        "receiver": "na-sa6",
+        "commissioner": null,
+        "total_animals": 114,
+        "source_office": null,
+        "receiver_office": "Chief Official",
+        "month_number": null,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "123561",
+      "designation": "OIP 115, 272",
+      "source": "edge_case",
+      "note": "EDGE CASE: ki zabar-dab5-ta (zabar-dab5 as source), parallel to OIP 115, 271. Receiver = na-sa6.",
+      "expected": {
+        "transaction_type": "transfer",
+        "source": "zabar-dab5",
+        "receiver": "na-sa6",
+        "commissioner": null,
+        "total_animals": 86,
+        "source_office": null,
+        "receiver_office": "Chief Official",
+        "month_number": null,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "100215",
+      "designation": "Aegyptus 17, 053 070",
+      "source": "cdli",
+      "note": "ba-zi expenditure from zu-ba-ga (Disbursal-NakabtumA). Intermediary = ad-da-kal-la, commissioner = szu-{d}nin-szubur with title dub-sar.",
+      "expected": {
+        "transaction_type": "expenditure",
+        "source": "zu-ba-ga",
+        "receiver": null,
+        "commissioner": "szu-{d}nin-szubur",
+        "total_animals": 3,
+        "source_office": "Disbursal-NakabtumA",
+        "receiver_office": null,
+        "month_number": 11,
+        "regnal_year": 9,
+        "ruler": "Amar-Suen",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "100218",
+      "designation": "Aegyptus 17, 056 101",
+      "source": "cdli",
+      "note": "Transfer from ab-ba-sa6-ga (Chief) to lugal-me-lam2 (Shepherds-Enlila). Clean tablet, tests inter-office transfer routing.",
+      "expected": {
+        "transaction_type": "transfer",
+        "source": "ab-ba-sa6-ga",
+        "receiver": "lugal-me-lam2",
+        "commissioner": null,
+        "total_animals": 30,
+        "source_office": "Chief Official",
+        "receiver_office": "Shepherds-Enlila",
+        "month_number": 9,
+        "regnal_year": 5,
+        "ruler": "Amar-Suen",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": []
+      }
+    },
+
+    {
+      "id": "100222",
+      "designation": "Aegyptus 17, 059 156",
+      "source": "cdli",
+      "note": "Large bala-delivery transfer: 537 animals from lugal-ku3-zu (ensi of Eshnunna) to in-ta-e3-a (Chief Official). Tests large numeral parsing and ensi2 title handling.",
+      "expected": {
+        "transaction_type": "transfer",
+        "source": "lugal-ku3-zu ensi2 esz3-nun-na{ki}",
+        "receiver": "in-ta-e3-a",
+        "commissioner": null,
+        "total_animals": 537,
+        "source_office": null,
+        "receiver_office": "Chief Official",
+        "month_number": 8,
+        "regnal_year": 2,
+        "ruler": "Šū-Suen",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": []
+      }
+    },
+
+    {
+      "id": "100268",
+      "designation": "Aegyptus 29, 107, 35",
+      "source": "cdli",
+      "note": "szu ba-ti from {d}szul-gi-a-a-mu (Disbursal) to ur-nigar{gar} (DeadAnimals). 10 animals including suckling young.",
+      "expected": {
+        "transaction_type": "receipt",
+        "source": "{d}szul-gi-a-a-mu",
+        "receiver": "ur-nigar{gar}",
+        "commissioner": null,
+        "total_animals": 10,
+        "source_office": "Disbursal",
+        "receiver_office": "DeadAnimals-Kitchen",
+        "month_number": null,
+        "regnal_year": 3,
+        "ruler": "Amar-Suen",
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": []
+      }
+    },
+
+    {
+      "id": "123484",
+      "designation": "OIP 115, 001",
+      "source": "edge_case",
+      "note": "EDGE CASE: wool-of-oxen record. Line 3 'gu4 siki ge6-ge6' = black wool of oxen (NOT live oxen). Line 4 'siki udu mu-kux(DU) lugal' = wool from sheep, royal delivery. total_animals should be 0: this is a commodity (siki/wool) record, not a live-animal record.",
+      "expected": {
+        "transaction_type": "receipt",
+        "source": null,
+        "receiver": null,
+        "commissioner": null,
+        "total_animals": 0,
+        "source_office": null,
+        "receiver_office": null,
+        "month_number": 7,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "123329",
+      "designation": "OIP 115, 003",
+      "source": "edge_case",
+      "note": "EDGE CASE: damaged mu-kux. Line 5 'mu-[kux(DU) ... x]' — the kux(DU) kernel is inside the damage bracket. strip_atf_damage removes it, leaving bare 'mu-'. Fix: pre-check raw lines for mu-[kux before stripping.",
+      "expected": {
+        "transaction_type": "delivery",
+        "source": null,
+        "receiver": null,
+        "commissioner": null,
+        "total_animals": null,
+        "source_office": null,
+        "receiver_office": null,
+        "month_number": 6,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    },
+
+    {
+      "id": "123525",
+      "designation": "OIP 115, 028",
+      "source": "edge_case",
+      "note": "EDGE CASE: carcass markers ad6/ad7. Lines: '3 ad7 gu4' (3 dead oxen), '58 ad7 udu u2' (58 dead grass-fed sheep), '7 ad6? masz2' (7 dead goats). Total = 68. Transaction = expenditure (zi-ga). Dead animals SHOULD count toward total_animals with qualifier ba-usz2.",
+      "expected": {
+        "transaction_type": "expenditure",
+        "source": "be-li2-du10",
+        "receiver": null,
+        "commissioner": null,
+        "total_animals": 68,
+        "source_office": null,
+        "receiver_office": null,
+        "month_number": 2,
+        "regnal_year": null,
+        "ruler": null,
+        "destination": null,
+        "destination_category": null,
+        "divine_recipients": null
+      }
+    }
+  ]
+}
