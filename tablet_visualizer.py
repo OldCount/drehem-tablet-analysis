@@ -1120,10 +1120,30 @@ def compute_timeline_data():
         "X": "Dead Animals Office",
     }
 
+    # ORACC name normalization — used to provide a "standardized name" view
+    # (e.g. "ab-ba-sa6-ga" → "Abbasaga"). Falls back to the raw ATF token
+    # when the official is not in the dictionary.
+    try:
+        from build_name_dictionary import normalize_name as _norm
+    except Exception:
+        _norm = None
+
+    def _canon(name: str) -> str:
+        if _norm is None:
+            return name
+        try:
+            r = _norm(name)
+        except Exception:
+            return name
+        if r and r.get("canonical"):
+            return r["canonical"]
+        return name
+
     officials = {}   # name -> dict
     for name, (office, sub) in OFFICIALS_TO_OFFICE.items():
         officials[name] = {
             "name": name,
+            "normalized_name": _canon(name),
             "office": office,
             "office_label": OFFICE_LABELS.get(office, office),
             "sub_office": sub,

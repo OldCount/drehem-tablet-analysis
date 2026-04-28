@@ -93,6 +93,12 @@
       grid-template-columns: 300px 1fr 360px;
     }
 
+    /* Timeline view takes the full main + right-panel width.
+       The right panel collapses, the sidebar is hidden by default. */
+    .app.timeline-mode { grid-template-columns: 0px 1fr 0; }
+    .app.timeline-mode.sidebar-open { grid-template-columns: 300px 1fr 0; }
+    .app.timeline-mode #rightPanel { display: none; }
+
     /* Header */
     .header {
       grid-column: 1 / -1;
@@ -1931,146 +1937,486 @@
 
     /* Timeline view */
     .timeline-view {
+      --tl-name-w: 200px;
+      --tl-meta-w: 80px;
+      --tl-cell-w: 22px;
+      --tl-row-h: 24px;
+      --tl-axis-h: 76px;
+      --tl-c-C: #4a9eff;
+      --tl-c-D: #b07fe0;
+      --tl-c-S: #00d68f;
+      --tl-c-X: #ff6b81;
       padding: 24px 28px 60px;
     }
     .timeline-view h2 {
       font-size: 22px;
       font-weight: 700;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .timeline-view .tl-subtitle {
       font-size: 12px;
       color: var(--text-dim);
-      margin-bottom: 18px;
-    }
-    .timeline-legend {
-      display: flex;
-      gap: 14px;
       margin-bottom: 16px;
+    }
+
+    /* Toolbar */
+    .tl-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       flex-wrap: wrap;
-      font-size: 11px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+    }
+    .tl-toolbar .tl-tb-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tl-toolbar .tl-tb-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       color: var(--text-dim);
+      margin-right: 2px;
     }
-    .timeline-legend .lg-item { display: flex; align-items: center; gap: 6px; }
-    .timeline-legend .lg-swatch {
-      width: 12px; height: 12px; border-radius: 3px; display: inline-block;
+    .tl-toolbar input[type=text] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 5px 9px;
+      font-size: 12px;
+      width: 160px;
+      outline: none;
     }
-    .timeline-grid-wrap {
+    .tl-toolbar input[type=text]:focus { border-color: var(--accent); }
+    .tl-toolbar select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      outline: none;
+    }
+    .tl-toolbar input[type=range] { width: 110px; }
+    .tl-chip {
+      cursor: pointer;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 11px;
+      user-select: none;
+      transition: all 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .tl-chip:hover { border-color: var(--border-glow); }
+    .tl-chip.off { opacity: 0.35; }
+    .tl-chip .tl-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      display: inline-block;
+    }
+    .tl-tb-toggle {
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 11px;
+      user-select: none;
+    }
+    .tl-tb-toggle.on {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(74, 158, 255, 0.1);
+    }
+    .tl-name-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0;
+      cursor: pointer;
+      user-select: none;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px;
+      font-size: 11px;
+      position: relative;
+    }
+    .tl-name-switch input { display: none; }
+    .tl-name-switch .tl-name-side {
+      padding: 3px 10px;
+      border-radius: 999px;
+      transition: color 0.18s, background 0.18s;
+      color: var(--text-dim);
+      z-index: 1;
+    }
+    .tl-name-switch.norm .tl-name-side[data-mode="norm"],
+    .tl-name-switch.raw  .tl-name-side[data-mode="raw"] {
+      background: var(--accent);
+      color: #051018;
+      font-weight: 700;
+    }
+    .tl-name-knob { display: none; }
+
+    /* Frame & scroller */
+    .tl-frame {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 14px;
+      overflow: hidden;
+    }
+    .tl-scroll {
       overflow-x: auto;
+      overflow-y: visible;
+      max-height: 70vh;
+      overflow-y: auto;
+      position: relative;
     }
-    .tl-grid {
-      display: grid;
-      grid-auto-flow: row;
-      gap: 0;
+    .tl-track-area {
+      min-width: max-content;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 10px;
-      min-width: 720px;
+      font-size: 11px;
     }
-    .tl-row {
-      display: grid;
-      align-items: center;
-      gap: 0;
-      border-bottom: 1px solid rgba(42, 48, 80, 0.25);
-    }
-    .tl-row.tl-header {
+
+    /* Axis: reign banner + period labels */
+    .tl-axis {
+      display: flex;
       position: sticky;
       top: 0;
+      z-index: 5;
+      background: linear-gradient(to bottom, var(--surface) 70%, rgba(20, 24, 40, 0.7) 100%);
+      backdrop-filter: blur(4px);
+      border-bottom: 1px solid var(--border-glow);
+      height: var(--tl-axis-h);
+    }
+    .tl-axis-name {
+      width: var(--tl-name-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 0 8px 18px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
+      border-right: 1px solid var(--border);
       background: var(--surface);
-      z-index: 2;
+    }
+    .tl-axis-track {
+      flex: 0 0 auto;
+      position: relative;
+    }
+    .tl-axis-meta {
+      width: var(--tl-meta-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-end;
+      padding: 0 10px 8px 0;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .tl-reign-band {
+      position: absolute;
+      top: 4px;
+      height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .tl-reign-band span {
+      padding: 0 8px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+    .tl-period-label {
+      position: absolute;
+      bottom: 2px;
+      width: var(--tl-cell-w);
+      text-align: center;
       font-size: 9px;
       color: var(--text-dim);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border-glow);
+      transform-origin: center bottom;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      height: 38px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 4px;
+      cursor: pointer;
+      user-select: none;
     }
-    .tl-row.tl-office {
-      background: rgba(74, 158, 255, 0.05);
+    .tl-period-label:hover { color: var(--text); }
+    .tl-period-label.reign-start {
       color: var(--accent);
       font-weight: 700;
-      font-size: 11px;
+    }
+    .tl-period-label.active {
+      color: var(--accent);
+    }
+    .tl-period-marker {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(80, 90, 130, 0.18);
+      pointer-events: none;
+    }
+    .tl-period-marker.reign {
+      background: rgba(74, 158, 255, 0.4);
+      width: 1px;
+    }
+
+    /* Office groups */
+    .tl-office-group { border-bottom: 1px solid var(--border); }
+    .tl-office-group:last-child { border-bottom: none; }
+    .tl-office-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px 9px 14px;
+      cursor: pointer;
+      user-select: none;
+      background: rgba(255, 255, 255, 0.02);
+      transition: background 0.15s;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+    }
+    .tl-office-header:hover { background: rgba(255, 255, 255, 0.04); }
+    .tl-office-header .tl-chevron {
+      display: inline-block;
+      width: 10px;
+      transition: transform 0.2s;
+      color: var(--text-dim);
+      font-size: 9px;
+    }
+    .tl-office-group.collapsed .tl-chevron { transform: rotate(-90deg); }
+    .tl-office-header .tl-office-color {
+      width: 8px;
+      height: 16px;
+      border-radius: 2px;
+    }
+    .tl-office-header .tl-office-label {
+      font-size: 12px;
+      font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
-    .tl-row.tl-office .tl-name { padding: 8px 8px 8px 6px; }
-    .tl-name {
-      padding: 6px 8px 6px 18px;
+    .tl-office-header .tl-office-count {
+      font-size: 10px;
+      color: var(--text-dim);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+    .tl-office-rows {
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+    .tl-office-group.collapsed .tl-office-rows {
+      max-height: 0 !important;
+    }
+
+    /* Official rows */
+    .tl-official {
+      display: flex;
+      align-items: stretch;
+      height: var(--tl-row-h);
+      transition: background 0.12s;
+    }
+    .tl-official:hover { background: rgba(74, 158, 255, 0.04); }
+    .tl-official.selected {
+      background: rgba(74, 158, 255, 0.1);
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+    .tl-official.fade { opacity: 0.25; }
+    .tl-name-cell {
+      width: var(--tl-name-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px 0 22px;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      position: sticky;
+      left: 0;
+      background: inherit;
+      z-index: 1;
+    }
+    .tl-official:not(.selected) .tl-name-cell { background: var(--surface); }
+    .tl-official.selected .tl-name-cell { background: rgba(74, 158, 255, 0.12); }
+    .tl-name-cell .tl-name-marker {
+      width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+    }
+    .tl-name-cell .tl-name-text {
+      flex: 1;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      cursor: pointer;
+      font-size: 11px;
     }
-    .tl-name:hover { color: var(--accent); }
-    .tl-cell {
-      height: 22px;
-      border-left: 1px solid rgba(42, 48, 80, 0.18);
-      position: relative;
-    }
-    .tl-cell .tl-bar {
-      position: absolute;
-      bottom: 2px;
-      left: 1px;
-      right: 1px;
-      border-radius: 2px;
-      cursor: pointer;
-      transition: filter 0.15s;
-    }
-    .tl-cell .tl-bar:hover { filter: brightness(1.4); }
-    .tl-period-label {
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-      padding: 6px 0;
-      text-align: center;
+    .tl-name-cell .tl-name-sub {
+      font-size: 9px;
       color: var(--text-dim);
-    }
-    .tl-period-label.tl-reign-start {
-      color: var(--accent);
-      font-weight: 700;
-    }
-    .tl-meta {
-      padding: 0 6px;
-      font-size: 10px;
-      color: var(--text-dim);
-      text-align: right;
       white-space: nowrap;
+      max-width: 90px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+    .tl-track {
+      flex: 0 0 auto;
+      position: relative;
+      background:
+        linear-gradient(to right, transparent calc(var(--tl-cell-w) - 1px), rgba(80, 90, 130, 0.12) calc(var(--tl-cell-w) - 1px), rgba(80, 90, 130, 0.12) var(--tl-cell-w), transparent var(--tl-cell-w));
+      background-size: var(--tl-cell-w) 100%;
+    }
+    .tl-tenure-band {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      border-radius: 4px;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+    .tl-bar {
+      position: absolute;
+      bottom: 4px;
+      width: calc(var(--tl-cell-w) - 4px);
+      border-radius: 2px 2px 1px 1px;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.15s;
+      transform-origin: bottom;
+    }
+    .tl-bar:hover {
+      filter: brightness(1.5);
+      transform: scaleX(1.4);
+      z-index: 3;
+    }
+    @keyframes tl-grow {
+      from { transform: scaleY(0); }
+      to   { transform: scaleY(1); }
+    }
+    .tl-bar.animate { animation: tl-grow 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards; }
+    .tl-meta-cell {
+      width: var(--tl-meta-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 0 12px 0 10px;
+      font-size: 11px;
+      color: var(--text-dim);
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .tl-meta-cell .tl-meta-num {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* Edge overlay */
+    .tl-edge-svg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 4;
+      overflow: visible;
+    }
+    .tl-edge-path {
+      fill: none;
+      stroke-linecap: round;
+      transition: stroke 0.2s, stroke-width 0.2s;
+    }
+
+    /* Detail panel */
     .tl-detail-panel {
       margin-top: 18px;
       background: var(--surface);
       border: 1px solid var(--border-glow);
       border-radius: 12px;
-      padding: 18px 20px;
+      padding: 0;
+      overflow: hidden;
       display: none;
     }
-    .tl-detail-panel.open { display: block; }
-    .tl-detail-panel h3 {
-      font-size: 16px;
-      margin-bottom: 4px;
+    .tl-detail-panel.open { display: block; animation: fadeInUp 0.25s ease both; }
+    .tl-detail-head {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(74, 158, 255, 0.06), transparent);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
     }
-    .tl-detail-panel .tl-detail-sub {
-      font-size: 11px;
-      color: var(--text-dim);
-      margin-bottom: 14px;
+    .tl-detail-head h3 {
+      font-size: 17px;
+      margin: 0 0 3px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tl-detail-head .tl-detail-badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 999px;
       text-transform: uppercase;
       letter-spacing: 0.4px;
+      font-weight: 700;
+      color: #000;
     }
+    .tl-detail-head .tl-detail-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.4px;
+    }
+    .tl-detail-close {
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-dim);
+      padding: 0 4px;
+    }
+    .tl-detail-close:hover { color: var(--text); }
+    .tl-detail-body { padding: 16px 20px 20px; }
     .tl-stat-row {
-      display: flex;
-      gap: 18px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
     }
     .tl-stat {
       background: var(--surface2);
       padding: 10px 14px;
       border-radius: 8px;
-      min-width: 100px;
+      border: 1px solid var(--border);
     }
     .tl-stat .v {
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 700;
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
@@ -2079,37 +2425,84 @@
       font-size: 10px;
       color: var(--text-dim);
       text-transform: uppercase;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
     }
-    .tl-edges {
+    .tl-network-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 18px;
     }
-    .tl-edges h4 {
+    @media (max-width: 720px) { .tl-network-grid { grid-template-columns: 1fr; } }
+    .tl-network-grid h4 {
       font-size: 11px;
       color: var(--text-dim);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      margin-bottom: 8px;
+      margin: 0 0 8px 0;
     }
-    .tl-edge-list { font-size: 12px; }
     .tl-edge-list .e {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 130px 1fr 40px;
+      align-items: center;
+      gap: 8px;
       padding: 4px 0;
-      border-bottom: 1px solid rgba(42, 48, 80, 0.25);
+      font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
     }
-    .tl-edge-list .e:last-child { border-bottom: none; }
+    .tl-edge-list .e .nm {
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+    }
+    .tl-edge-list .e .nm:hover { color: var(--accent); }
+    .tl-edge-list .e .bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--surface2);
+      overflow: hidden;
+    }
+    .tl-edge-list .e .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
     .tl-edge-list .e .c {
       color: var(--accent);
       font-weight: 600;
+      text-align: right;
     }
-    .tl-office-color-C { background: #4a9eff; }
-    .tl-office-color-D { background: #b07fe0; }
-    .tl-office-color-S { background: #00d68f; }
-    .tl-office-color-X { background: #ff6b81; }
+
+    /* Tooltip for cells */
+    .tl-tip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(20, 24, 40, 0.96);
+      border: 1px solid var(--border-glow);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.12s;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+    .tl-tip.visible { opacity: 1; }
+    .tl-tip .t-name { color: var(--accent); font-weight: 600; }
+    .tl-tip .t-period { color: var(--text-dim); margin-left: 6px; }
+    .tl-tip .t-count { color: var(--text); margin-top: 2px; }
+
+    .tl-empty {
+      padding: 28px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 12px;
+    }
 
     /* Help modal */
     .help-modal {
@@ -2459,6 +2852,8 @@
 
     // ---- Tablet loading ----
     async function loadTablet(id) {
+      // Leaving timeline view: restore standard 3-pane layout
+      document.getElementById('app').classList.remove('timeline-mode');
       currentTabletId = id;
       currentFilterIdx = filteredIndex.findIndex(t => t.id === id);
       window.location.hash = id;
@@ -3177,142 +3572,647 @@
     }
 
     // ---- Corpus stats ----
+    // Timeline state. Persisted across re-renders so toolbar/scroll feel stable.
+    const TL_STATE = {
+      officeOn: { C: true, D: true, S: true, X: true },
+      query: '',
+      sort: 'office',          // office | total | first | name
+      minTablets: 0,
+      cellW: 22,                // px (zoom)
+      showEdges: true,
+      collapsed: { C: false, D: false, S: false, X: false },
+      selected: null,          // official name
+      hoverPeriod: null,
+      nameMode: 'raw',         // 'raw' (ATF) | 'norm' (ORACC canonical)
+    };
+    function tlDisplayName(o) {
+      if (!o) return '';
+      return TL_STATE.nameMode === 'norm' && o.normalized_name ? o.normalized_name : o.name;
+    }
+    // Reverse lookup so detail-panel "jump to peer" works when peers are
+    // identified by raw ATF token even in normalized mode.
+    function tlOfficialByEither(label) {
+      if (!timelineData) return null;
+      return timelineData.officials.find(o => o.name === label || o.normalized_name === label);
+    }
+    const TL_OFFICE_COLOR = { C: '#4a9eff', D: '#b07fe0', S: '#00d68f', X: '#ff6b81' };
+    const TL_OFFICE_ORDER = ['C', 'D', 'S', 'X'];
+
     async function renderTimelineView() {
+      const main = document.getElementById('mainContent');
+      // Switch to full-width layout (collapse the right panel)
+      document.getElementById('app').classList.add('timeline-mode');
       if (!timelineData) {
+        main.innerHTML = '<div class="empty-state" style="padding:40px;"><div class="spinner"></div> Loading timeline...</div>';
         try {
           const r = await fetch(`${API}/api/timeline`);
           timelineData = await r.json();
         } catch (e) {
-          document.getElementById('mainContent').innerHTML = '<div class="empty-state" style="padding:40px;">Failed to load timeline data.</div>';
+          main.innerHTML = '<div class="tl-empty">Failed to load timeline data.</div>';
           return;
         }
       }
+      currentTabletId = null;
+
+      main.innerHTML = `
+        <div class="timeline-view fade-in" id="tlView">
+          <h2>Officials &amp; Timeline</h2>
+          <div class="tl-subtitle" id="tlSubtitle"></div>
+          <div class="tl-toolbar" id="tlToolbar">
+            <div class="tl-tb-group">
+              <span class="tl-tb-label">Search</span>
+              <input type="text" id="tlSearch" placeholder="Filter officials…" />
+            </div>
+            <div class="tl-tb-group">
+              <span class="tl-tb-label">Sort</span>
+              <select id="tlSort">
+                <option value="office">By office</option>
+                <option value="total">Most tablets</option>
+                <option value="first">First active</option>
+                <option value="name">Name (A–Z)</option>
+              </select>
+            </div>
+            <div class="tl-tb-group">
+              <span class="tl-tb-label">Bureaus</span>
+              <span class="tl-chip" data-office="C" title="Click to toggle, double-click to jump"><span class="tl-dot" style="background:var(--tl-c-C);"></span>Chief</span>
+              <span class="tl-chip" data-office="D" title="Click to toggle, double-click to jump"><span class="tl-dot" style="background:var(--tl-c-D);"></span>Disbursal</span>
+              <span class="tl-chip" data-office="S" title="Click to toggle, double-click to jump"><span class="tl-dot" style="background:var(--tl-c-S);"></span>Shepherds</span>
+              <span class="tl-chip" data-office="X" title="Click to toggle, double-click to jump"><span class="tl-dot" style="background:var(--tl-c-X);"></span>Dead Animals</span>
+            </div>
+            <div class="tl-tb-group">
+              <span class="tl-tb-label">Names</span>
+              <span class="tl-name-switch" id="tlNameSwitch" title="Toggle between raw ATF transliteration and ORACC canonical name">
+                <span class="tl-name-side" data-mode="raw">ATF</span>
+                <span class="tl-name-side" data-mode="norm">Standardized</span>
+              </span>
+            </div>
+            <div class="tl-tb-group">
+              <span class="tl-tb-label">Min tablets</span>
+              <input type="range" id="tlMin" min="0" max="100" step="5" />
+              <span id="tlMinVal" style="font-size:11px;color:var(--text-dim);width:30px;">0</span>
+            </div>
+            <div class="tl-tb-group">
+              <span class="tl-tb-label">Zoom</span>
+              <input type="range" id="tlZoom" min="14" max="42" step="2" />
+            </div>
+            <div class="tl-tb-toggle" id="tlEdges">Show edges</div>
+            <div style="flex:1;"></div>
+            <div class="tl-tb-toggle" id="tlReset" title="Reset filters and selection">Reset</div>
+          </div>
+          <div class="tl-frame">
+            <div class="tl-scroll" id="tlScroll">
+              <div class="tl-track-area" id="tlTrackArea"></div>
+            </div>
+          </div>
+          <div class="tl-detail-panel" id="tlDetail"></div>
+        </div>
+        <div class="tl-tip" id="tlTip"></div>
+      `;
+      tlBindToolbar();
+      tlSyncToolbarUI();
+      tlRenderGrid();
+    }
+
+    function tlBindToolbar() {
+      const search = document.getElementById('tlSearch');
+      search.addEventListener('input', () => { TL_STATE.query = search.value.toLowerCase().trim(); tlRenderGrid(); });
+      document.getElementById('tlSort').addEventListener('change', e => { TL_STATE.sort = e.target.value; tlRenderGrid(); });
+      document.getElementById('tlMin').addEventListener('input', e => {
+        TL_STATE.minTablets = +e.target.value;
+        document.getElementById('tlMinVal').textContent = e.target.value;
+        tlRenderGrid();
+      });
+      document.getElementById('tlZoom').addEventListener('input', e => {
+        TL_STATE.cellW = +e.target.value;
+        document.documentElement.style.setProperty('--tl-cell-w', TL_STATE.cellW + 'px');
+        // Re-set on the timeline-view too because the var is scoped there
+        const v = document.getElementById('tlView');
+        if (v) v.style.setProperty('--tl-cell-w', TL_STATE.cellW + 'px');
+        tlRenderGrid();
+      });
+      document.querySelectorAll('#tlToolbar .tl-chip').forEach(el => {
+        el.addEventListener('click', () => {
+          const o = el.dataset.office;
+          TL_STATE.officeOn[o] = !TL_STATE.officeOn[o];
+          el.classList.toggle('off', !TL_STATE.officeOn[o]);
+          tlRenderGrid();
+        });
+        el.addEventListener('dblclick', () => {
+          const o = el.dataset.office;
+          // ensure the office is enabled, then scroll its banner into view
+          if (!TL_STATE.officeOn[o]) {
+            TL_STATE.officeOn[o] = true;
+            el.classList.remove('off');
+            tlRenderGrid();
+          }
+          requestAnimationFrame(() => {
+            const grp = document.querySelector(`.tl-office-group[data-office="${o}"]`);
+            if (grp) grp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        });
+      });
+      // Name mode switch (pure-span, no <input>, to avoid label/input race)
+      const switchEl = document.getElementById('tlNameSwitch');
+      const setNameMode = (mode) => {
+        TL_STATE.nameMode = mode;
+        switchEl.classList.toggle('raw', mode === 'raw');
+        switchEl.classList.toggle('norm', mode === 'norm');
+        tlRenderGrid();
+      };
+      switchEl.addEventListener('click', e => {
+        const side = e.target.closest('.tl-name-side');
+        if (side) setNameMode(side.dataset.mode);
+        else      setNameMode(TL_STATE.nameMode === 'raw' ? 'norm' : 'raw');
+      });
+      document.getElementById('tlEdges').addEventListener('click', () => {
+        TL_STATE.showEdges = !TL_STATE.showEdges;
+        document.getElementById('tlEdges').classList.toggle('on', TL_STATE.showEdges);
+        tlRenderGrid();
+      });
+      document.getElementById('tlReset').addEventListener('click', () => {
+        TL_STATE.officeOn = { C: true, D: true, S: true, X: true };
+        TL_STATE.query = '';
+        TL_STATE.sort = 'office';
+        TL_STATE.minTablets = 0;
+        TL_STATE.cellW = 22;
+        TL_STATE.collapsed = { C: false, D: false, S: false, X: false };
+        TL_STATE.selected = null;
+        document.getElementById('tlSearch').value = '';
+        document.getElementById('tlSort').value = 'office';
+        document.getElementById('tlMin').value = 0;
+        document.getElementById('tlMinVal').textContent = 0;
+        document.getElementById('tlZoom').value = 22;
+        document.querySelectorAll('#tlToolbar .tl-chip').forEach(el => el.classList.remove('off'));
+        const v = document.getElementById('tlView');
+        if (v) v.style.setProperty('--tl-cell-w', '22px');
+        document.getElementById('tlDetail').classList.remove('open');
+        tlSyncToolbarUI();
+        tlRenderGrid();
+      });
+    }
+
+    function tlSyncToolbarUI() {
+      document.getElementById('tlSearch').value = TL_STATE.query;
+      document.getElementById('tlSort').value = TL_STATE.sort;
+      document.getElementById('tlMin').value = TL_STATE.minTablets;
+      document.getElementById('tlMinVal').textContent = TL_STATE.minTablets;
+      document.getElementById('tlZoom').value = TL_STATE.cellW;
+      document.getElementById('tlEdges').classList.toggle('on', TL_STATE.showEdges);
+      document.querySelectorAll('#tlToolbar .tl-chip').forEach(el => {
+        const o = el.dataset.office;
+        el.classList.toggle('off', !TL_STATE.officeOn[o]);
+      });
+      const sw = document.getElementById('tlNameSwitch');
+      if (sw) {
+        sw.classList.toggle('raw', TL_STATE.nameMode === 'raw');
+        sw.classList.toggle('norm', TL_STATE.nameMode === 'norm');
+      }
+    }
+
+    function tlVisibleOfficials() {
+      let list = timelineData.officials.filter(o => TL_STATE.officeOn[o.office]);
+      if (TL_STATE.minTablets > 0) list = list.filter(o => o.total_tablets >= TL_STATE.minTablets);
+      if (TL_STATE.query) {
+        const q = TL_STATE.query;
+        list = list.filter(o =>
+          o.name.toLowerCase().includes(q)
+          || (o.normalized_name || '').toLowerCase().includes(q)
+          || (o.sub_office || '').toLowerCase().includes(q));
+      }
+      const cmpName = (a, b) => tlDisplayName(a).localeCompare(tlDisplayName(b));
+      switch (TL_STATE.sort) {
+        case 'total': list.sort((a, b) => b.total_tablets - a.total_tablets); break;
+        case 'first': list.sort((a, b) => (a.first_year_idx || 0) - (b.first_year_idx || 0) || cmpName(a, b)); break;
+        case 'name':  list.sort(cmpName); break;
+        default:
+          // Office grouping is handled by the renderer; within each office, sort by first-active.
+          list.sort((a, b) => {
+            const ao = TL_OFFICE_ORDER.indexOf(a.office), bo = TL_OFFICE_ORDER.indexOf(b.office);
+            if (ao !== bo) return ao - bo;
+            return (a.first_year_idx || 0) - (b.first_year_idx || 0) || a.name.localeCompare(b.name);
+          });
+      }
+      return list;
+    }
+
+    function tlReignBands(periods) {
+      // Group consecutive periods by reign abbreviation prefix → band ranges.
+      const REIGN_NAMES = { 'Š': 'Šulgi', 'AS': 'Amar-Suen', 'ŠS': 'Šū-Suen', 'IS': 'Ibbi-Suen' };
+      const REIGN_COLORS = { 'Š': '#4a6e9f', 'AS': '#7c4a9f', 'ŠS': '#9f4a6e', 'IS': '#9f7c4a' };
+      const bands = [];
+      let curr = null;
+      periods.forEach((p, i) => {
+        const pre = p.split('.')[0];
+        if (!curr || curr.prefix !== pre) {
+          if (curr) bands.push(curr);
+          curr = { prefix: pre, name: REIGN_NAMES[pre] || pre, color: REIGN_COLORS[pre] || '#666', start: i, end: i };
+        } else {
+          curr.end = i;
+        }
+      });
+      if (curr) bands.push(curr);
+      return bands;
+    }
+
+    function tlRenderGrid() {
       const t = timelineData;
       const periods = t.periods;
-      const pIdx = Object.fromEntries(periods.map((p, i) => [p, i]));
-      const officeOrder = ['C', 'D', 'S', 'X'];
-      const officeColor = { C: '#4a9eff', D: '#b07fe0', S: '#00d68f', X: '#ff6b81' };
+      const cw = TL_STATE.cellW;
+      const trackWidth = periods.length * cw;
 
-      // Build edge lookup for the detail panel
+      // Subtitle
+      const visible = tlVisibleOfficials();
+      const subtitle = document.getElementById('tlSubtitle');
+      const totalTablets = visible.reduce((s, o) => s + o.total_tablets, 0);
+      subtitle.textContent =
+        `${visible.length} of ${t.officials.length} officials · ${periods.length} regnal-year periods (${periods[0]} → ${periods[periods.length-1]}) · ${totalTablets.toLocaleString()} tablets in current selection`;
+
+      // Max activity in any single (visible-official, period) cell, for bar scaling.
+      let maxCellActivity = 1;
+      for (const o of visible) {
+        for (const v of Object.values(o.by_period)) if (v > maxCellActivity) maxCellActivity = v;
+      }
+
+      // Build edge lookups (computed once per render — small enough)
       const outgoing = {}, incoming = {};
       for (const e of t.edges) {
         (outgoing[e.source] = outgoing[e.source] || []).push(e);
         (incoming[e.target] = incoming[e.target] || []).push(e);
       }
 
-      // Identify reign boundaries on x-axis (where the abbreviation prefix changes)
-      const reignStarts = new Set();
-      let prevPrefix = '';
-      for (const p of periods) {
-        const pre = p.split('.')[0];
-        if (pre !== prevPrefix) { reignStarts.add(p); prevPrefix = pre; }
-      }
+      const reignBands = tlReignBands(periods);
+      const reignStarts = new Set(reignBands.map(b => b.start));
 
-      // Group officials by office
+      const area = document.getElementById('tlTrackArea');
+
+      // ----- Axis -----
+      let axis = `<div class="tl-axis">
+        <div class="tl-axis-name">Official</div>
+        <div class="tl-axis-track" style="width:${trackWidth}px;">`;
+      // Reign bands
+      for (const b of reignBands) {
+        const left = b.start * cw + 1;
+        const w = (b.end - b.start + 1) * cw - 2;
+        axis += `<div class="tl-reign-band" style="left:${left}px;width:${w}px;background:${b.color};"><span>${b.name}</span></div>`;
+      }
+      // Period markers + labels
+      periods.forEach((p, i) => {
+        const reign = reignStarts.has(i);
+        axis += `<div class="tl-period-marker${reign ? ' reign' : ''}" style="left:${i*cw}px;"></div>`;
+        axis += `<div class="tl-period-label${reign ? ' reign-start' : ''}" data-period="${p}" data-i="${i}" style="left:${i*cw}px;width:${cw}px;">${p}</div>`;
+      });
+      axis += `</div><div class="tl-axis-meta">Tablets</div></div>`;
+
+      // ----- Body: groups -----
+      let body = '';
       const grouped = {};
-      for (const o of t.officials) {
-        (grouped[o.office] = grouped[o.office] || []).push(o);
-      }
+      for (const o of visible) (grouped[o.office] = grouped[o.office] || []).push(o);
 
-      // Find max activity in any single (official, period) cell, for bar scaling
-      let maxCellActivity = 1;
-      for (const o of t.officials) {
-        for (const v of Object.values(o.by_period)) {
-          if (v > maxCellActivity) maxCellActivity = v;
-        }
-      }
+      // When sort isn't "office", flatten into one synthetic group named "All"
+      const groups = (TL_STATE.sort === 'office')
+        ? TL_OFFICE_ORDER.filter(k => grouped[k] && grouped[k].length).map(k => ({ key: k, label: t.office_labels[k], officials: grouped[k] }))
+        : [{ key: 'all', label: 'Sorted view', officials: visible }];
 
-      const nameCol = '180px';
-      const metaCol = '90px';
-      const cellCol = '14px';
-      const gridTemplate = `${nameCol} repeat(${periods.length}, ${cellCol}) ${metaCol}`;
+      for (const g of groups) {
+        const isCollapsed = g.key !== 'all' && TL_STATE.collapsed[g.key];
+        const officeColor = g.key === 'all' ? '#778ca3' : TL_OFFICE_COLOR[g.key];
+        const rowsHeight = g.officials.length * 30;
+        body += `<div class="tl-office-group${isCollapsed ? ' collapsed' : ''}" data-office="${g.key}">
+          <div class="tl-office-header" data-office="${g.key}">
+            <span class="tl-chevron">▾</span>
+            <span class="tl-office-color" style="background:${officeColor};"></span>
+            <span class="tl-office-label">${g.label}</span>
+            <span class="tl-office-count">· ${g.officials.length} officials · ${g.officials.reduce((s,o)=>s+o.total_tablets,0).toLocaleString()} tablets</span>
+          </div>
+          <div class="tl-office-rows" style="max-height:${rowsHeight}px;">`;
 
-      let html = `<div class="timeline-view fade-in">
-        <h2>Officials &amp; Timeline</h2>
-        <div class="tl-subtitle">${t.officials.length} active officials across ${periods.length} regnal-year periods. Cell height ≈ tablets in that year.</div>
-        <div class="timeline-legend">
-          <div class="lg-item"><span class="lg-swatch tl-office-color-C"></span>Chief Official (C)</div>
-          <div class="lg-item"><span class="lg-swatch tl-office-color-D"></span>Disbursal Office (D)</div>
-          <div class="lg-item"><span class="lg-swatch tl-office-color-S"></span>Shepherds Office (S)</div>
-          <div class="lg-item"><span class="lg-swatch tl-office-color-X"></span>Dead Animals Office (X)</div>
-        </div>
-        <div class="timeline-grid-wrap">
-          <div class="tl-grid" style="grid-template-columns:${gridTemplate};">`;
+        for (const o of g.officials) {
+          const isSel = TL_STATE.selected && TL_STATE.selected !== o.name;
+          const fadeClass = (TL_STATE.selected && TL_STATE.selected !== o.name) ? ' fade' : '';
+          const selClass = (TL_STATE.selected === o.name) ? ' selected' : '';
+          const display = tlDisplayName(o);
+          // Show the *other* name as the small subtitle so both forms remain
+          // visible even after toggling — useful for building a mental map
+          // between transliteration and canonical reading.
+          const altName = (TL_STATE.nameMode === 'norm' && o.normalized_name && o.normalized_name !== o.name)
+            ? o.name
+            : (TL_STATE.nameMode === 'raw' && o.normalized_name && o.normalized_name !== o.name)
+              ? o.normalized_name
+              : o.sub_office.replace(/^.*?-/, '');
+          body += `<div class="tl-official${selClass}${fadeClass}" data-name="${esc(o.name)}">
+            <div class="tl-name-cell" data-name="${esc(o.name)}">
+              <span class="tl-name-marker" style="background:${TL_OFFICE_COLOR[o.office] || '#778ca3'};"></span>
+              <span class="tl-name-text" title="${esc(o.name)} · ${esc(o.normalized_name || '')}">${esc(display)}</span>
+              <span class="tl-name-sub" title="${esc(o.sub_office)}">${esc(altName)}</span>
+            </div>
+            <div class="tl-track" style="width:${trackWidth}px;">`;
 
-      // Header row: period labels
-      html += `<div class="tl-row tl-header" style="grid-template-columns:${gridTemplate};">
-        <div class="tl-name">Official</div>`;
-      for (const p of periods) {
-        const cls = reignStarts.has(p) ? 'tl-period-label tl-reign-start' : 'tl-period-label';
-        html += `<div class="${cls}" title="${p}">${p}</div>`;
-      }
-      html += `<div class="tl-meta">Tablets</div></div>`;
-
-      for (const officeKey of officeOrder) {
-        const list = grouped[officeKey];
-        if (!list || !list.length) continue;
-        const label = t.office_labels[officeKey] || officeKey;
-        // Office banner row
-        html += `<div class="tl-row tl-office" style="grid-template-columns:${gridTemplate};">
-          <div class="tl-name">${label}</div>
-          <div style="grid-column: span ${periods.length + 1};"></div></div>`;
-
-        for (const o of list) {
-          html += `<div class="tl-row" style="grid-template-columns:${gridTemplate};">
-            <div class="tl-name" onclick="showOfficialDetail('${esc(o.name)}')" title="${esc(o.sub_office)}">${esc(o.name)}</div>`;
-          for (const p of periods) {
-            const v = o.by_period[p] || 0;
-            if (v > 0) {
-              // Bar height: log-ish scaling so single tablets are still visible
-              const h = Math.max(3, Math.round(18 * Math.sqrt(v / maxCellActivity)));
-              const op = 0.4 + 0.6 * Math.min(1, v / maxCellActivity);
-              html += `<div class="tl-cell"><div class="tl-bar" style="height:${h}px;background:${officeColor[officeKey]};opacity:${op};" title="${esc(o.name)} · ${p} · ${v} tablets" onclick="showOfficialDetail('${esc(o.name)}')"></div></div>`;
-            } else {
-              html += `<div class="tl-cell"></div>`;
+          // Tenure band: subtle tint between first and last active period
+          if (o.first_year_idx != null && o.last_year_idx != null && periods.length > 0) {
+            // first_year_idx / last_year_idx are absolute reign-line indices, but
+            // by_period uses period labels — align via index of first/last labels.
+            let firstP = -1, lastP = -1;
+            for (const [i, p] of periods.entries()) {
+              if (firstP < 0 && o.by_period[p]) firstP = i;
+              if (o.by_period[p]) lastP = i;
+            }
+            if (firstP >= 0) {
+              const left = firstP * cw;
+              const w = (lastP - firstP + 1) * cw;
+              body += `<div class="tl-tenure-band" style="left:${left}px;width:${w}px;background:${TL_OFFICE_COLOR[o.office] || '#778ca3'};"></div>`;
             }
           }
-          html += `<div class="tl-meta">${o.total_tablets.toLocaleString()}</div></div>`;
+
+          // Bars
+          let barIdx = 0;
+          periods.forEach((p, i) => {
+            const v = o.by_period[p] || 0;
+            if (v <= 0) return;
+            const ratio = v / maxCellActivity;
+            const h = Math.max(3, Math.round(22 * Math.sqrt(ratio)));
+            const opacity = 0.45 + 0.55 * Math.min(1, Math.sqrt(ratio));
+            const left = i * cw + 2;
+            const w = cw - 4;
+            const delay = Math.min(0.4, barIdx * 0.005);
+            body += `<div class="tl-bar animate" data-name="${esc(o.name)}" data-period="${p}" data-count="${v}" `
+                  + `style="left:${left}px;width:${w}px;height:${h}px;background:${TL_OFFICE_COLOR[o.office] || '#778ca3'};opacity:${opacity};animation-delay:${delay}s;"></div>`;
+            barIdx++;
+          });
+          body += `</div>
+            <div class="tl-meta-cell"><span class="tl-meta-num">${o.total_tablets.toLocaleString()}</span></div>
+          </div>`;
         }
+        body += `</div></div>`;
       }
 
-      html += `</div></div>
-        <div class="tl-detail-panel" id="tlDetailPanel"></div>
-      </div>`;
+      area.innerHTML = axis + body;
 
-      document.getElementById('mainContent').innerHTML = html;
-      document.getElementById('rightPanel').innerHTML = '<div class="empty-state" style="height:auto;padding:40px 16px;"><p style="font-size:12px;">Click an official to see partners</p></div>';
-      currentTabletId = null;
+      // ----- Wire interactions -----
 
-      // Expose handlers for inline onclick
-      window.showOfficialDetail = function (name) {
-        const o = timelineData.officials.find(x => x.name === name);
-        if (!o) return;
-        const out = (outgoing[name] || []).slice(0, 12);
-        const inc = (incoming[name] || []).slice(0, 12);
-        const panel = document.getElementById('tlDetailPanel');
-        let h = `<h3>${esc(o.name)}</h3>
-          <div class="tl-detail-sub">${esc(o.office_label)} · ${esc(o.sub_office)} · ${o.first_period || '?'} → ${o.last_period || '?'}</div>
+      // Office header collapse
+      area.querySelectorAll('.tl-office-header').forEach(el => {
+        el.addEventListener('click', () => {
+          const o = el.dataset.office;
+          if (o === 'all') return;
+          TL_STATE.collapsed[o] = !TL_STATE.collapsed[o];
+          el.parentElement.classList.toggle('collapsed', TL_STATE.collapsed[o]);
+        });
+      });
+      // Click name → select official
+      area.querySelectorAll('.tl-official').forEach(el => {
+        el.addEventListener('click', e => {
+          if (e.target.closest('.tl-bar')) return;  // bar click handled separately
+          const name = el.dataset.name;
+          tlSelectOfficial(name === TL_STATE.selected ? null : name);
+        });
+      });
+      // Bar tooltip + click
+      const tip = document.getElementById('tlTip');
+      area.querySelectorAll('.tl-bar').forEach(el => {
+        el.addEventListener('mouseenter', e => {
+          const name = el.dataset.name;
+          const o = tlOfficialByEither(name);
+          const display = o ? tlDisplayName(o) : name;
+          const p = el.dataset.period;
+          const c = el.dataset.count;
+          tip.innerHTML = `<div><span class="t-name">${esc(display)}</span><span class="t-period">${p}</span></div>
+                          <div class="t-count">${c} tablet${c==1?'':'s'}</div>`;
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mousemove', e => {
+          tip.style.left = (e.clientX + 12) + 'px';
+          tip.style.top  = (e.clientY + 12) + 'px';
+        });
+        el.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          tlSelectOfficial(el.dataset.name);
+        });
+      });
+      // Period label click → highlight column
+      area.querySelectorAll('.tl-period-label').forEach(el => {
+        el.addEventListener('click', () => tlShowPeriodSummary(el.dataset.period));
+      });
+
+      // Detail panel state restore
+      if (TL_STATE.selected) tlRenderDetailPanel(TL_STATE.selected, outgoing, incoming);
+      else document.getElementById('tlDetail').classList.remove('open');
+
+      // Edges overlay
+      tlRenderEdges(visible, periods, cw);
+    }
+
+    function tlSelectOfficial(name) {
+      TL_STATE.selected = name;
+      document.querySelectorAll('.tl-official').forEach(el => {
+        el.classList.toggle('selected', el.dataset.name === name);
+        el.classList.toggle('fade', !!name && el.dataset.name !== name);
+      });
+      const detail = document.getElementById('tlDetail');
+      if (!name) {
+        detail.classList.remove('open');
+        // remove any drawn edges
+        const old = document.querySelector('.tl-edge-svg'); if (old) old.remove();
+        return;
+      }
+      // Re-build edge maps each time (cheap)
+      const outgoing = {}, incoming = {};
+      for (const e of timelineData.edges) {
+        (outgoing[e.source] = outgoing[e.source] || []).push(e);
+        (incoming[e.target] = incoming[e.target] || []).push(e);
+      }
+      tlRenderDetailPanel(name, outgoing, incoming);
+      tlRenderEdges(tlVisibleOfficials(), timelineData.periods, TL_STATE.cellW);
+      // Scroll selected official into view inside the timeline
+      const row = document.querySelector(`.tl-official[data-name="${CSS.escape(name)}"]`);
+      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function tlRenderDetailPanel(name, outgoing, incoming) {
+      const o = timelineData.officials.find(x => x.name === name);
+      if (!o) return;
+      const out = (outgoing[name] || []).slice(0, 10);
+      const inc = (incoming[name] || []).slice(0, 10);
+      const maxOut = out.length ? out[0].count : 1;
+      const maxInc = inc.length ? inc[0].count : 1;
+
+      // Sparkline-ish active span text
+      const span = (o.first_period && o.last_period)
+        ? `${o.first_period} → ${o.last_period}`
+        : 'unknown span';
+      const activeYears = Object.keys(o.by_period).length;
+      const peakPeriod = Object.entries(o.by_period).sort((a, b) => b[1] - a[1])[0];
+      const officeColor = TL_OFFICE_COLOR[o.office] || '#778ca3';
+
+      const edgeRow = (peer, c, max, color) => {
+        const peerObj = tlOfficialByEither(peer);
+        const peerDisplay = peerObj ? tlDisplayName(peerObj) : peer;
+        const peerSub = peerObj ? peerObj.sub_office : '';
+        const titleAttr = peerObj && peerObj.normalized_name && peerObj.normalized_name !== peerObj.name
+          ? `${peerObj.name} · ${peerObj.normalized_name}`
+          : peer;
+        return `
+          <div class="e">
+            <span class="nm" data-jump="${esc(peer)}" title="${esc(titleAttr)}${peerSub ? ' · ' + esc(peerSub) : ''}">${esc(peerDisplay)}</span>
+            <span class="bar"><span style="width:${Math.round(c / max * 100)}%;background:${color};"></span></span>
+            <span class="c">${c}</span>
+          </div>`;
+      };
+
+      const display = tlDisplayName(o);
+      const altLine = (o.normalized_name && o.normalized_name !== o.name)
+        ? (TL_STATE.nameMode === 'norm' ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.name)})</span>` : `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.normalized_name)})</span>`)
+        : '';
+      const html = `
+        <div class="tl-detail-head">
+          <div>
+            <h3>
+              <span class="tl-detail-badge" style="background:${officeColor};">${o.office}</span>
+              ${esc(display)} ${altLine}
+            </h3>
+            <div class="tl-detail-sub">${esc(o.office_label)} · ${esc(o.sub_office)} · ${span} · ${activeYears} active year${activeYears===1?'':'s'}${peakPeriod ? ` · peak ${peakPeriod[0]} (${peakPeriod[1]})` : ''}</div>
+          </div>
+          <span class="tl-detail-close" id="tlDetailClose" title="Close">&times;</span>
+        </div>
+        <div class="tl-detail-body">
           <div class="tl-stat-row">
-            <div class="tl-stat"><div class="v">${o.total_tablets.toLocaleString()}</div><div class="l">Tablets</div></div>
+            <div class="tl-stat"><div class="v">${o.total_tablets.toLocaleString()}</div><div class="l">Tablets touched</div></div>
             <div class="tl-stat"><div class="v">${o.as_source.toLocaleString()}</div><div class="l">As source</div></div>
             <div class="tl-stat"><div class="v">${o.as_receiver.toLocaleString()}</div><div class="l">As receiver</div></div>
-            <div class="tl-stat"><div class="v">${o.as_intermediary.toLocaleString()}</div><div class="l">As intermediary</div></div>
+            <div class="tl-stat"><div class="v">${o.as_intermediary.toLocaleString()}</div><div class="l">As giri₃</div></div>
+            <div class="tl-stat"><div class="v">${activeYears}</div><div class="l">Years active</div></div>
+            <div class="tl-stat"><div class="v">${peakPeriod ? peakPeriod[1] : 0}</div><div class="l">Peak year</div></div>
           </div>
-          <div class="tl-edges">
-            <div><h4>Sent to (top)</h4><div class="tl-edge-list">`;
-        if (!out.length) h += `<div class="e" style="color:var(--text-dim);">No outgoing transactions recorded.</div>`;
-        for (const e of out) h += `<div class="e"><span>${esc(e.target)}</span><span class="c">${e.count}</span></div>`;
-        h += `</div></div><div><h4>Received from (top)</h4><div class="tl-edge-list">`;
-        if (!inc.length) h += `<div class="e" style="color:var(--text-dim);">No incoming transactions recorded.</div>`;
-        for (const e of inc) h += `<div class="e"><span>${esc(e.source)}</span><span class="c">${e.count}</span></div>`;
-        h += `</div></div></div>`;
-        panel.innerHTML = h;
-        panel.classList.add('open');
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      };
+          <div class="tl-network-grid">
+            <div>
+              <h4>Sent to (top 10)</h4>
+              <div class="tl-edge-list" id="tlEdgesOut">
+                ${out.length ? out.map(e => edgeRow(e.target, e.count, maxOut, '#ff6b81')).join('') : '<div style="color:var(--text-dim);font-size:11px;">No outgoing transactions recorded.</div>'}
+              </div>
+            </div>
+            <div>
+              <h4>Received from (top 10)</h4>
+              <div class="tl-edge-list" id="tlEdgesIn">
+                ${inc.length ? inc.map(e => edgeRow(e.source, e.count, maxInc, '#00d68f')).join('') : '<div style="color:var(--text-dim);font-size:11px;">No incoming transactions recorded.</div>'}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      const detail = document.getElementById('tlDetail');
+      detail.innerHTML = html;
+      detail.classList.add('open');
+      document.getElementById('tlDetailClose').addEventListener('click', () => tlSelectOfficial(null));
+      detail.querySelectorAll('.nm[data-jump]').forEach(el => {
+        el.addEventListener('click', () => tlSelectOfficial(el.dataset.jump));
+      });
+    }
+
+    function tlRenderEdges(visible, periods, cw) {
+      const area = document.getElementById('tlTrackArea');
+      if (!area) return;
+      const old = area.querySelector('.tl-edge-svg'); if (old) old.remove();
+      if (!TL_STATE.showEdges || !TL_STATE.selected) return;
+
+      const sel = TL_STATE.selected;
+      const visibleNames = new Set(visible.map(o => o.name));
+      // Edges connecting selected ↔ visible officials
+      const ed = timelineData.edges.filter(e => (e.source === sel || e.target === sel) && visibleNames.has(e.source) && visibleNames.has(e.target));
+      if (!ed.length) return;
+
+      // Position lookup: row.center.y inside .tl-track-area
+      const officials = area.querySelectorAll('.tl-official');
+      const yOf = {};
+      const areaRect = area.getBoundingClientRect();
+      officials.forEach(el => {
+        const r = el.getBoundingClientRect();
+        yOf[el.dataset.name] = r.top + r.height / 2 - areaRect.top;
+      });
+      // x at the right edge of the name column, where the track starts
+      const nameW = parseInt(getComputedStyle(area.firstElementChild).getPropertyValue('width')) || 200;
+      // Better: use the actual axis-name width
+      const axisName = area.querySelector('.tl-axis-name');
+      const xStart = axisName ? axisName.getBoundingClientRect().right - areaRect.left : 200;
+
+      const maxCount = Math.max(...ed.map(e => e.count));
+      const svgNs = 'http://www.w3.org/2000/svg';
+      const svg = document.createElementNS(svgNs, 'svg');
+      svg.setAttribute('class', 'tl-edge-svg');
+      svg.setAttribute('width', area.clientWidth);
+      svg.setAttribute('height', area.clientHeight);
+
+      for (const e of ed) {
+        if (yOf[e.source] == null || yOf[e.target] == null) continue;
+        const fromSel = e.source === sel;
+        const y1 = yOf[e.source], y2 = yOf[e.target];
+        // Draw as a Bezier on the LHS, leaving the timeline track area uncluttered.
+        const x = xStart + 4;
+        const bow = Math.max(20, Math.abs(y1 - y2) * 0.3);
+        const d = `M ${x} ${y1} C ${x - bow} ${y1}, ${x - bow} ${y2}, ${x} ${y2}`;
+        const path = document.createElementNS(svgNs, 'path');
+        path.setAttribute('class', 'tl-edge-path');
+        path.setAttribute('d', d);
+        path.setAttribute('stroke', fromSel ? '#ff6b81' : '#00d68f');
+        path.setAttribute('stroke-width', Math.max(1, Math.min(4, Math.sqrt(e.count / maxCount) * 4)));
+        path.setAttribute('opacity', 0.6);
+        svg.appendChild(path);
+      }
+      area.appendChild(svg);
+    }
+
+    function tlShowPeriodSummary(period) {
+      // Top officials in this period across all bureaus
+      const t = timelineData;
+      const rows = [];
+      for (const o of t.officials) {
+        const v = o.by_period[period] || 0;
+        if (v > 0) rows.push({ name: o.name, office: o.office, sub: o.sub_office, count: v });
+      }
+      rows.sort((a, b) => b.count - a.count);
+      const total = rows.reduce((s, r) => s + r.count, 0);
+      const max = rows.length ? rows[0].count : 1;
+
+      const detail = document.getElementById('tlDetail');
+      detail.innerHTML = `
+        <div class="tl-detail-head">
+          <div>
+            <h3>
+              <span class="tl-detail-badge" style="background:#778ca3;">YEAR</span>
+              ${esc(period)}
+            </h3>
+            <div class="tl-detail-sub">${rows.length} active official${rows.length===1?'':'s'} · ${total.toLocaleString()} tablets recorded this regnal year</div>
+          </div>
+          <span class="tl-detail-close" id="tlDetailClose" title="Close">&times;</span>
+        </div>
+        <div class="tl-detail-body">
+          <div class="tl-edge-list">
+            ${rows.length
+              ? rows.slice(0, 25).map(r => {
+                  const o = tlOfficialByEither(r.name);
+                  const dn = o ? tlDisplayName(o) : r.name;
+                  return `
+                <div class="e">
+                  <span class="nm" data-jump="${esc(r.name)}" title="${esc(r.name)}${o && o.normalized_name && o.normalized_name !== o.name ? ' · ' + esc(o.normalized_name) : ''}">
+                    <span class="tl-name-marker" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${TL_OFFICE_COLOR[r.office]};margin-right:6px;"></span>
+                    ${esc(dn)} <span style="color:var(--text-dim);">· ${esc(r.sub)}</span>
+                  </span>
+                  <span class="bar"><span style="width:${Math.round(r.count/max*100)}%;background:${TL_OFFICE_COLOR[r.office]};"></span></span>
+                  <span class="c">${r.count}</span>
+                </div>`;
+                }).join('')
+              : '<div style="color:var(--text-dim);font-size:11px;">No officials recorded for this period.</div>'}
+          </div>
+        </div>`;
+      detail.classList.add('open');
+      document.getElementById('tlDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      detail.querySelectorAll('.nm[data-jump]').forEach(el => {
+        el.addEventListener('click', () => tlSelectOfficial(el.dataset.jump));
+      });
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function renderCorpusStats() {
+      // Leaving timeline view: restore standard 3-pane layout
+      document.getElementById('app').classList.remove('timeline-mode');
       if (!corpusStats) return;
       const s = corpusStats;
       const txColors = { delivery: '#4a9eff', expenditure: '#ff6b81', transfer: '#b07fe0', receipt: '#00d68f', unknown: '#666' };
