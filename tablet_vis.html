@@ -1941,7 +1941,7 @@
       --tl-meta-w: 80px;
       --tl-cell-w: 22px;
       --tl-row-h: 24px;
-      --tl-axis-h: 76px;
+      --tl-axis-h: 92px;
       --tl-c-C: #4a9eff;
       --tl-c-D: #b07fe0;
       --tl-c-S: #00d68f;
@@ -2153,7 +2153,7 @@
     }
     .tl-period-label {
       position: absolute;
-      bottom: 2px;
+      bottom: 8px;
       width: var(--tl-cell-w);
       text-align: center;
       font-size: 9px;
@@ -2161,7 +2161,7 @@
       transform-origin: center bottom;
       writing-mode: vertical-rl;
       transform: rotate(180deg);
-      height: 38px;
+      height: 50px;
       display: flex;
       align-items: flex-start;
       justify-content: center;
@@ -2504,6 +2504,549 @@
       font-size: 12px;
     }
 
+    /* ───────────────────────────────────────────── Animals timeline ── */
+    /* Green-tinted reskin so the user can tell at a glance which view
+       they're in. The timeline-view variables (--tl-*) get redefined,
+       and the page header picks up an emerald accent.            */
+    .app.animals-mode {
+      --accent: #34d399;
+      --border-glow: rgba(52, 211, 153, 0.45);
+      --gold-glow: rgba(52, 211, 153, 0.06);
+    }
+    .app.animals-mode .header h1 span { color: #34d399; }
+    .app.animals-mode #btnAnimals { border-color: #34d399; color: #34d399; }
+
+    .anim-view {
+      --av-cell-w: 24px;
+      --av-row-h: 26px;
+      --av-axis-h: 92px;
+      --av-name-w: 220px;
+      --av-meta-w: 130px;
+      --av-c-sheep_adult:  #22c55e;
+      --av-c-sheep_young:  #86efac;
+      --av-c-goat_adult:   #0ea5e9;
+      --av-c-goat_young:   #7dd3fc;
+      --av-c-cattle_adult: #a855f7;
+      --av-c-cattle_young: #d8b4fe;
+      --av-c-equids:       #f59e0b;
+      --av-c-other:        #94a3b8;
+      padding: 24px 28px 60px;
+      animation: fadeInUp 0.32s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    @keyframes avFade {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .anim-view h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .anim-view h2 .av-pulse {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #34d399;
+      box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+      animation: avPulse 1.8s ease-out infinite;
+    }
+    @keyframes avPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6); }
+      80%  { box-shadow: 0 0 0 14px rgba(52, 211, 153, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+    }
+    .anim-view .av-subtitle {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    /* Top stats strip */
+    .av-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .av-strip .av-stat {
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(34, 197, 94, 0.02));
+      border: 1px solid rgba(52, 211, 153, 0.2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      transition: transform 0.18s, border-color 0.18s;
+    }
+    .av-strip .av-stat:hover {
+      transform: translateY(-2px);
+      border-color: rgba(52, 211, 153, 0.5);
+    }
+    .av-strip .av-stat .v {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: #34d399;
+    }
+    .av-strip .av-stat .l {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+    }
+
+    /* Toolbar — same shell as the officials timeline but green-tinted */
+    .av-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 12px;
+    }
+    .av-toolbar .tb-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-dim);
+    }
+    .av-toolbar input[type=text],
+    .av-toolbar select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      padding: 4px 9px;
+      font-size: 12px;
+      outline: none;
+    }
+    .av-toolbar input[type=text]:focus { border-color: #34d399; }
+    .av-toolbar input[type=range] { width: 110px; }
+    .av-mode {
+      display: inline-flex;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 2px;
+    }
+    .av-mode .av-mode-side {
+      cursor: pointer;
+      padding: 3px 11px;
+      border-radius: 999px;
+      font-size: 11px;
+      color: var(--text-dim);
+      user-select: none;
+      transition: color 0.18s, background 0.18s;
+    }
+    .av-mode .av-mode-side.on {
+      background: #34d399;
+      color: #052017;
+      font-weight: 700;
+    }
+    .av-cat-chip {
+      cursor: pointer;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 11px;
+      user-select: none;
+      transition: opacity 0.15s, border-color 0.15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .av-cat-chip .av-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .av-cat-chip:hover { border-color: var(--border-glow); }
+    .av-cat-chip.off { opacity: 0.32; }
+    .av-tb-toggle {
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      font-size: 11px;
+      user-select: none;
+    }
+    .av-tb-toggle.on {
+      border-color: #34d399;
+      color: #34d399;
+      background: rgba(52, 211, 153, 0.1);
+    }
+
+    /* Frame & track area */
+    .av-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .av-scroll {
+      overflow: auto;
+      max-height: 70vh;
+      position: relative;
+    }
+    .av-area {
+      min-width: max-content;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+
+    /* Axis and reign banner */
+    .av-axis {
+      display: flex;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: linear-gradient(to bottom, var(--surface) 70%, rgba(20, 24, 40, 0.7) 100%);
+      backdrop-filter: blur(4px);
+      border-bottom: 1px solid var(--border-glow);
+      height: var(--av-axis-h);
+    }
+    .av-axis-name, .av-axis-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 0 8px 18px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-dim);
+      background: var(--surface);
+    }
+    .av-axis-name { width: var(--av-name-w); border-right: 1px solid var(--border); }
+    .av-axis-meta {
+      width: var(--av-meta-w);
+      justify-content: flex-end;
+      padding: 0 12px 8px 0;
+      border-left: 1px solid var(--border);
+    }
+    .av-axis-track { flex: 0 0 auto; position: relative; }
+    .av-reign-band {
+      position: absolute;
+      top: 4px; height: 22px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.85);
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+      white-space: nowrap;
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .av-period-marker {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: rgba(80, 90, 130, 0.18);
+      pointer-events: none;
+    }
+    .av-period-marker.reign { background: rgba(52, 211, 153, 0.4); }
+    .av-period-label {
+      position: absolute;
+      bottom: 8px;
+      width: var(--av-cell-w);
+      height: 50px;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      text-align: center;
+      font-size: 9px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .av-period-label.reign-start { color: #34d399; font-weight: 700; }
+    .av-period-label:hover { color: var(--text); }
+
+    /* Animal rows */
+    .av-row {
+      display: flex;
+      align-items: stretch;
+      height: var(--av-row-h);
+      transition: background 0.12s;
+      animation: avFade 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards;
+    }
+    .av-row:hover { background: rgba(52, 211, 153, 0.05); }
+    .av-row.selected { background: rgba(52, 211, 153, 0.12); box-shadow: inset 3px 0 0 #34d399; }
+    .av-row.fade { opacity: 0.28; }
+    .av-name-cell {
+      width: var(--av-name-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 8px 0 22px;
+      cursor: pointer;
+      border-right: 1px solid var(--border);
+      position: sticky;
+      left: 0;
+      background: var(--surface);
+      z-index: 1;
+    }
+    .av-row.selected .av-name-cell { background: rgba(52, 211, 153, 0.14); }
+    .av-name-marker {
+      width: 8px; height: 16px; border-radius: 2px; flex: 0 0 auto;
+    }
+    .av-name-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .av-name-cat {
+      font-size: 9px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .av-track {
+      flex: 0 0 auto;
+      position: relative;
+      background:
+        linear-gradient(to right, transparent calc(var(--av-cell-w) - 1px), rgba(80, 90, 130, 0.1) calc(var(--av-cell-w) - 1px), rgba(80, 90, 130, 0.1) var(--av-cell-w), transparent var(--av-cell-w));
+      background-size: var(--av-cell-w) 100%;
+    }
+    .av-bar {
+      position: absolute;
+      bottom: 4px;
+      width: calc(var(--av-cell-w) - 4px);
+      border-radius: 2px;
+      cursor: pointer;
+      transform-origin: bottom;
+      transition: filter 0.15s, transform 0.15s;
+      animation: avGrow 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards;
+    }
+    @keyframes avGrow {
+      from { transform: scaleY(0); }
+      to   { transform: scaleY(1); }
+    }
+    .av-bar:hover {
+      filter: brightness(1.5);
+      transform: scaleX(1.4);
+      z-index: 3;
+    }
+    .av-bar.outlier {
+      box-shadow: 0 0 0 1px rgba(255, 200, 50, 0.7), 0 0 8px rgba(255, 200, 50, 0.4);
+    }
+    .av-meta-cell {
+      width: var(--av-meta-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 0 12px 0 10px;
+      font-size: 11px;
+      color: var(--text-dim);
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .av-meta-cell .av-meta-num {
+      color: var(--text);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .av-meta-cell .av-meta-second {
+      color: var(--text-dim);
+      font-size: 10px;
+    }
+
+    /* Stacked composition strip (above the per-animal rows) */
+    .av-stack-row {
+      display: flex;
+      align-items: stretch;
+      height: 50px;
+      border-bottom: 1px solid var(--border-glow);
+      animation: avFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    .av-stack-name {
+      width: var(--av-name-w);
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 0 8px 0 22px;
+      font-size: 10px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-right: 1px solid var(--border);
+      background: var(--surface);
+      position: sticky;
+      left: 0;
+      z-index: 1;
+    }
+    .av-stack-track { flex: 0 0 auto; position: relative; }
+    .av-stack-col {
+      position: absolute;
+      bottom: 4px;
+      width: calc(var(--av-cell-w) - 4px);
+      display: flex;
+      flex-direction: column-reverse;
+      cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .av-stack-col:hover { filter: brightness(1.4); }
+    .av-stack-col > div { width: 100%; }
+    .av-stack-col > div:first-child { border-radius: 2px 2px 0 0; }
+    .av-stack-meta {
+      width: var(--av-meta-w);
+      flex: 0 0 auto;
+      border-left: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    /* Detail panel */
+    .av-detail {
+      margin-top: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border-glow);
+      border-radius: 12px;
+      overflow: hidden;
+      display: none;
+    }
+    .av-detail.open { display: block; animation: fadeInUp 0.28s ease both; }
+    .av-detail-head {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), transparent);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .av-detail-head h3 {
+      font-size: 17px;
+      margin: 0 0 3px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .av-detail-head .av-detail-badge {
+      font-size: 10px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: #052017;
+    }
+    .av-detail-head .av-detail-sub {
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.3px;
+    }
+    .av-detail-close {
+      cursor: pointer;
+      font-size: 18px;
+      color: var(--text-dim);
+      padding: 0 4px;
+    }
+    .av-detail-close:hover { color: var(--text); }
+    .av-detail-body { padding: 16px 20px 20px; }
+
+    .av-spark {
+      width: 100%;
+      height: 110px;
+      margin-bottom: 18px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .av-spark svg { width: 100%; height: 100%; }
+
+    .av-detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 720px) { .av-detail-grid { grid-template-columns: 1fr; } }
+    .av-detail-grid h4 {
+      font-size: 11px;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 0 0 8px 0;
+    }
+    .av-list .e {
+      display: grid;
+      grid-template-columns: 110px 1fr 60px;
+      gap: 8px;
+      align-items: center;
+      padding: 4px 0;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .av-list .e .nm {
+      color: var(--text);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .av-list .e .nm:hover { color: #34d399; }
+    .av-list .e .bar {
+      height: 6px;
+      border-radius: 3px;
+      background: var(--surface2);
+      overflow: hidden;
+    }
+    .av-list .e .bar > span {
+      display: block;
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+    .av-list .e .c {
+      color: #34d399;
+      font-weight: 600;
+      text-align: right;
+    }
+    .av-warn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: rgba(255, 200, 50, 0.08);
+      border: 1px solid rgba(255, 200, 50, 0.4);
+      border-radius: 6px;
+      font-size: 11px;
+      color: #ffd166;
+      line-height: 1.5;
+    }
+
+    .av-tip {
+      position: fixed;
+      pointer-events: none;
+      background: rgba(8, 24, 18, 0.96);
+      border: 1px solid rgba(52, 211, 153, 0.45);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      z-index: 100;
+      opacity: 0;
+      transition: opacity 0.12s;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+    }
+    .av-tip.visible { opacity: 1; }
+    .av-tip .t-name { color: #34d399; font-weight: 600; }
+    .av-tip .t-period { color: var(--text-dim); margin-left: 6px; }
+    .av-tip .t-count { color: var(--text); margin-top: 2px; }
+
     /* Help modal */
     .help-modal {
       position: fixed;
@@ -2623,6 +3166,8 @@
           data-nl="Overzicht">Overview</button>
         <button class="btn small" id="btnTimeline" title="Officials & timeline (T)" data-en="Timeline"
           data-nl="Tijdlijn">Timeline</button>
+        <button class="btn small" id="btnAnimals" title="Animals timeline (A)" data-en="Animals"
+          data-nl="Dieren">Animals</button>
         <button class="btn primary" id="btnRandom" data-en='Random <kbd class="kbd">R</kbd>'
           data-nl='Willekeurig <kbd class="kbd">R</kbd>'>Random <kbd class="kbd">R</kbd></button>
         <button class="btn small" id="btnPrev">&larr;</button>
@@ -2722,6 +3267,7 @@
       <div class="shortcut-row"><span>Toggle sidebar</span><span><kbd class="kbd">S</kbd></span></div>
       <div class="shortcut-row"><span>Corpus overview</span><span><kbd class="kbd">O</kbd></span></div>
       <div class="shortcut-row"><span>Officials timeline</span><span><kbd class="kbd">T</kbd></span></div>
+      <div class="shortcut-row"><span>Animals timeline</span><span><kbd class="kbd">A</kbd></span></div>
       <div class="shortcut-row"><span>Focus search</span><span><kbd class="kbd">/</kbd></span></div>
       <div class="shortcut-row"><span>Clear / close</span><span><kbd class="kbd">Esc</kbd></span></div>
       <div class="shortcut-row"><span>Colorblind mode</span><span><kbd class="kbd">C</kbd></span></div>
@@ -2738,6 +3284,7 @@
     let currentFilterIdx = -1, activeRoleFilters = new Set(), filterTx = '', filterConf = '';
     let corpusStats = null;
     let timelineData = null;
+    let animalsData = null;
     let isolatedCategory = null;
     let currentLang = 'en';
 
@@ -2852,8 +3399,10 @@
 
     // ---- Tablet loading ----
     async function loadTablet(id) {
-      // Leaving timeline view: restore standard 3-pane layout
-      document.getElementById('app').classList.remove('timeline-mode');
+      // Leaving any full-width view: restore standard 3-pane layout & default theme
+      const app = document.getElementById('app');
+      app.classList.remove('timeline-mode');
+      app.classList.remove('animals-mode');
       currentTabletId = id;
       currentFilterIdx = filteredIndex.findIndex(t => t.id === id);
       window.location.hash = id;
@@ -3587,13 +4136,18 @@
     };
     function tlDisplayName(o) {
       if (!o) return '';
-      return TL_STATE.nameMode === 'norm' && o.normalized_name ? o.normalized_name : o.name;
+      // atf_name is the underlying transliteration even when the official's
+      // tenure is split into multiple phase records; the synthetic key
+      // (`o.name`) lives only as an internal identifier.
+      const base = TL_STATE.nameMode === 'norm' && o.normalized_name
+        ? o.normalized_name
+        : (o.atf_name || o.name);
+      return o.phase ? `${base} (${o.phase})` : base;
     }
-    // Reverse lookup so detail-panel "jump to peer" works when peers are
-    // identified by raw ATF token even in normalized mode.
     function tlOfficialByEither(label) {
       if (!timelineData) return null;
-      return timelineData.officials.find(o => o.name === label || o.normalized_name === label);
+      return timelineData.officials.find(o =>
+        o.name === label || o.atf_name === label || o.normalized_name === label);
     }
     const TL_OFFICE_COLOR = { C: '#4a9eff', D: '#b07fe0', S: '#00d68f', X: '#ff6b81' };
     const TL_OFFICE_ORDER = ['C', 'D', 'S', 'X'];
@@ -3601,7 +4155,9 @@
     async function renderTimelineView() {
       const main = document.getElementById('mainContent');
       // Switch to full-width layout (collapse the right panel)
-      document.getElementById('app').classList.add('timeline-mode');
+      const app = document.getElementById('app');
+      app.classList.add('timeline-mode');
+      app.classList.remove('animals-mode'); // ensure default (blue) theme
       if (!timelineData) {
         main.innerHTML = '<div class="empty-state" style="padding:40px;"><div class="spinner"></div> Loading timeline...</div>';
         try {
@@ -3775,7 +4331,7 @@
       if (TL_STATE.query) {
         const q = TL_STATE.query;
         list = list.filter(o =>
-          o.name.toLowerCase().includes(q)
+          (o.atf_name || o.name).toLowerCase().includes(q)
           || (o.normalized_name || '').toLowerCase().includes(q)
           || (o.sub_office || '').toLowerCase().includes(q));
       }
@@ -3891,18 +4447,19 @@
           const fadeClass = (TL_STATE.selected && TL_STATE.selected !== o.name) ? ' fade' : '';
           const selClass = (TL_STATE.selected === o.name) ? ' selected' : '';
           const display = tlDisplayName(o);
+          const atf = o.atf_name || o.name;
           // Show the *other* name as the small subtitle so both forms remain
           // visible even after toggling — useful for building a mental map
           // between transliteration and canonical reading.
-          const altName = (TL_STATE.nameMode === 'norm' && o.normalized_name && o.normalized_name !== o.name)
-            ? o.name
-            : (TL_STATE.nameMode === 'raw' && o.normalized_name && o.normalized_name !== o.name)
+          const altName = (TL_STATE.nameMode === 'norm' && o.normalized_name && o.normalized_name !== atf)
+            ? atf
+            : (TL_STATE.nameMode === 'raw' && o.normalized_name && o.normalized_name !== atf)
               ? o.normalized_name
               : o.sub_office.replace(/^.*?-/, '');
           body += `<div class="tl-official${selClass}${fadeClass}" data-name="${esc(o.name)}">
             <div class="tl-name-cell" data-name="${esc(o.name)}">
               <span class="tl-name-marker" style="background:${TL_OFFICE_COLOR[o.office] || '#778ca3'};"></span>
-              <span class="tl-name-text" title="${esc(o.name)} · ${esc(o.normalized_name || '')}">${esc(display)}</span>
+              <span class="tl-name-text" title="${esc(atf)}${o.normalized_name ? ' · ' + esc(o.normalized_name) : ''}${o.phase ? ' · ' + esc(o.sub_office) : ''}">${esc(display)}</span>
               <span class="tl-name-sub" title="${esc(o.sub_office)}">${esc(altName)}</span>
             </div>
             <div class="tl-track" style="width:${trackWidth}px;">`;
@@ -4048,9 +4605,10 @@
         const peerObj = tlOfficialByEither(peer);
         const peerDisplay = peerObj ? tlDisplayName(peerObj) : peer;
         const peerSub = peerObj ? peerObj.sub_office : '';
-        const titleAttr = peerObj && peerObj.normalized_name && peerObj.normalized_name !== peerObj.name
-          ? `${peerObj.name} · ${peerObj.normalized_name}`
-          : peer;
+        const peerAtf = peerObj ? (peerObj.atf_name || peerObj.name) : peer;
+        const titleAttr = peerObj && peerObj.normalized_name && peerObj.normalized_name !== peerAtf
+          ? `${peerAtf} · ${peerObj.normalized_name}`
+          : peerAtf;
         return `
           <div class="e">
             <span class="nm" data-jump="${esc(peer)}" title="${esc(titleAttr)}${peerSub ? ' · ' + esc(peerSub) : ''}">${esc(peerDisplay)}</span>
@@ -4060,8 +4618,11 @@
       };
 
       const display = tlDisplayName(o);
-      const altLine = (o.normalized_name && o.normalized_name !== o.name)
-        ? (TL_STATE.nameMode === 'norm' ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.name)})</span>` : `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.normalized_name)})</span>`)
+      const atfName = o.atf_name || o.name;
+      const altLine = (o.normalized_name && o.normalized_name !== atfName)
+        ? (TL_STATE.nameMode === 'norm'
+            ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(atfName)})</span>`
+            : `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.normalized_name)})</span>`)
         : '';
       const html = `
         <div class="tl-detail-head">
@@ -4159,6 +4720,555 @@
       area.appendChild(svg);
     }
 
+    // ============================================================
+    // Animals timeline view
+    // ============================================================
+    const AV_STATE = {
+      catOn: { sheep_adult: true, sheep_young: true, goat_adult: true, goat_young: true,
+               cattle_adult: true, cattle_young: true, equids: true, other: true },
+      query: '',
+      sort: 'tablets',         // tablets | total | name | category
+      cellW: 24,                // px (zoom)
+      mode: 'animals',          // animals | tablets — what bar height encodes
+      showOutliers: true,
+      showStack: true,          // stacked composition row
+      selected: null,           // animal name
+    };
+
+    async function renderAnimalsView() {
+      const main = document.getElementById('mainContent');
+      // Switch to full-width animals theme.
+      const app = document.getElementById('app');
+      app.classList.add('timeline-mode');
+      app.classList.add('animals-mode');
+      if (!animalsData) {
+        main.innerHTML = '<div class="empty-state" style="padding:40px;"><div class="spinner"></div> Loading livestock timeline...</div>';
+        try {
+          const r = await fetch(`${API}/api/animals_timeline`);
+          animalsData = await r.json();
+        } catch (e) {
+          main.innerHTML = '<div class="tl-empty">Failed to load animals data.</div>';
+          return;
+        }
+      }
+      currentTabletId = null;
+
+      const totalCount = animalsData.animals.reduce((s, a) => s + a.total_count, 0);
+      const totalTablets = Object.values(animalsData.tablets_by_period).reduce((s, n) => s + n, 0);
+      const totalAnimalTerms = animalsData.animals.length;
+
+      main.innerHTML = `
+        <div class="anim-view" id="avView">
+          <h2><span class="av-pulse"></span> Animals &amp; Livestock</h2>
+          <div class="av-subtitle" id="avSubtitle"></div>
+
+          <div class="av-strip">
+            <div class="av-stat"><div class="v">${totalCount.toLocaleString()}</div><div class="l">Animals counted</div></div>
+            <div class="av-stat"><div class="v">${totalTablets.toLocaleString()}</div><div class="l">Tablets with livestock</div></div>
+            <div class="av-stat"><div class="v">${totalAnimalTerms}</div><div class="l">Distinct species/qualifiers</div></div>
+            <div class="av-stat"><div class="v">${animalsData.periods.length}</div><div class="l">Regnal-year periods</div></div>
+          </div>
+
+          <div class="av-toolbar" id="avToolbar">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="tb-label">Search</span>
+              <input type="text" id="avSearch" placeholder="Filter terms…" />
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="tb-label">Sort</span>
+              <select id="avSort">
+                <option value="tablets">Most tablets</option>
+                <option value="total">Most animals</option>
+                <option value="name">Name (A–Z)</option>
+                <option value="category">By category</option>
+              </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="tb-label">Bar shows</span>
+              <span class="av-mode" id="avMode">
+                <span class="av-mode-side on" data-mode="animals">Animals</span>
+                <span class="av-mode-side"   data-mode="tablets">Tablets</span>
+              </span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <span class="tb-label">Categories</span>
+              <span class="av-cat-chip" data-cat="sheep_adult"><span class="av-dot" style="background:var(--av-c-sheep_adult);"></span>Sheep</span>
+              <span class="av-cat-chip" data-cat="sheep_young"><span class="av-dot" style="background:var(--av-c-sheep_young);"></span>Lambs</span>
+              <span class="av-cat-chip" data-cat="goat_adult"><span class="av-dot" style="background:var(--av-c-goat_adult);"></span>Goats</span>
+              <span class="av-cat-chip" data-cat="goat_young"><span class="av-dot" style="background:var(--av-c-goat_young);"></span>Kids</span>
+              <span class="av-cat-chip" data-cat="cattle_adult"><span class="av-dot" style="background:var(--av-c-cattle_adult);"></span>Cattle</span>
+              <span class="av-cat-chip" data-cat="cattle_young"><span class="av-dot" style="background:var(--av-c-cattle_young);"></span>Calves</span>
+              <span class="av-cat-chip" data-cat="equids"><span class="av-dot" style="background:var(--av-c-equids);"></span>Equids</span>
+              <span class="av-cat-chip" data-cat="other"><span class="av-dot" style="background:var(--av-c-other);"></span>Other</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span class="tb-label">Zoom</span>
+              <input type="range" id="avZoom" min="14" max="42" step="2" />
+            </div>
+            <div class="av-tb-toggle on" id="avStackTog" title="Toggle stacked composition row">Stacked</div>
+            <div class="av-tb-toggle on" id="avOutTog"   title="Highlight bars where one tablet contributes ≥70 % of the year's total">Outliers</div>
+            <div style="flex:1;"></div>
+            <div class="av-tb-toggle" id="avReset">Reset</div>
+          </div>
+
+          <div class="av-frame">
+            <div class="av-scroll" id="avScroll">
+              <div class="av-area" id="avArea"></div>
+            </div>
+          </div>
+          <div class="av-detail" id="avDetail"></div>
+        </div>
+        <div class="av-tip" id="avTip"></div>
+      `;
+      avBindToolbar();
+      avSyncToolbarUI();
+      avRenderGrid();
+    }
+
+    function avBindToolbar() {
+      const $ = id => document.getElementById(id);
+      $('avSearch').addEventListener('input', e => { AV_STATE.query = e.target.value.toLowerCase().trim(); avRenderGrid(); });
+      $('avSort').addEventListener('change', e => { AV_STATE.sort = e.target.value; avRenderGrid(); });
+      $('avZoom').addEventListener('input', e => {
+        AV_STATE.cellW = +e.target.value;
+        $('avView').style.setProperty('--av-cell-w', AV_STATE.cellW + 'px');
+        avRenderGrid();
+      });
+      document.querySelectorAll('#avToolbar .av-cat-chip').forEach(el => {
+        el.addEventListener('click', () => {
+          const c = el.dataset.cat;
+          AV_STATE.catOn[c] = !AV_STATE.catOn[c];
+          el.classList.toggle('off', !AV_STATE.catOn[c]);
+          avRenderGrid();
+        });
+      });
+      // Mode switch
+      $('avMode').addEventListener('click', e => {
+        const side = e.target.closest('.av-mode-side');
+        if (!side) return;
+        AV_STATE.mode = side.dataset.mode;
+        document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
+        avRenderGrid();
+      });
+      $('avStackTog').addEventListener('click', () => {
+        AV_STATE.showStack = !AV_STATE.showStack;
+        $('avStackTog').classList.toggle('on', AV_STATE.showStack);
+        avRenderGrid();
+      });
+      $('avOutTog').addEventListener('click', () => {
+        AV_STATE.showOutliers = !AV_STATE.showOutliers;
+        $('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
+        avRenderGrid();
+      });
+      $('avReset').addEventListener('click', () => {
+        Object.keys(AV_STATE.catOn).forEach(k => AV_STATE.catOn[k] = true);
+        AV_STATE.query = '';
+        AV_STATE.sort = 'tablets';
+        AV_STATE.cellW = 24;
+        AV_STATE.mode = 'animals';
+        AV_STATE.showOutliers = true;
+        AV_STATE.showStack = true;
+        AV_STATE.selected = null;
+        $('avSearch').value = '';
+        $('avSort').value = 'tablets';
+        $('avZoom').value = 24;
+        $('avView').style.setProperty('--av-cell-w', '24px');
+        document.querySelectorAll('#avToolbar .av-cat-chip').forEach(el => el.classList.remove('off'));
+        document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === 'animals'));
+        $('avStackTog').classList.add('on');
+        $('avOutTog').classList.add('on');
+        $('avDetail').classList.remove('open');
+        avRenderGrid();
+      });
+    }
+    function avSyncToolbarUI() {
+      document.getElementById('avSearch').value = AV_STATE.query;
+      document.getElementById('avSort').value = AV_STATE.sort;
+      document.getElementById('avZoom').value = AV_STATE.cellW;
+      document.querySelectorAll('#avToolbar .av-cat-chip').forEach(el => {
+        const c = el.dataset.cat;
+        el.classList.toggle('off', !AV_STATE.catOn[c]);
+      });
+      document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === AV_STATE.mode));
+      document.getElementById('avStackTog').classList.toggle('on', AV_STATE.showStack);
+      document.getElementById('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
+    }
+
+    function avVisibleAnimals() {
+      let list = animalsData.animals.filter(a => AV_STATE.catOn[a.category]);
+      if (AV_STATE.query) {
+        const q = AV_STATE.query;
+        list = list.filter(a => a.name.toLowerCase().includes(q) || a.category.includes(q));
+      }
+      switch (AV_STATE.sort) {
+        case 'total': list.sort((a, b) => b.total_count - a.total_count); break;
+        case 'name':  list.sort((a, b) => a.name.localeCompare(b.name)); break;
+        case 'category': list.sort((a, b) => a.category.localeCompare(b.category) || b.total_tablets - a.total_tablets); break;
+        default:      list.sort((a, b) => b.total_tablets - a.total_tablets);
+      }
+      return list;
+    }
+
+    function avReignBands(periods) {
+      const REIGN_NAMES = { 'Š': 'Šulgi', 'AS': 'Amar-Suen', 'ŠS': 'Šū-Suen', 'IS': 'Ibbi-Suen' };
+      // Green-tinted reign bands so the animals view feels distinct.
+      const REIGN_COLORS = { 'Š': '#0e6a47', 'AS': '#137a4a', 'ŠS': '#1a8a5a', 'IS': '#1f9a6a' };
+      const bands = [];
+      let curr = null;
+      periods.forEach((p, i) => {
+        const pre = p.split('.')[0];
+        if (!curr || curr.prefix !== pre) {
+          if (curr) bands.push(curr);
+          curr = { prefix: pre, name: REIGN_NAMES[pre] || pre, color: REIGN_COLORS[pre] || '#666', start: i, end: i };
+        } else curr.end = i;
+      });
+      if (curr) bands.push(curr);
+      return bands;
+    }
+
+    function avRenderGrid() {
+      const a = animalsData;
+      if (!a) return;
+      const cw = AV_STATE.cellW;
+      const periods = a.periods;
+      const trackWidth = periods.length * cw;
+
+      const visible = avVisibleAnimals();
+      const subtitle = document.getElementById('avSubtitle');
+      const visTotal = visible.reduce((s, x) => s + x.total_count, 0);
+      const visTabs  = visible.reduce((s, x) => s + x.total_tablets, 0);
+      subtitle.textContent =
+        `${visible.length} of ${a.animals.length} animal terms · ${visTotal.toLocaleString()} animals · ${visTabs.toLocaleString()} tablet appearances · ${periods[0]} → ${periods[periods.length-1]}`;
+
+      // Maximum bar value for scaling — depends on mode.
+      const valOf = (x, p) => AV_STATE.mode === 'tablets'
+        ? (x.by_period_tablets[p] || 0)
+        : (x.by_period[p] || 0);
+      let maxV = 1;
+      for (const x of visible) {
+        for (const p of periods) {
+          const v = valOf(x, p);
+          if (v > maxV) maxV = v;
+        }
+      }
+
+      const reignBands = avReignBands(periods);
+      const reignStarts = new Set(reignBands.map(b => b.start));
+      const area = document.getElementById('avArea');
+
+      // ─── Axis ─────────────────────────────────────────────
+      let html = `<div class="av-axis">
+        <div class="av-axis-name">Animal term</div>
+        <div class="av-axis-track" style="width:${trackWidth}px;">`;
+      for (const b of reignBands) {
+        const left = b.start * cw + 1;
+        const w = (b.end - b.start + 1) * cw - 2;
+        html += `<div class="av-reign-band" style="left:${left}px;width:${w}px;background:${b.color};">${esc(b.name)}</div>`;
+      }
+      periods.forEach((p, i) => {
+        const reign = reignStarts.has(i);
+        html += `<div class="av-period-marker${reign ? ' reign' : ''}" style="left:${i*cw}px;"></div>`;
+        html += `<div class="av-period-label${reign ? ' reign-start' : ''}" data-period="${esc(p)}" style="left:${i*cw}px;width:${cw}px;">${esc(p)}</div>`;
+      });
+      html += `</div><div class="av-axis-meta">${AV_STATE.mode === 'tablets' ? 'Tablets · animals' : 'Animals · tablets'}</div></div>`;
+
+      // ─── Stacked composition strip ────────────────────────
+      if (AV_STATE.showStack) {
+        // For each period, sum animals per category across visible terms only.
+        const stack = {};
+        for (const p of periods) stack[p] = {};
+        for (const x of visible) {
+          for (const p of periods) {
+            const v = x.by_period[p] || 0;
+            if (v > 0) stack[p][x.category] = (stack[p][x.category] || 0) + v;
+          }
+        }
+        let stackMax = 1;
+        for (const p of periods) {
+          const total = Object.values(stack[p]).reduce((s, n) => s + n, 0);
+          if (total > stackMax) stackMax = total;
+        }
+        html += `<div class="av-stack-row">
+          <div class="av-stack-name">Composition</div>
+          <div class="av-stack-track" style="width:${trackWidth}px;position:relative;">`;
+        const catOrder = ['sheep_adult', 'sheep_young', 'goat_adult', 'goat_young', 'cattle_adult', 'cattle_young', 'equids', 'other'];
+        for (let i = 0; i < periods.length; i++) {
+          const p = periods[i];
+          const total = Object.values(stack[p]).reduce((s, n) => s + n, 0);
+          if (total <= 0) continue;
+          const ratio = total / stackMax;
+          const colH = Math.max(2, Math.round(40 * Math.sqrt(ratio)));
+          let segments = '';
+          for (const c of catOrder) {
+            const v = stack[p][c] || 0;
+            if (v <= 0) continue;
+            const h = Math.round(colH * (v / total));
+            segments += `<div style="height:${h}px;background:var(--av-c-${c});"></div>`;
+          }
+          html += `<div class="av-stack-col" data-period="${esc(p)}" data-total="${total}" style="left:${i*cw + 2}px;width:${cw - 4}px;height:${colH}px;">${segments}</div>`;
+        }
+        html += `</div><div class="av-stack-meta"></div></div>`;
+      }
+
+      // ─── Animal rows ──────────────────────────────────────
+      visible.forEach((x, idx) => {
+        const cat = x.category;
+        const color = `var(--av-c-${cat})`;
+        const isSel = AV_STATE.selected === x.name;
+        const fade = AV_STATE.selected && AV_STATE.selected !== x.name;
+        html += `<div class="av-row${isSel ? ' selected' : ''}${fade ? ' fade' : ''}" data-name="${esc(x.name)}" style="animation-delay:${Math.min(0.4, idx*0.012)}s;">
+          <div class="av-name-cell" data-name="${esc(x.name)}">
+            <span class="av-name-marker" style="background:${color};"></span>
+            <span class="av-name-text" title="${esc(x.name)}">${esc(x.name)}</span>
+            <span class="av-name-cat">${esc(cat.replace('_', ' '))}</span>
+          </div>
+          <div class="av-track" style="width:${trackWidth}px;">`;
+        let barI = 0;
+        periods.forEach((p, i) => {
+          const v = valOf(x, p);
+          if (v <= 0) return;
+          const ratio = v / maxV;
+          const h = Math.max(3, Math.round((parseInt(getComputedStyle(document.documentElement).getPropertyValue('--av-row-h')) || 26) * 0.85 * Math.sqrt(ratio)));
+          const op = 0.55 + 0.45 * Math.sqrt(ratio);
+          const left = i * cw + 2;
+          const w = cw - 4;
+          // Outlier flag: in this period one tablet contributes ≥70 %
+          // of the term's total — likely a single anomalous tablet.
+          const tot = x.by_period[p] || 0;
+          const mx  = x.by_period_max[p] || 0;
+          const outlier = AV_STATE.showOutliers && tot > 0 && (mx / tot) >= 0.7 && tot >= 20;
+          const dy = Math.min(0.5, barI * 0.005);
+          html += `<div class="av-bar${outlier ? ' outlier' : ''}" data-name="${esc(x.name)}" data-period="${esc(p)}" data-count="${v}" data-tablets="${x.by_period_tablets[p] || 0}" data-total="${tot}" data-max="${mx}" style="left:${left}px;width:${w}px;height:${h}px;background:${color};opacity:${op};animation-delay:${dy}s;"></div>`;
+          barI++;
+        });
+        html += `</div>
+          <div class="av-meta-cell"><span class="av-meta-num">${(AV_STATE.mode === 'tablets' ? x.total_tablets : x.total_count).toLocaleString()}</span><span class="av-meta-second">${AV_STATE.mode === 'tablets' ? '· ' + x.total_count.toLocaleString() + ' an.' : '· ' + x.total_tablets.toLocaleString() + ' tab.'}</span></div>
+        </div>`;
+      });
+
+      area.innerHTML = html;
+
+      // Interactions
+      const tip = document.getElementById('avTip');
+      area.querySelectorAll('.av-bar').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.dataset.name;
+          const p = el.dataset.period;
+          const c = +el.dataset.count;
+          const t = +el.dataset.tablets;
+          const tot = +el.dataset.total;
+          const mx = +el.dataset.max;
+          let extra = '';
+          if (AV_STATE.mode === 'tablets')
+            extra = `<div class="t-count">${t} tablet${t === 1 ? '' : 's'} · ${tot.toLocaleString()} animals</div>`;
+          else
+            extra = `<div class="t-count">${tot.toLocaleString()} animals · ${t} tablet${t === 1 ? '' : 's'}</div>`;
+          if (mx > 0 && tot > 0 && mx / tot >= 0.7 && tot >= 20)
+            extra += `<div style="color:#ffd166;margin-top:2px;">Single tablet ≥${Math.round(mx/tot*100)}% of total</div>`;
+          tip.innerHTML = `<div><span class="t-name">${esc(name)}</span><span class="t-period">${esc(p)}</span></div>${extra}`;
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mousemove', e => {
+          tip.style.left = (e.clientX + 12) + 'px';
+          tip.style.top = (e.clientY + 12) + 'px';
+        });
+        el.addEventListener('mouseleave', () => tip.classList.remove('visible'));
+        el.addEventListener('click', () => avSelectAnimal(el.dataset.name));
+      });
+      area.querySelectorAll('.av-row').forEach(el => {
+        el.addEventListener('click', e => {
+          if (e.target.closest('.av-bar')) return;
+          avSelectAnimal(el.dataset.name === AV_STATE.selected ? null : el.dataset.name);
+        });
+      });
+      area.querySelectorAll('.av-stack-col').forEach(el => {
+        el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
+      });
+      area.querySelectorAll('.av-period-label').forEach(el => {
+        el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
+      });
+
+      if (AV_STATE.selected) avRenderDetail(AV_STATE.selected);
+      else document.getElementById('avDetail').classList.remove('open');
+    }
+
+    function avSelectAnimal(name) {
+      AV_STATE.selected = name;
+      document.querySelectorAll('.av-row').forEach(el => {
+        el.classList.toggle('selected', el.dataset.name === name);
+        el.classList.toggle('fade', !!name && el.dataset.name !== name);
+      });
+      if (!name) { document.getElementById('avDetail').classList.remove('open'); return; }
+      avRenderDetail(name);
+      const row = document.querySelector(`.av-row[data-name="${CSS.escape(name)}"]`);
+      if (row) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function avRenderDetail(name) {
+      const a = animalsData;
+      const x = a.animals.find(v => v.name === name);
+      if (!x) return;
+      const detail = document.getElementById('avDetail');
+      const color = `var(--av-c-${x.category})`;
+      const periods = a.periods;
+
+      // Build sparkline SVG showing animal-count + tablet-count over time
+      const w = 760, h = 110, padL = 36, padR = 8, padT = 8, padB = 22;
+      const xs = i => padL + (i / Math.max(1, periods.length - 1)) * (w - padL - padR);
+      const animsArr = periods.map(p => x.by_period[p] || 0);
+      const tabsArr  = periods.map(p => x.by_period_tablets[p] || 0);
+      const aMax = Math.max(1, ...animsArr);
+      const tMax = Math.max(1, ...tabsArr);
+      const yA = v => h - padB - (v / aMax) * (h - padT - padB);
+      const yT = v => h - padB - (v / tMax) * (h - padT - padB);
+      const pathA = animsArr.map((v, i) => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yA(v).toFixed(1)}`).join(' ');
+      const pathT = tabsArr.map((v, i)  => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yT(v).toFixed(1)}`).join(' ');
+      // Reign tick marks
+      let tickMarks = '';
+      let prevPre = '';
+      periods.forEach((p, i) => {
+        const pre = p.split('.')[0];
+        if (pre !== prevPre) {
+          tickMarks += `<line x1="${xs(i)}" x2="${xs(i)}" y1="${padT}" y2="${h - padB}" stroke="rgba(52,211,153,0.25)" stroke-dasharray="2 3"/>`
+                    +  `<text x="${xs(i) + 3}" y="${padT + 10}" font-size="9" fill="rgba(52,211,153,0.7)">${pre}</text>`;
+          prevPre = pre;
+        }
+      });
+      // X-axis labels at first/last
+      const xAxis = `<text x="${padL}" y="${h - 6}" font-size="9" fill="#666">${periods[0]}</text>
+                     <text x="${w - padR}" y="${h - 6}" font-size="9" fill="#666" text-anchor="end">${periods[periods.length - 1]}</text>`;
+      // Y-axis labels (animals)
+      const yAxis = `<text x="6" y="${padT + 8}" font-size="9" fill="#34d399">${aMax.toLocaleString()}</text>
+                     <text x="6" y="${h - padB - 1}" font-size="9" fill="#34d399">0</text>`;
+
+      const spark = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+        ${tickMarks}
+        ${yAxis}${xAxis}
+        <path d="${pathT}" stroke="rgba(255,209,102,0.45)" stroke-width="1.2" fill="none"/>
+        <path d="${pathA}" stroke="#34d399" stroke-width="1.8" fill="none"/>
+      </svg>`;
+
+      // Top contributors
+      const top = x.top_contributors.slice(0, 8);
+      const topMax = top.length ? top[0].count : 1;
+      const contribRows = top.map(c => `
+        <div class="e">
+          <span class="nm" data-tablet="${esc(c.tablet)}" title="Open P${esc(c.tablet)} — ${esc(c.animal)}">P${esc(c.tablet)}</span>
+          <span class="bar"><span style="width:${Math.round(c.count / topMax * 100)}%;background:${color};"></span></span>
+          <span class="c">${c.count}</span>
+        </div>`).join('');
+
+      // Outlier periods
+      const outliers = periods.map(p => {
+        const tot = x.by_period[p] || 0;
+        const mx  = x.by_period_max[p] || 0;
+        if (tot >= 20 && mx / tot >= 0.7) return { p, tot, mx, ratio: mx / tot };
+        return null;
+      }).filter(Boolean).sort((a, b) => b.ratio - a.ratio).slice(0, 6);
+      const outlierBlock = outliers.length ? `
+        <div class="av-warn">
+          <strong>Possible outliers:</strong>
+          ${outliers.map(o => `${esc(o.p)} (${o.mx.toLocaleString()}/${o.tot.toLocaleString()}, ${Math.round(o.ratio*100)}%)`).join(' · ')}
+          — periods where a single tablet drives most of the count for ${esc(x.name)}. Worth re-checking the extraction.
+        </div>` : '';
+
+      // Sheep-to-tablet baseline: show this animal's per-tablet average versus the corpus mean
+      const avgPerTab = x.total_tablets > 0 ? Math.round(x.total_count / x.total_tablets * 10) / 10 : 0;
+
+      detail.innerHTML = `
+        <div class="av-detail-head">
+          <div>
+            <h3>
+              <span class="av-detail-badge" style="background:${color};">${esc(x.category.replace('_', ' '))}</span>
+              ${esc(x.name)}
+            </h3>
+            <div class="av-detail-sub">
+              ${x.total_count.toLocaleString()} animals across ${x.total_tablets.toLocaleString()} tablets
+              · avg ${avgPerTab} per tablet
+              · active in ${Object.keys(x.by_period).length} of ${periods.length} periods
+            </div>
+          </div>
+          <span class="av-detail-close" id="avDetailClose">&times;</span>
+        </div>
+        <div class="av-detail-body">
+          <div class="av-spark" title="Green: animal count · Yellow: tablet count">${spark}</div>
+          ${outlierBlock}
+          <div class="av-detail-grid">
+            <div>
+              <h4>Top contributing tablets</h4>
+              <div class="av-list">${contribRows || '<div style="color:var(--text-dim);font-size:11px;">No data.</div>'}</div>
+            </div>
+            <div>
+              <h4>Active periods (top by total)</h4>
+              <div class="av-list">
+                ${Object.entries(x.by_period).sort((a,b) => b[1]-a[1]).slice(0, 8).map(([p, v]) => {
+                  const pmax = Math.max(1, ...Object.values(x.by_period));
+                  return `<div class="e">
+                    <span class="nm" data-period="${esc(p)}">${esc(p)}</span>
+                    <span class="bar"><span style="width:${Math.round(v / pmax * 100)}%;background:${color};"></span></span>
+                    <span class="c">${v.toLocaleString()}</span>
+                  </div>`;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      detail.classList.add('open');
+      document.getElementById('avDetailClose').addEventListener('click', () => avSelectAnimal(null));
+      detail.querySelectorAll('.nm[data-tablet]').forEach(el => {
+        el.addEventListener('click', () => loadTablet(el.dataset.tablet));
+      });
+      detail.querySelectorAll('.nm[data-period]').forEach(el => {
+        el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
+      });
+    }
+
+    function avShowPeriodSummary(period) {
+      const a = animalsData;
+      const rows = [];
+      for (const x of a.animals) {
+        const v = x.by_period[period] || 0;
+        if (v > 0) rows.push({ name: x.name, category: x.category, count: v, tablets: x.by_period_tablets[period] || 0, max: x.by_period_max[period] || 0 });
+      }
+      rows.sort((p, q) => q.count - p.count);
+      const total = rows.reduce((s, r) => s + r.count, 0);
+      const totTab = a.tablets_by_period[period] || 0;
+      const ratio = a.sheep_to_tablet[period];
+
+      const detail = document.getElementById('avDetail');
+      const max = rows.length ? rows[0].count : 1;
+      detail.innerHTML = `
+        <div class="av-detail-head">
+          <div>
+            <h3><span class="av-detail-badge" style="background:#34d399;">PERIOD</span> ${esc(period)}</h3>
+            <div class="av-detail-sub">
+              ${total.toLocaleString()} animals across ${totTab.toLocaleString()} tablets
+              ${ratio != null ? ` · ratio ${ratio} animals/tablet` : ''}
+            </div>
+          </div>
+          <span class="av-detail-close" id="avDetailClose">&times;</span>
+        </div>
+        <div class="av-detail-body">
+          <div class="av-list">
+            ${rows.slice(0, 30).map(r => `
+              <div class="e">
+                <span class="nm" data-jump="${esc(r.name)}">
+                  <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--av-c-${r.category});margin-right:8px;"></span>
+                  ${esc(r.name)} <span style="color:var(--text-dim);font-size:10px;">· ${r.tablets} tablet${r.tablets===1?'':'s'}</span>
+                </span>
+                <span class="bar"><span style="width:${Math.round(r.count/max*100)}%;background:var(--av-c-${r.category});"></span></span>
+                <span class="c">${r.count.toLocaleString()}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      detail.classList.add('open');
+      document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      detail.querySelectorAll('.nm[data-jump]').forEach(el => {
+        el.addEventListener('click', () => avSelectAnimal(el.dataset.jump));
+      });
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
     function tlShowPeriodSummary(period) {
       // Top officials in this period across all bureaus
       const t = timelineData;
@@ -4189,9 +5299,10 @@
               ? rows.slice(0, 25).map(r => {
                   const o = tlOfficialByEither(r.name);
                   const dn = o ? tlDisplayName(o) : r.name;
+                  const atf = o ? (o.atf_name || o.name) : r.name;
                   return `
                 <div class="e">
-                  <span class="nm" data-jump="${esc(r.name)}" title="${esc(r.name)}${o && o.normalized_name && o.normalized_name !== o.name ? ' · ' + esc(o.normalized_name) : ''}">
+                  <span class="nm" data-jump="${esc(r.name)}" title="${esc(atf)}${o && o.normalized_name && o.normalized_name !== atf ? ' · ' + esc(o.normalized_name) : ''}">
                     <span class="tl-name-marker" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${TL_OFFICE_COLOR[r.office]};margin-right:6px;"></span>
                     ${esc(dn)} <span style="color:var(--text-dim);">· ${esc(r.sub)}</span>
                   </span>
@@ -4211,8 +5322,10 @@
     }
 
     function renderCorpusStats() {
-      // Leaving timeline view: restore standard 3-pane layout
-      document.getElementById('app').classList.remove('timeline-mode');
+      // Leaving any full-width view: restore standard 3-pane layout & default theme
+      const app = document.getElementById('app');
+      app.classList.remove('timeline-mode');
+      app.classList.remove('animals-mode');
       if (!corpusStats) return;
       const s = corpusStats;
       const txColors = { delivery: '#4a9eff', expenditure: '#ff6b81', transfer: '#b07fe0', receipt: '#00d68f', unknown: '#666' };
@@ -4307,6 +5420,7 @@
     });
     document.getElementById('btnStats').addEventListener('click', renderCorpusStats);
     document.getElementById('btnTimeline').addEventListener('click', renderTimelineView);
+    document.getElementById('btnAnimals').addEventListener('click', renderAnimalsView);
     document.getElementById('btnColorblind').addEventListener('click', () => {
       document.body.classList.toggle('colorblind');
       ROLE_COLORS = document.body.classList.contains('colorblind') ? ROLE_COLORS_CB : ROLE_COLORS_NORMAL;
@@ -4355,6 +5469,7 @@
         case 'r': document.getElementById('btnRandom').click(); break;
         case 'o': renderCorpusStats(); break;
         case 't': renderTimelineView(); break;
+        case 'a': renderAnimalsView(); break;
         case 's': document.getElementById('btnToggleSidebar').click(); break;
         case 'c': document.getElementById('btnColorblind').click(); break;
         case '/': e.preventDefault(); document.getElementById('searchInput').focus(); break;

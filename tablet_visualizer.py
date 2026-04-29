@@ -1001,6 +1001,7 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
     tablet_index = None
     _corpus_stats = None
     _timeline = None
+    _animals_timeline = None
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(BASE_DIR), **kwargs)
@@ -1034,6 +1035,8 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
             self.send_json(self._corpus_stats)
         elif self.path == "/api/timeline":
             self.send_json(self._timeline)
+        elif self.path == "/api/animals_timeline":
+            self.send_json(self._animals_timeline)
         else:
             super().do_GET()
 
@@ -1102,6 +1105,70 @@ def _split_persons(field: str) -> list[str]:
     return [n.strip() for n in field.split(";") if n.strip()]
 
 
+# ---------------------------------------------------------------------------
+# Tenure overrides for officials whose role changed mid-corpus.
+#
+# The OFFICIALS_TO_OFFICE map in drehem_extract.py is one office per name.
+# A few officials had distinct, well-attested careers in two bureaus and
+# really should be split. The override key is the ATF name; the value is
+# an ordered list of phases. Each phase declares the inclusive
+# (ruler, regnal_year, month) cut-off and the role the official held
+# during that span. Phases are evaluated in order; the first phase whose
+# end-date is on or after the tablet's date wins.
+#
+# A None component matches any value ("up to AS.09 month 7" inclusive →
+# any earlier ruler / earlier year, plus AS.09 months 1–7).
+#
+# Reference (Tsouparopoulou 2013, Sigrist 1992):
+#   Intaea served the Shepherds–LuNingirsu family AS.03–AS.09.07 before
+#   being promoted to Chief Official from AS.09.08 through IS.02.
+# ---------------------------------------------------------------------------
+
+# (ruler_abbr or None, year or None, month or None)
+TENURE_PHASES = {
+    "in-ta-e3-a": [
+        # Up to and including AS.09 month 7 → Shepherds-LuNingirsu
+        {"end": ("AS", 9, 7),  "office": "S", "sub_office": "Shepherds-LuNingirsu"},
+        # Anything later → Chief Official
+        {"end": (None, None, None), "office": "C", "sub_office": "Chief Official"},
+    ],
+}
+
+_RULER_ABBR = {"Šulgi": "Š", "Amar-Suen": "AS", "Šū-Suen": "ŠS", "Ibbi-Suen": "IS"}
+_RULER_RANK = {abbr: i for i, abbr in enumerate(["Š", "AS", "ŠS", "IS"])}
+
+
+def _date_le(a, b):
+    """Compare two (ruler_abbr, year, month) tuples; None on b means infinity."""
+    if b == (None, None, None):
+        return True
+    if b[0] is None:
+        return True
+    ar = _RULER_RANK.get(a[0], -1)
+    br = _RULER_RANK.get(b[0], -1)
+    if ar != br:
+        return ar < br
+    ay = a[1] or 0
+    by = b[1] or 0
+    if ay != by:
+        return ay <= by
+    am = a[2] or 0
+    bm = b[2] or 99
+    return am <= bm
+
+
+def _resolved_role(name, ruler_abbr, year, month, default_office, default_sub):
+    """Apply TENURE_PHASES override and return (office, sub_office)."""
+    phases = TENURE_PHASES.get(name)
+    if not phases:
+        return default_office, default_sub
+    here = (ruler_abbr, year or 0, month or 0)
+    for ph in phases:
+        if _date_le(here, ph["end"]):
+            return ph["office"], ph["sub_office"]
+    return default_office, default_sub
+
+
 def compute_timeline_data():
     """Build per-official activity grid + transaction edges.
 
@@ -1110,6 +1177,10 @@ def compute_timeline_data():
         – total tablets
         – outgoing edges (this official → receiver) and incoming
           (source → this official) when both ends are recognised officials.
+
+    Officials listed in TENURE_PHASES are split into one synthetic entry
+    per phase (e.g. Intaea S → C), each tracked independently with its
+    own date range and edges.
     """
     from collections import defaultdict, Counter
 
@@ -1139,14 +1210,18 @@ def compute_timeline_data():
             return r["canonical"]
         return name
 
-    officials = {}   # name -> dict
-    for name, (office, sub) in OFFICIALS_TO_OFFICE.items():
-        officials[name] = {
-            "name": name,
-            "normalized_name": _canon(name),
+    def _new_record(synthetic_key, atf_name, office, sub_office, phase_label=None):
+        return {
+            # `name` is the unique key that edges and click-handlers reference.
+            # When an official has split tenure it becomes synthetic
+            # (e.g. "in-ta-e3-a#S"); otherwise it is identical to atf_name.
+            "name": synthetic_key,
+            "atf_name": atf_name,
+            "normalized_name": _canon(atf_name),
             "office": office,
             "office_label": OFFICE_LABELS.get(office, office),
-            "sub_office": sub,
+            "sub_office": sub_office,
+            "phase": phase_label,
             "by_period": Counter(),
             "first_period": None,
             "last_period": None,
@@ -1158,8 +1233,48 @@ def compute_timeline_data():
             "as_intermediary": 0,
         }
 
+    # `officials` maps a synthetic key (the ATF name plus an optional phase
+    # suffix when the career spans multiple offices) to one record. This is
+    # the dictionary the timeline renders. We also keep a reverse index
+    # `phase_keys[name]` so the per-tablet date resolver can pick the right
+    # bucket without re-scanning.
+    officials = {}
+    phase_keys = {}   # ATF name -> list of synthetic keys, in phase order
+
+    for name, (office, sub) in OFFICIALS_TO_OFFICE.items():
+        if name in TENURE_PHASES:
+            keys = []
+            for ph in TENURE_PHASES[name]:
+                key = f"{name}#{ph['office']}"  # e.g. in-ta-e3-a#S
+                officials[key] = _new_record(
+                    synthetic_key=key,
+                    atf_name=name,
+                    office=ph["office"],
+                    sub_office=ph["sub_office"],
+                    phase_label=ph["office"],
+                )
+                keys.append(key)
+            phase_keys[name] = keys
+        else:
+            officials[name] = _new_record(name, name, office, sub)
+            phase_keys[name] = [name]
+
     edges = Counter()   # (source, receiver) -> tablet count
     periods_seen = set()
+
+    def _resolve_key(name, ruler_abbr, year, month):
+        """Pick the right phase key for a given ATF name and tablet date."""
+        keys = phase_keys.get(name)
+        if not keys:
+            return None
+        if len(keys) == 1:
+            return keys[0]
+        # Multi-phase: walk the override list, find the first phase that contains the date.
+        here = (ruler_abbr, year or 0, month or 0)
+        for ph, key in zip(TENURE_PHASES[name], keys):
+            if _date_le(here, ph["end"]):
+                return key
+        return keys[-1]
 
     with open(EXTRACTED, "r", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -1173,6 +1288,11 @@ def compute_timeline_data():
                 year = 0
             if year <= 0:
                 continue
+            try:
+                month = int(row.get("month_number") or 0)
+            except ValueError:
+                month = 0
+            ruler_abbr = _RULER_ABBR.get(ruler, ruler)
 
             label = _period_label(ruler, year)
             year_idx = sum(rl[2] for rl in RULER_ORDER[:r_idx]) + year
@@ -1182,25 +1302,23 @@ def compute_timeline_data():
             receivers = _split_persons(row.get("receiver", ""))
             intermediaries = _split_persons(row.get("intermediary", ""))
 
-            # Track per-official activity (any role hit counts the tablet once
-            # per official — a multi-role person on the same tablet still gets
-            # counted once via the set below).
-            present = set()
-            for s in sources:
-                if s in officials:
-                    present.add(s)
-                    officials[s]["as_source"] += 1
-            for r in receivers:
-                if r in officials:
-                    present.add(r)
-                    officials[r]["as_receiver"] += 1
-            for m in intermediaries:
-                if m in officials:
-                    present.add(m)
-                    officials[m]["as_intermediary"] += 1
+            # Resolve each name to a *phase key* — for officials with split
+            # tenures (e.g. Intaea), this routes the tablet to whichever
+            # bureau they served in at the time of the tablet.
+            src_keys = [k for s in sources if (k := _resolve_key(s, ruler_abbr, year, month))]
+            rcv_keys = [k for r in receivers if (k := _resolve_key(r, ruler_abbr, year, month))]
+            int_keys = [k for m in intermediaries if (k := _resolve_key(m, ruler_abbr, year, month))]
 
-            for name in present:
-                o = officials[name]
+            present = set()
+            for k in src_keys:
+                present.add(k); officials[k]["as_source"] += 1
+            for k in rcv_keys:
+                present.add(k); officials[k]["as_receiver"] += 1
+            for k in int_keys:
+                present.add(k); officials[k]["as_intermediary"] += 1
+
+            for k in present:
+                o = officials[k]
                 o["by_period"][label] += 1
                 o["total_tablets"] += 1
                 if year_idx < o["first_year_idx"]:
@@ -1210,12 +1328,12 @@ def compute_timeline_data():
                     o["last_year_idx"] = year_idx
                     o["last_period"] = label
 
-            # Network edges: source → receiver pairs of known officials.
-            for s in sources:
-                if s not in officials:
-                    continue
-                for r in receivers:
-                    if r in officials and r != s:
+            # Network edges: source → receiver pairs of known officials,
+            # using the resolved phase keys so a Shepherd-era Intaea is
+            # distinct from a Chief-era Intaea in the network.
+            for s in src_keys:
+                for r in rcv_keys:
+                    if r != s:
                         edges[(s, r)] += 1
 
     periods = [label for _idx, label in sorted(periods_seen)]
@@ -1253,14 +1371,207 @@ def compute_timeline_data():
     }
 
 
+# ---------------------------------------------------------------------------
+# Animals timeline / livestock breakdown
+# ---------------------------------------------------------------------------
+
+# Coarse category grouping for the stacked-area view. Each animal term in
+# animals_detail is matched against its prefix (before the first hyphen
+# or space) and routed to one of these buckets. Anything not listed falls
+# under "other". Categories are intentionally coarse — fine-grained
+# species/qualifier distinctions surface in the drill-down.
+ANIMAL_CATEGORIES = {
+    "sheep_adult":  {"label": "Sheep (adult)",  "color": "#22c55e",
+                     "members": {"udu", "u8"}},
+    "sheep_young":  {"label": "Sheep (young)",  "color": "#86efac",
+                     "members": {"sila4", "kir11"}},
+    "goat_adult":   {"label": "Goats (adult)",  "color": "#0ea5e9",
+                     "members": {"masz2", "ud5"}},
+    "goat_young":   {"label": "Goats (young)",  "color": "#7dd3fc",
+                     "members": {"masz", "masz-da3"}},
+    "cattle_adult": {"label": "Cattle (adult)", "color": "#a855f7",
+                     "members": {"gu4", "ab2"}},
+    "cattle_young": {"label": "Cattle (young)", "color": "#d8b4fe",
+                     "members": {"amar"}},
+    "equids":       {"label": "Equids",         "color": "#f59e0b",
+                     "members": {"ansze", "anše", "{ansze}kunga2"}},
+    "other":        {"label": "Other",          "color": "#94a3b8",
+                     "members": set()},
+}
+
+
+def _animal_base(animal_term: str) -> str:
+    """Strip qualifiers and curly-brace determinatives to a base species token.
+
+    'udu-niga'        → 'udu'
+    'udu'             → 'udu'
+    'masz2-gal-niga'  → 'masz2'
+    'amar masz-da3'   → 'amar'
+    '{ansze}kunga2'   → '{ansze}kunga2'  (preserve composite)
+    """
+    if not animal_term:
+        return ""
+    # Whole-token composite? keep verbatim for equids etc.
+    if animal_term.startswith("{") and "}" in animal_term:
+        return animal_term
+    # Otherwise take the part before the first hyphen or space.
+    head = re.split(r"[-\s]", animal_term, 1)[0]
+    return head
+
+
+def _animal_category(base: str) -> str:
+    for key, meta in ANIMAL_CATEGORIES.items():
+        if base in meta["members"]:
+            return key
+    return "other"
+
+
+# Pattern matches `count×animal-qualifier` entries.
+# count is either an integer or `[imp:N]` (deterministic imputation).
+_ANIMAL_ENTRY_RE = re.compile(r"(\[imp:(\d+)\]|(\d+))\s*[×x]\s*([^,]+)")
+
+
+def _parse_animals_detail(detail: str):
+    """Yield (count, animal_term) tuples from an animals_detail cell."""
+    for m in _ANIMAL_ENTRY_RE.finditer(detail or ""):
+        if m.group(2):
+            count = int(m.group(2))
+        else:
+            count = int(m.group(3))
+        animal = m.group(4).strip()
+        if animal:
+            yield count, animal
+
+
+def compute_animals_timeline():
+    """Build per-period × animal activity grid for the livestock view.
+
+    Returns:
+        periods           – ordered list of regnal-year period labels
+        animals           – list of per-animal records (top-N by tablet count)
+        categories        – {category: {label, color, members:[animal_term...]}}
+        by_period_total   – {period: total_animal_count}
+        by_period_tx      – {period: {tx_type: count}}
+        sheep_to_tablet   – per-period mean animals/tablet (for sussing outliers)
+    """
+    from collections import Counter, defaultdict
+
+    # Gather: animal_base -> period -> [(tablet_id, count_on_that_tablet)]
+    contributions = defaultdict(lambda: defaultdict(list))
+    by_period_total = Counter()                   # period -> sum animals
+    tx_by_period = defaultdict(Counter)           # period -> {tx: count}
+    tablets_by_period = Counter()                 # period -> # tablets with animals
+    period_idx_by_label = {}
+
+    with open(EXTRACTED, "r", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            ruler = row.get("ruler", "")
+            r_idx = _ruler_index(ruler)
+            if r_idx < 0:
+                continue
+            try:
+                year = int(row.get("regnal_year") or 0)
+            except ValueError:
+                year = 0
+            if year <= 0:
+                continue
+            label = _period_label(ruler, year)
+            year_idx = sum(rl[2] for rl in RULER_ORDER[:r_idx]) + year
+            period_idx_by_label[label] = year_idx
+
+            entries = list(_parse_animals_detail(row.get("animals_detail", "")))
+            if not entries:
+                continue
+
+            tablets_by_period[label] += 1
+            tx = row.get("transaction_type") or "unknown"
+            tx_by_period[label][tx] += 1
+
+            for count, animal in entries:
+                base = _animal_base(animal)
+                contributions[base][label].append({
+                    "tablet": row["tablet_id"],
+                    "count": count,
+                    "animal": animal,
+                })
+                by_period_total[label] += count
+
+    periods = sorted(period_idx_by_label.keys(), key=lambda p: period_idx_by_label[p])
+
+    # Per-animal aggregates and outlier metrics
+    animals_out = []
+    for base, by_period in contributions.items():
+        total_count = 0
+        total_tablets = 0
+        by_period_count = {}
+        by_period_tablets = {}
+        by_period_max = {}
+        top_tablets_overall = []
+        for period, contribs in by_period.items():
+            psum = sum(c["count"] for c in contribs)
+            total_count += psum
+            total_tablets += len(contribs)
+            by_period_count[period] = psum
+            by_period_tablets[period] = len(contribs)
+            by_period_max[period] = max(c["count"] for c in contribs)
+            top_tablets_overall.extend(contribs)
+
+        # Top 8 contributing tablets across the whole corpus, for drill-down.
+        top_tablets_overall.sort(key=lambda c: -c["count"])
+        top_tablets_overall = top_tablets_overall[:8]
+
+        category = _animal_category(base)
+        animals_out.append({
+            "name": base,
+            "category": category,
+            "label": base,
+            "by_period": by_period_count,
+            "by_period_tablets": by_period_tablets,
+            "by_period_max": by_period_max,
+            "total_count": total_count,
+            "total_tablets": total_tablets,
+            "top_contributors": top_tablets_overall,
+        })
+
+    # Drop singletons (one tablet) since they bloat the list with
+    # one-off readings; researchers can still find them via the issue
+    # log if needed.
+    animals_out = [a for a in animals_out if a["total_tablets"] >= 2]
+    animals_out.sort(key=lambda a: (-a["total_tablets"], -a["total_count"]))
+
+    # Sheep-to-tablet ratio per period — useful for spotting suspicious
+    # records (e.g. one tablet inflating the count).
+    sheep_to_tablet = {}
+    for p, n_tab in tablets_by_period.items():
+        if n_tab > 0:
+            sheep_to_tablet[p] = round(by_period_total[p] / n_tab, 1)
+
+    categories_out = {
+        k: {"label": v["label"], "color": v["color"]}
+        for k, v in ANIMAL_CATEGORIES.items()
+    }
+
+    return {
+        "periods": periods,
+        "animals": animals_out,
+        "categories": categories_out,
+        "by_period_total": dict(by_period_total),
+        "by_period_tx": {k: dict(v) for k, v in tx_by_period.items()},
+        "tablets_by_period": dict(tablets_by_period),
+        "sheep_to_tablet": sheep_to_tablet,
+    }
+
+
 def serve(port=8585):
     print("Loading tablets...")
     VisualizerHandler.tablets = load_database()
     VisualizerHandler.tablet_index = build_tablet_index()
     VisualizerHandler._corpus_stats = compute_corpus_stats(VisualizerHandler.tablet_index)
     VisualizerHandler._timeline = compute_timeline_data()
+    VisualizerHandler._animals_timeline = compute_animals_timeline()
     print(f"Loaded {len(VisualizerHandler.tablets)} tablets, "
-          f"{len(VisualizerHandler._timeline['officials'])} active officials")
+          f"{len(VisualizerHandler._timeline['officials'])} active officials, "
+          f"{len(VisualizerHandler._animals_timeline['animals'])} animal terms")
 
     server = HTTPServer(("", port), VisualizerHandler)
     print(f"\nTablet Visualizer running on http://localhost:{port}/tablet_vis.html")
