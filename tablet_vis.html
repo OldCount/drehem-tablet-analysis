@@ -2517,8 +2517,8 @@
     .app.animals-mode #btnAnimals { border-color: #34d399; color: #34d399; }
 
     .anim-view {
-      --av-cell-w: 24px;
-      --av-row-h: 26px;
+      --av-cell-w: 28px;
+      --av-row-h: 32px;
       --av-axis-h: 92px;
       --av-name-w: 220px;
       --av-meta-w: 130px;
@@ -3025,6 +3025,66 @@
       font-size: 11px;
       color: #ffd166;
       line-height: 1.5;
+    }
+
+    /* Hero stacked-area chart */
+    .av-hero {
+      background: linear-gradient(180deg, rgba(52, 211, 153, 0.04), rgba(8, 14, 22, 0));
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      border-radius: 14px;
+      padding: 14px 18px 18px;
+      margin-bottom: 18px;
+      animation: avFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+    }
+    .av-hero-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .av-hero-header h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .av-hero-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+    }
+    .av-hero-chart {
+      cursor: crosshair;
+      transition: filter 0.3s;
+    }
+    .av-hero-chart svg {
+      transition: opacity 0.4s;
+    }
+    .av-hero-chart svg path {
+      transition: fill-opacity 0.2s;
+    }
+    .av-hero-chart svg path:hover {
+      fill-opacity: 1;
+    }
+    .av-hero-legend {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+      font-size: 11px;
+      color: var(--text-dim);
+    }
+    .av-hero-leg {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .av-hero-leg .av-dot {
+      width: 10px; height: 10px; border-radius: 2px; display: inline-block;
     }
 
     .av-tip {
@@ -4721,23 +4781,27 @@
     }
 
     // ============================================================
-    // Animals timeline view
+    // Animals timeline view (redesigned: hero stacked area + bars +
+    // direct cell drill-down; lazy /api/animals_cell for tablet lists).
     // ============================================================
     const AV_STATE = {
       catOn: { sheep_adult: true, sheep_young: true, goat_adult: true, goat_young: true,
                cattle_adult: true, cattle_young: true, equids: true, other: true },
       query: '',
-      sort: 'tablets',         // tablets | total | name | category
-      cellW: 24,                // px (zoom)
-      mode: 'animals',          // animals | tablets — what bar height encodes
+      sort: 'tablets',
+      cellW: 28,
+      mode: 'animals',          // animals | tablets — bar height meaning
       showOutliers: true,
-      showStack: true,          // stacked composition row
+      heroMetric: 'absolute',   // absolute | share — area-chart y-axis
+      heroFocusYear: null,      // when set, hero zooms to month-level for that year
       selected: null,           // animal name
     };
+    const AV_CAT_ORDER = ['sheep_adult', 'sheep_young', 'goat_adult', 'goat_young', 'cattle_adult', 'cattle_young', 'equids', 'other'];
+    const AV_CAT_COLOR = { sheep_adult: '#22c55e', sheep_young: '#86efac', goat_adult: '#0ea5e9', goat_young: '#7dd3fc', cattle_adult: '#a855f7', cattle_young: '#d8b4fe', equids: '#f59e0b', other: '#94a3b8' };
+    const AV_CAT_LABEL = { sheep_adult: 'Sheep', sheep_young: 'Lambs', goat_adult: 'Goats', goat_young: 'Kids', cattle_adult: 'Cattle', cattle_young: 'Calves', equids: 'Equids', other: 'Other' };
 
     async function renderAnimalsView() {
       const main = document.getElementById('mainContent');
-      // Switch to full-width animals theme.
       const app = document.getElementById('app');
       app.classList.add('timeline-mode');
       app.classList.add('animals-mode');
@@ -4767,6 +4831,23 @@
             <div class="av-stat"><div class="v">${totalTablets.toLocaleString()}</div><div class="l">Tablets with livestock</div></div>
             <div class="av-stat"><div class="v">${totalAnimalTerms}</div><div class="l">Distinct species/qualifiers</div></div>
             <div class="av-stat"><div class="v">${animalsData.periods.length}</div><div class="l">Regnal-year periods</div></div>
+          </div>
+
+          <!-- Hero stacked-area chart: corpus composition over time -->
+          <div class="av-hero" id="avHero">
+            <div class="av-hero-header">
+              <h3 id="avHeroTitle">Composition over time</h3>
+              <div class="av-hero-controls">
+                <span class="av-mode" id="avHeroMetric">
+                  <span class="av-mode-side on" data-metric="absolute">Absolute</span>
+                  <span class="av-mode-side"   data-metric="share">% share</span>
+                </span>
+                <span class="tb-label" id="avHeroFocusLabel" style="display:none;">Focused</span>
+                <span class="av-tb-toggle" id="avHeroBackBtn" style="display:none;">← All reigns</span>
+              </div>
+            </div>
+            <div class="av-hero-chart" id="avHeroChart"></div>
+            <div class="av-hero-legend" id="avHeroLegend"></div>
           </div>
 
           <div class="av-toolbar" id="avToolbar">
@@ -4805,7 +4886,6 @@
               <span class="tb-label">Zoom</span>
               <input type="range" id="avZoom" min="14" max="42" step="2" />
             </div>
-            <div class="av-tb-toggle on" id="avStackTog" title="Toggle stacked composition row">Stacked</div>
             <div class="av-tb-toggle on" id="avOutTog"   title="Highlight bars where one tablet contributes ≥70 % of the year's total">Outliers</div>
             <div style="flex:1;"></div>
             <div class="av-tb-toggle" id="avReset">Reset</div>
@@ -4822,6 +4902,7 @@
       `;
       avBindToolbar();
       avSyncToolbarUI();
+      avRenderHero();
       avRenderGrid();
     }
 
@@ -4850,34 +4931,43 @@
         document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
         avRenderGrid();
       });
-      $('avStackTog').addEventListener('click', () => {
-        AV_STATE.showStack = !AV_STATE.showStack;
-        $('avStackTog').classList.toggle('on', AV_STATE.showStack);
-        avRenderGrid();
-      });
       $('avOutTog').addEventListener('click', () => {
         AV_STATE.showOutliers = !AV_STATE.showOutliers;
         $('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
         avRenderGrid();
       });
+      // Hero metric switch (absolute count vs % share)
+      $('avHeroMetric').addEventListener('click', e => {
+        const side = e.target.closest('.av-mode-side');
+        if (!side) return;
+        AV_STATE.heroMetric = side.dataset.metric;
+        document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
+        avRenderHero();
+      });
+      $('avHeroBackBtn').addEventListener('click', () => {
+        AV_STATE.heroFocusYear = null;
+        avRenderHero();
+      });
       $('avReset').addEventListener('click', () => {
         Object.keys(AV_STATE.catOn).forEach(k => AV_STATE.catOn[k] = true);
         AV_STATE.query = '';
         AV_STATE.sort = 'tablets';
-        AV_STATE.cellW = 24;
+        AV_STATE.cellW = 28;
         AV_STATE.mode = 'animals';
         AV_STATE.showOutliers = true;
-        AV_STATE.showStack = true;
+        AV_STATE.heroMetric = 'absolute';
+        AV_STATE.heroFocusYear = null;
         AV_STATE.selected = null;
         $('avSearch').value = '';
         $('avSort').value = 'tablets';
-        $('avZoom').value = 24;
-        $('avView').style.setProperty('--av-cell-w', '24px');
+        $('avZoom').value = 28;
+        $('avView').style.setProperty('--av-cell-w', '28px');
         document.querySelectorAll('#avToolbar .av-cat-chip').forEach(el => el.classList.remove('off'));
         document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === 'animals'));
-        $('avStackTog').classList.add('on');
+        document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === 'absolute'));
         $('avOutTog').classList.add('on');
         $('avDetail').classList.remove('open');
+        avRenderHero();
         avRenderGrid();
       });
     }
@@ -4890,7 +4980,7 @@
         el.classList.toggle('off', !AV_STATE.catOn[c]);
       });
       document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === AV_STATE.mode));
-      document.getElementById('avStackTog').classList.toggle('on', AV_STATE.showStack);
+      document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === AV_STATE.heroMetric));
       document.getElementById('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
     }
 
@@ -4972,44 +5062,6 @@
       });
       html += `</div><div class="av-axis-meta">${AV_STATE.mode === 'tablets' ? 'Tablets · animals' : 'Animals · tablets'}</div></div>`;
 
-      // ─── Stacked composition strip ────────────────────────
-      if (AV_STATE.showStack) {
-        // For each period, sum animals per category across visible terms only.
-        const stack = {};
-        for (const p of periods) stack[p] = {};
-        for (const x of visible) {
-          for (const p of periods) {
-            const v = x.by_period[p] || 0;
-            if (v > 0) stack[p][x.category] = (stack[p][x.category] || 0) + v;
-          }
-        }
-        let stackMax = 1;
-        for (const p of periods) {
-          const total = Object.values(stack[p]).reduce((s, n) => s + n, 0);
-          if (total > stackMax) stackMax = total;
-        }
-        html += `<div class="av-stack-row">
-          <div class="av-stack-name">Composition</div>
-          <div class="av-stack-track" style="width:${trackWidth}px;position:relative;">`;
-        const catOrder = ['sheep_adult', 'sheep_young', 'goat_adult', 'goat_young', 'cattle_adult', 'cattle_young', 'equids', 'other'];
-        for (let i = 0; i < periods.length; i++) {
-          const p = periods[i];
-          const total = Object.values(stack[p]).reduce((s, n) => s + n, 0);
-          if (total <= 0) continue;
-          const ratio = total / stackMax;
-          const colH = Math.max(2, Math.round(40 * Math.sqrt(ratio)));
-          let segments = '';
-          for (const c of catOrder) {
-            const v = stack[p][c] || 0;
-            if (v <= 0) continue;
-            const h = Math.round(colH * (v / total));
-            segments += `<div style="height:${h}px;background:var(--av-c-${c});"></div>`;
-          }
-          html += `<div class="av-stack-col" data-period="${esc(p)}" data-total="${total}" style="left:${i*cw + 2}px;width:${cw - 4}px;height:${colH}px;">${segments}</div>`;
-        }
-        html += `</div><div class="av-stack-meta"></div></div>`;
-      }
-
       // ─── Animal rows ──────────────────────────────────────
       visible.forEach((x, idx) => {
         const cat = x.category;
@@ -5073,7 +5125,12 @@
           tip.style.top = (e.clientY + 12) + 'px';
         });
         el.addEventListener('mouseleave', () => tip.classList.remove('visible'));
-        el.addEventListener('click', () => avSelectAnimal(el.dataset.name));
+        el.addEventListener('click', e => {
+          // Bar click → cell drill-down (animal × period → tablet list).
+          // Hold Shift / cmd to instead select the animal row.
+          if (e.shiftKey || e.metaKey) avSelectAnimal(el.dataset.name);
+          else avShowCellDrilldown(el.dataset.name, el.dataset.period);
+        });
       });
       area.querySelectorAll('.av-row').forEach(el => {
         el.addEventListener('click', e => {
@@ -5081,15 +5138,291 @@
           avSelectAnimal(el.dataset.name === AV_STATE.selected ? null : el.dataset.name);
         });
       });
-      area.querySelectorAll('.av-stack-col').forEach(el => {
-        el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
-      });
       area.querySelectorAll('.av-period-label').forEach(el => {
         el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
       });
 
       if (AV_STATE.selected) avRenderDetail(AV_STATE.selected);
       else document.getElementById('avDetail').classList.remove('open');
+    }
+
+    // Hero stacked-area chart: corpus composition over time (categories).
+    // Two metrics: absolute animal counts or % share.
+    // Two zoom levels: full reign sequence (year) or single-year (12 months).
+    function avRenderHero() {
+      const a = animalsData;
+      const chart = document.getElementById('avHeroChart');
+      const title = document.getElementById('avHeroTitle');
+      const focusLabel = document.getElementById('avHeroFocusLabel');
+      const backBtn = document.getElementById('avHeroBackBtn');
+      const legend = document.getElementById('avHeroLegend');
+      if (!chart) return;
+      const focus = AV_STATE.heroFocusYear;
+      const cats = AV_CAT_ORDER.filter(c => AV_STATE.catOn[c]);
+
+      // Build the (period × category) sum grid for whichever zoom level.
+      let periods, catMatrix, periodKind;
+      if (focus) {
+        // Single-year monthly view: 12 buckets, fixed order
+        periods = Array.from({ length: 12 }, (_, i) => `${focus}.${String(i + 1).padStart(2, '0')}`);
+        periodKind = 'month';
+        catMatrix = {};
+        for (const p of periods) catMatrix[p] = {};
+        for (const x of a.animals) {
+          if (!AV_STATE.catOn[x.category]) continue;
+          for (const p of periods) {
+            const v = x.by_month[p] || 0;
+            if (v > 0) catMatrix[p][x.category] = (catMatrix[p][x.category] || 0) + v;
+          }
+        }
+        title.textContent = `Composition during ${focus} (months)`;
+        focusLabel.textContent = focus;
+        focusLabel.style.display = '';
+        backBtn.style.display = '';
+      } else {
+        periods = a.periods;
+        periodKind = 'year';
+        catMatrix = {};
+        for (const p of periods) catMatrix[p] = {};
+        for (const x of a.animals) {
+          if (!AV_STATE.catOn[x.category]) continue;
+          for (const p of periods) {
+            const v = x.by_period[p] || 0;
+            if (v > 0) catMatrix[p][x.category] = (catMatrix[p][x.category] || 0) + v;
+          }
+        }
+        title.textContent = `Composition over time — ${periods[0]} → ${periods[periods.length - 1]}`;
+        focusLabel.style.display = 'none';
+        backBtn.style.display = 'none';
+      }
+
+      // Fixed dimensions (responsive via CSS) — we use viewBox so the SVG
+      // fills the container width.
+      const W = 1200, H = 280, padL = 50, padR = 14, padT = 18, padB = 40;
+      const innerW = W - padL - padR, innerH = H - padT - padB;
+      const xs = i => padL + (periods.length <= 1 ? innerW / 2 : (i / (periods.length - 1)) * innerW);
+
+      // Compute totals per period (for share mode) and a y-max
+      const totals = periods.map(p => Object.values(catMatrix[p] || {}).reduce((s, v) => s + v, 0));
+      const yMaxAbs = Math.max(1, ...totals);
+      const yMax = AV_STATE.heroMetric === 'share' ? 100 : yMaxAbs;
+      const ys = v => padT + innerH - (v / yMax) * innerH;
+
+      // For each period, build a cumulative stack (bottom→top in cat order)
+      // For "share" mode, normalize each period's stack to 100 %.
+      const stack = periods.map((p, i) => {
+        const cm = catMatrix[p] || {};
+        const total = totals[i] || 0;
+        const out = {};
+        let cum = 0;
+        for (const c of cats) {
+          const v = cm[c] || 0;
+          out[c] = { from: cum, to: cum + v };
+          cum += v;
+        }
+        if (AV_STATE.heroMetric === 'share' && total > 0) {
+          for (const c of cats) {
+            out[c].from = (out[c].from / total) * 100;
+            out[c].to   = (out[c].to   / total) * 100;
+          }
+        }
+        return out;
+      });
+
+      // Build a smoothed area path per category with monotone-cubic interpolation
+      const smoothPath = (pts) => {
+        if (!pts.length) return '';
+        if (pts.length === 1) return `M ${pts[0][0]} ${pts[0][1]}`;
+        // Bezier interpolation between consecutive points
+        let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+        for (let i = 1; i < pts.length; i++) {
+          const [px, py] = pts[i - 1];
+          const [cx, cy] = pts[i];
+          const mx = (px + cx) / 2;
+          d += ` C ${mx.toFixed(1)} ${py.toFixed(1)}, ${mx.toFixed(1)} ${cy.toFixed(1)}, ${cx.toFixed(1)} ${cy.toFixed(1)}`;
+        }
+        return d;
+      };
+
+      // Reign tick lines + labels
+      let reignTicks = '';
+      let prevPre = '';
+      periods.forEach((p, i) => {
+        const pre = p.split('.')[0];
+        if (pre !== prevPre) {
+          reignTicks += `<line x1="${xs(i).toFixed(1)}" x2="${xs(i).toFixed(1)}" y1="${padT}" y2="${H - padB}" stroke="rgba(52,211,153,0.18)" stroke-dasharray="2 4" />`;
+          if (!focus) {
+            reignTicks += `<text x="${(xs(i) + 4).toFixed(1)}" y="${(padT + 12).toFixed(1)}" font-size="10" fill="#34d399">${pre}</text>`;
+          }
+          prevPre = pre;
+        }
+      });
+
+      // Y-axis labels (a few)
+      const ticks = AV_STATE.heroMetric === 'share' ? [0, 25, 50, 75, 100]
+                                                     : [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
+      const yLabels = ticks.map(t => `
+        <line x1="${padL}" x2="${W - padR}" y1="${ys(t).toFixed(1)}" y2="${ys(t).toFixed(1)}" stroke="rgba(255,255,255,0.04)"/>
+        <text x="${padL - 6}" y="${(ys(t) + 3).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="end">${AV_STATE.heroMetric === 'share' ? Math.round(t) + '%' : Math.round(t).toLocaleString()}</text>
+      `).join('');
+
+      // Layered areas (bottom-up)
+      let areas = '';
+      for (let ci = 0; ci < cats.length; ci++) {
+        const c = cats[ci];
+        const topPts = periods.map((p, i) => [xs(i), ys(stack[i][c].to)]);
+        const botPts = periods.map((p, i) => [xs(i), ys(stack[i][c].from)]);
+        // Path: top forward, bottom reverse
+        const fwd = smoothPath(topPts);
+        // For closing the area we use straight line back along the bottom
+        const back = botPts.slice().reverse().map(([x, y]) => `L ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
+        const d = `${fwd} ${back} Z`;
+        areas += `<path d="${d}" fill="${AV_CAT_COLOR[c]}" fill-opacity="0.78" stroke="${AV_CAT_COLOR[c]}" stroke-width="0.5" stroke-opacity="0.5">
+          <title>${AV_CAT_LABEL[c]}</title>
+        </path>`;
+      }
+
+      // X-axis labels: show every Nth period
+      const labelStep = focus ? 1 : Math.max(1, Math.ceil(periods.length / 16));
+      let xLabels = '';
+      periods.forEach((p, i) => {
+        if (i % labelStep !== 0 && i !== periods.length - 1) return;
+        const label = focus ? p.split('.').pop() : p;
+        xLabels += `<text x="${xs(i).toFixed(1)}" y="${(H - padB + 14).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="middle">${esc(label)}</text>`;
+      });
+
+      // Hover guideline
+      chart.innerHTML = `<svg id="avHeroSvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:280px;display:block;">
+        ${yLabels}
+        ${reignTicks}
+        ${areas}
+        ${xLabels}
+        <line id="avHeroGuide" x1="0" x2="0" y1="${padT}" y2="${H - padB}" stroke="rgba(52,211,153,0.6)" stroke-width="1" opacity="0"/>
+      </svg>`;
+
+      legend.innerHTML = cats.map(c => `
+        <span class="av-hero-leg" data-cat="${c}">
+          <span class="av-dot" style="background:${AV_CAT_COLOR[c]};"></span>${AV_CAT_LABEL[c]}
+        </span>`).join('');
+
+      // Hover & click on the chart
+      const svg = document.getElementById('avHeroSvg');
+      const guide = document.getElementById('avHeroGuide');
+      const tip = document.getElementById('avTip');
+      svg.addEventListener('mousemove', e => {
+        const rect = svg.getBoundingClientRect();
+        const fx = (e.clientX - rect.left) / rect.width * W;
+        // Snap to nearest period
+        let nearest = 0, best = Infinity;
+        periods.forEach((p, i) => {
+          const d = Math.abs(xs(i) - fx);
+          if (d < best) { best = d; nearest = i; }
+        });
+        const xSnap = xs(nearest);
+        guide.setAttribute('x1', xSnap);
+        guide.setAttribute('x2', xSnap);
+        guide.setAttribute('opacity', '1');
+        const p = periods[nearest];
+        const cm = catMatrix[p] || {};
+        const total = totals[nearest] || 0;
+        let lines = `<div><span class="t-name">${esc(p)}</span></div>
+                     <div class="t-count">${total.toLocaleString()} animals</div>`;
+        for (const c of cats) {
+          const v = cm[c] || 0;
+          if (v <= 0) continue;
+          const pct = total > 0 ? Math.round(v / total * 100) : 0;
+          lines += `<div style="display:flex;align-items:center;gap:6px;color:#cbd5e1;">
+            <span style="width:8px;height:8px;border-radius:2px;background:${AV_CAT_COLOR[c]};"></span>
+            ${AV_CAT_LABEL[c]}: ${v.toLocaleString()} (${pct}%)
+          </div>`;
+        }
+        tip.innerHTML = lines;
+        tip.classList.add('visible');
+        tip.style.left = (e.clientX + 12) + 'px';
+        tip.style.top = (e.clientY + 12) + 'px';
+      });
+      svg.addEventListener('mouseleave', () => {
+        guide.setAttribute('opacity', '0');
+        tip.classList.remove('visible');
+      });
+      svg.addEventListener('click', e => {
+        const rect = svg.getBoundingClientRect();
+        const fx = (e.clientX - rect.left) / rect.width * W;
+        let nearest = 0, best = Infinity;
+        periods.forEach((p, i) => {
+          const d = Math.abs(xs(i) - fx);
+          if (d < best) { best = d; nearest = i; }
+        });
+        const p = periods[nearest];
+        if (!focus && periodKind === 'year') {
+          // Drill into monthly view of that year
+          AV_STATE.heroFocusYear = p;
+          avRenderHero();
+        } else {
+          // Already monthly — show period summary for that month
+          avShowPeriodSummary(p, periodKind);
+        }
+      });
+    }
+
+    // Click a single bar → open detail panel listing the tablets that
+    // contributed to that exact (animal × period) cell.
+    async function avShowCellDrilldown(animal, period, granularity) {
+      granularity = granularity || (period.split('.').length === 3 ? 'month' : 'year');
+      const detail = document.getElementById('avDetail');
+      detail.classList.add('open');
+      detail.innerHTML = `<div class="av-detail-head">
+          <div>
+            <h3><span class="av-detail-badge" style="background:#34d399;">CELL</span> ${esc(animal)} · ${esc(period)}</h3>
+            <div class="av-detail-sub">Loading tablets…</div>
+          </div>
+          <span class="av-detail-close" id="avDetailClose">&times;</span>
+        </div>
+        <div class="av-detail-body"><div class="loading"><div class="spinner"></div> Loading…</div></div>`;
+      document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+
+      let cell;
+      try {
+        const r = await fetch(`${API}/api/animals_cell?animal=${encodeURIComponent(animal)}&period=${encodeURIComponent(period)}&granularity=${granularity}`);
+        cell = await r.json();
+      } catch (e) {
+        detail.querySelector('.av-detail-body').innerHTML = '<div class="tl-empty">Failed to load drill-down.</div>';
+        return;
+      }
+      const x = animalsData.animals.find(a => a.name === animal);
+      const color = x ? `var(--av-c-${x.category})` : '#34d399';
+      const cat = x ? x.category : 'other';
+      const tablets = cell.tablets;
+      const max = tablets.length ? tablets[0].count : 1;
+      const sum = cell.total_count || 0;
+      const dominant = tablets.length && sum > 0 && tablets[0].count / sum >= 0.7;
+
+      detail.innerHTML = `<div class="av-detail-head">
+          <div>
+            <h3>
+              <span class="av-detail-badge" style="background:${color};">${esc(cat.replace('_',' '))}</span>
+              ${esc(animal)} · ${esc(period)}
+            </h3>
+            <div class="av-detail-sub">${cell.total_count.toLocaleString()} animals across ${cell.total_tablets.toLocaleString()} tablets · click any tablet to open it</div>
+          </div>
+          <span class="av-detail-close" id="avDetailClose">&times;</span>
+        </div>
+        <div class="av-detail-body">
+          ${dominant ? `<div class="av-warn">Tablet P${esc(tablets[0].tablet)} alone contributes ${tablets[0].count.toLocaleString()} of ${sum.toLocaleString()} animals (${Math.round(tablets[0].count/sum*100)}%) — worth re-checking the extraction.</div>` : ''}
+          <div class="av-list" style="margin-top:8px;max-height:380px;overflow:auto;">
+            ${tablets.map(t => `
+              <div class="e">
+                <span class="nm" data-tablet="${esc(t.tablet)}" title="Open P${esc(t.tablet)}">P${esc(t.tablet)} <span style="color:var(--text-dim);font-size:10px;">${esc(t.animal)}</span></span>
+                <span class="bar"><span style="width:${Math.round(t.count/max*100)}%;background:${color};"></span></span>
+                <span class="c">${t.count.toLocaleString()}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      detail.querySelectorAll('.nm[data-tablet]').forEach(el => {
+        el.addEventListener('click', () => loadTablet(el.dataset.tablet));
+      });
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     function avSelectAnimal(name) {
@@ -5148,6 +5481,40 @@
         <path d="${pathA}" stroke="#34d399" stroke-width="1.8" fill="none"/>
       </svg>`;
 
+      // Monthly seasonality histogram: aggregate this animal's counts by
+      // calendar month (1–12) across the entire span. Useful for the
+      // thesis question "are there seasonal patterns in intake".
+      const monthBuckets = Array.from({ length: 12 }, () => 0);
+      for (const [k, v] of Object.entries(x.by_month || {})) {
+        const mm = parseInt(k.split('.')[2] || '0', 10);
+        if (mm >= 1 && mm <= 12) monthBuckets[mm - 1] += v;
+      }
+      const monthMax = Math.max(1, ...monthBuckets);
+      const mw = 760, mh = 90, mPadL = 30, mPadR = 8, mPadT = 6, mPadB = 18;
+      const mxScale = i => mPadL + (i / 11) * (mw - mPadL - mPadR);
+      const myScale = v => mh - mPadB - (v / monthMax) * (mh - mPadT - mPadB);
+      const monthBarWidth = (mw - mPadL - mPadR) / 12 * 0.75;
+      const monthBars = monthBuckets.map((v, i) => {
+        if (v === 0) return '';
+        const top = myScale(v);
+        const baseY = mh - mPadB;
+        const x0 = mxScale(i + 0.5) - monthBarWidth / 2;
+        return `<rect x="${x0.toFixed(1)}" y="${top.toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${(baseY - top).toFixed(1)}" fill="${color.replace('var(--av-c-', '').replace(')', '')}" rx="2" />`;
+      }).join('');
+      const monthLabels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((m, i) => `<text x="${mxScale(i + 0.5).toFixed(1)}" y="${(mh - 4).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="middle">${m}</text>`).join('');
+      const monthSpark = monthBuckets.some(v => v > 0) ? `
+        <svg viewBox="0 0 ${mw} ${mh}" preserveAspectRatio="none" style="width:100%;height:90px;">
+          <text x="6" y="${mPadT + 8}" font-size="9" fill="#34d399">${monthMax.toLocaleString()}</text>
+          ${monthBuckets.map((v, i) => {
+            if (v === 0) return '';
+            const x0 = mxScale(i + 0.5) - monthBarWidth / 2;
+            const top = myScale(v);
+            const baseY = mh - mPadB;
+            return `<rect x="${x0.toFixed(1)}" y="${top.toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${(baseY - top).toFixed(1)}" fill="${AV_CAT_COLOR[x.category]}" rx="2"><title>Month ${i+1}: ${v.toLocaleString()}</title></rect>`;
+          }).join('')}
+          ${monthLabels}
+        </svg>` : '';
+
       // Top contributors
       const top = x.top_contributors.slice(0, 8);
       const topMax = top.length ? top[0].count : 1;
@@ -5192,6 +5559,7 @@
         </div>
         <div class="av-detail-body">
           <div class="av-spark" title="Green: animal count · Yellow: tablet count">${spark}</div>
+          ${monthSpark ? `<div class="av-spark" style="height:90px;" title="Seasonal pattern: total animals per calendar month across all years">${monthSpark}</div>` : ''}
           ${outlierBlock}
           <div class="av-detail-grid">
             <div>
@@ -5223,16 +5591,28 @@
       });
     }
 
-    function avShowPeriodSummary(period) {
+    function avShowPeriodSummary(period, granularity) {
+      // `granularity` is 'year' (default) or 'month'. Picks the right
+      // by_period vs by_month lookup from the animals dataset.
+      granularity = granularity || (period.split('.').length === 3 ? 'month' : 'year');
       const a = animalsData;
       const rows = [];
       for (const x of a.animals) {
-        const v = x.by_period[period] || 0;
-        if (v > 0) rows.push({ name: x.name, category: x.category, count: v, tablets: x.by_period_tablets[period] || 0, max: x.by_period_max[period] || 0 });
+        const v = granularity === 'month'
+          ? (x.by_month[period] || 0)
+          : (x.by_period[period] || 0);
+        if (v > 0) {
+          const tabs = granularity === 'month'
+            ? (x.by_month_tablets[period] || 0)
+            : (x.by_period_tablets[period] || 0);
+          rows.push({ name: x.name, category: x.category, count: v, tablets: tabs });
+        }
       }
       rows.sort((p, q) => q.count - p.count);
       const total = rows.reduce((s, r) => s + r.count, 0);
-      const totTab = a.tablets_by_period[period] || 0;
+      const totTab = granularity === 'month'
+        ? (a.tablets_by_month[period] || 0)
+        : (a.tablets_by_period[period] || 0);
       const ratio = a.sheep_to_tablet[period];
 
       const detail = document.getElementById('avDetail');
@@ -5240,10 +5620,14 @@
       detail.innerHTML = `
         <div class="av-detail-head">
           <div>
-            <h3><span class="av-detail-badge" style="background:#34d399;">PERIOD</span> ${esc(period)}</h3>
+            <h3>
+              <span class="av-detail-badge" style="background:#34d399;">${granularity === 'month' ? 'MONTH' : 'YEAR'}</span>
+              ${esc(period)}
+            </h3>
             <div class="av-detail-sub">
               ${total.toLocaleString()} animals across ${totTab.toLocaleString()} tablets
-              ${ratio != null ? ` · ratio ${ratio} animals/tablet` : ''}
+              ${ratio != null && granularity === 'year' ? ` · ratio ${ratio} animals/tablet` : ''}
+              · click an animal to see its detail, or click a count to see contributing tablets
             </div>
           </div>
           <span class="av-detail-close" id="avDetailClose">&times;</span>
@@ -5257,7 +5641,7 @@
                   ${esc(r.name)} <span style="color:var(--text-dim);font-size:10px;">· ${r.tablets} tablet${r.tablets===1?'':'s'}</span>
                 </span>
                 <span class="bar"><span style="width:${Math.round(r.count/max*100)}%;background:var(--av-c-${r.category});"></span></span>
-                <span class="c">${r.count.toLocaleString()}</span>
+                <span class="c" data-cell-animal="${esc(r.name)}" data-cell-period="${esc(period)}" data-cell-gran="${granularity}" style="cursor:pointer;text-decoration:underline dotted;">${r.count.toLocaleString()}</span>
               </div>`).join('')}
           </div>
         </div>`;
@@ -5265,6 +5649,9 @@
       document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
       detail.querySelectorAll('.nm[data-jump]').forEach(el => {
         el.addEventListener('click', () => avSelectAnimal(el.dataset.jump));
+      });
+      detail.querySelectorAll('.c[data-cell-animal]').forEach(el => {
+        el.addEventListener('click', () => avShowCellDrilldown(el.dataset.cellAnimal, el.dataset.cellPeriod, el.dataset.cellGran));
       });
       detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }

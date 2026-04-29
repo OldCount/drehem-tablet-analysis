@@ -1037,6 +1037,13 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
             self.send_json(self._timeline)
         elif self.path == "/api/animals_timeline":
             self.send_json(self._animals_timeline)
+        elif self.path.startswith("/api/animals_cell"):
+            from urllib.parse import urlparse, parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            animal = (qs.get("animal") or [""])[0]
+            period = (qs.get("period") or [""])[0]
+            gran   = (qs.get("granularity") or ["year"])[0]
+            self.send_json(get_animals_cell(animal, period, gran))
         else:
             super().do_GET()
 
@@ -1225,8 +1232,8 @@ def compute_timeline_data():
             "by_period": Counter(),
             "first_period": None,
             "last_period": None,
-            "first_year_idx": 10**9,
-            "last_year_idx": -1,
+            "first_year_idx": None,
+            "last_year_idx": None,
             "total_tablets": 0,
             "as_source": 0,
             "as_receiver": 0,
@@ -1295,7 +1302,12 @@ def compute_timeline_data():
             ruler_abbr = _RULER_ABBR.get(ruler, ruler)
 
             label = _period_label(ruler, year)
-            year_idx = sum(rl[2] for rl in RULER_ORDER[:r_idx]) + year
+            # year_idx must order tablets across reigns. A flat sum collides
+            # when a tablet is dated past its reign's nominal length
+            # (e.g. AS.10 vs ŠS.01 — Amar-Suen ruled 9 years, but a few
+            # tablets carry an AS.10 date). A (ruler_idx, year) tuple keeps
+            # AS.10 between AS.09 and ŠS.01 where it belongs.
+            year_idx = (r_idx, year)
             periods_seen.add((year_idx, label))
 
             sources = _split_persons(row.get("source", ""))
@@ -1321,10 +1333,10 @@ def compute_timeline_data():
                 o = officials[k]
                 o["by_period"][label] += 1
                 o["total_tablets"] += 1
-                if year_idx < o["first_year_idx"]:
+                if o["first_year_idx"] is None or year_idx < o["first_year_idx"]:
                     o["first_year_idx"] = year_idx
                     o["first_period"] = label
-                if year_idx > o["last_year_idx"]:
+                if o["last_year_idx"] is None or year_idx > o["last_year_idx"]:
                     o["last_year_idx"] = year_idx
                     o["last_period"] = label
 
@@ -1344,9 +1356,14 @@ def compute_timeline_data():
         if o["total_tablets"] == 0:
             continue
         o["by_period"] = dict(o["by_period"])
-        if o["first_year_idx"] == 10**9:
-            o["first_year_idx"] = None
-            o["last_year_idx"] = None
+        # Year-idx tuples (r_idx, year) don't survive JSON round-trips
+        # cleanly; the front-end only uses these for span-band sizing,
+        # so we collapse them to a single integer for transport.
+        if o["first_year_idx"] is not None:
+            r_idx0, y0 = o["first_year_idx"]
+            o["first_year_idx"] = r_idx0 * 100 + y0
+            r_idx1, y1 = o["last_year_idx"]
+            o["last_year_idx"] = r_idx1 * 100 + y1
         out_officials.append(o)
 
     # Sort officials: by office then by first-active period
@@ -1354,7 +1371,7 @@ def compute_timeline_data():
     out_officials.sort(key=lambda o: (
         office_rank.get(o["office"], 99),
         o["sub_office"],
-        o["first_year_idx"] or 0,
+        o["first_year_idx"] if o["first_year_idx"] is not None else 99999,
         o["name"],
     ))
 
@@ -1430,6 +1447,12 @@ def _animal_category(base: str) -> str:
 # count is either an integer or `[imp:N]` (deterministic imputation).
 _ANIMAL_ENTRY_RE = re.compile(r"(\[imp:(\d+)\]|(\d+))\s*[×x]\s*([^,]+)")
 
+# Cached cell-level contributions populated by compute_animals_timeline().
+# Keyed by animal_base -> period_label -> [{tablet, count, animal}].
+# Looked up by /api/animals_cell to lazy-load drill-down data.
+ANIMAL_CONTRIB_YEAR = {}
+ANIMAL_CONTRIB_MONTH = {}
+
 
 def _parse_animals_detail(detail: str):
     """Yield (count, animal_term) tuples from an animals_detail cell."""
@@ -1446,22 +1469,29 @@ def _parse_animals_detail(detail: str):
 def compute_animals_timeline():
     """Build per-period × animal activity grid for the livestock view.
 
-    Returns:
-        periods           – ordered list of regnal-year period labels
-        animals           – list of per-animal records (top-N by tablet count)
-        categories        – {category: {label, color, members:[animal_term...]}}
-        by_period_total   – {period: total_animal_count}
-        by_period_tx      – {period: {tx_type: count}}
-        sheep_to_tablet   – per-period mean animals/tablet (for sussing outliers)
+    Two granularities are produced:
+        – year-level   (e.g. "AS.05")  — always populated
+        – month-level  (e.g. "AS.05.07") — populated only when the tablet's
+          month_number is set
+
+    Per (animal × period) cells include the top-50 contributing tablets so
+    the front-end can show a direct drill-down without needing a second
+    round-trip.
     """
     from collections import Counter, defaultdict
 
-    # Gather: animal_base -> period -> [(tablet_id, count_on_that_tablet)]
-    contributions = defaultdict(lambda: defaultdict(list))
-    by_period_total = Counter()                   # period -> sum animals
-    tx_by_period = defaultdict(Counter)           # period -> {tx: count}
-    tablets_by_period = Counter()                 # period -> # tablets with animals
-    period_idx_by_label = {}
+    # animal_base -> {period_label: [{tablet, count, animal}]}
+    # These contributions are kept module-level so the /api/animals_cell
+    # endpoint can serve drill-downs lazily without recomputing.
+    contrib_year = defaultdict(lambda: defaultdict(list))
+    contrib_month = defaultdict(lambda: defaultdict(list))
+    by_period_total_y = Counter()
+    by_period_total_m = Counter()
+    tx_by_period_y = defaultdict(Counter)
+    tablets_by_period_y = Counter()
+    tablets_by_period_m = Counter()
+    period_idx_year = {}
+    period_idx_month = {}
 
     with open(EXTRACTED, "r", encoding="utf-8") as f:
         for row in csv.DictReader(f):
@@ -1475,90 +1505,129 @@ def compute_animals_timeline():
                 year = 0
             if year <= 0:
                 continue
-            label = _period_label(ruler, year)
-            year_idx = sum(rl[2] for rl in RULER_ORDER[:r_idx]) + year
-            period_idx_by_label[label] = year_idx
+            try:
+                month = int(row.get("month_number") or 0)
+            except ValueError:
+                month = 0
+
+            label_y = _period_label(ruler, year)
+            label_m = f"{label_y}.{month:02d}" if 1 <= month <= 13 else None
+            period_idx_year[label_y] = (r_idx, year)
+            if label_m is not None:
+                period_idx_month[label_m] = (r_idx, year, month)
 
             entries = list(_parse_animals_detail(row.get("animals_detail", "")))
             if not entries:
                 continue
 
-            tablets_by_period[label] += 1
+            tablets_by_period_y[label_y] += 1
+            if label_m: tablets_by_period_m[label_m] += 1
             tx = row.get("transaction_type") or "unknown"
-            tx_by_period[label][tx] += 1
+            tx_by_period_y[label_y][tx] += 1
 
             for count, animal in entries:
                 base = _animal_base(animal)
-                contributions[base][label].append({
-                    "tablet": row["tablet_id"],
-                    "count": count,
-                    "animal": animal,
-                })
-                by_period_total[label] += count
+                rec = {"tablet": row["tablet_id"], "count": count, "animal": animal}
+                contrib_year[base][label_y].append(rec)
+                if label_m: contrib_month[base][label_m].append(rec)
+                by_period_total_y[label_y] += count
+                if label_m: by_period_total_m[label_m] += count
 
-    periods = sorted(period_idx_by_label.keys(), key=lambda p: period_idx_by_label[p])
+    periods_year  = sorted(period_idx_year.keys(),  key=lambda p: period_idx_year[p])
+    periods_month = sorted(period_idx_month.keys(), key=lambda p: period_idx_month[p])
 
-    # Per-animal aggregates and outlier metrics
-    animals_out = []
-    for base, by_period in contributions.items():
-        total_count = 0
-        total_tablets = 0
-        by_period_count = {}
-        by_period_tablets = {}
-        by_period_max = {}
-        top_tablets_overall = []
-        for period, contribs in by_period.items():
+    # Per-animal aggregates. Per-cell tablet lists are NOT included in the
+    # main payload (would be ~3 MB JSON); callers fetch them on-demand via
+    # /api/animals_cell which reads from the cached contrib_* dicts.
+    def _summarize(contribs_by_period):
+        out_count, out_tabs, out_max, total_c, total_t = {}, {}, {}, 0, 0
+        for period, contribs in contribs_by_period.items():
             psum = sum(c["count"] for c in contribs)
-            total_count += psum
-            total_tablets += len(contribs)
-            by_period_count[period] = psum
-            by_period_tablets[period] = len(contribs)
-            by_period_max[period] = max(c["count"] for c in contribs)
-            top_tablets_overall.extend(contribs)
+            total_c += psum
+            total_t += len(contribs)
+            out_count[period] = psum
+            out_tabs[period] = len(contribs)
+            out_max[period] = max(c["count"] for c in contribs)
+        return out_count, out_tabs, out_max, total_c, total_t
 
-        # Top 8 contributing tablets across the whole corpus, for drill-down.
-        top_tablets_overall.sort(key=lambda c: -c["count"])
-        top_tablets_overall = top_tablets_overall[:8]
-
-        category = _animal_category(base)
+    animals_out = []
+    overall_top = {}  # animal -> top 8 contributors across the corpus
+    for base, year_buckets in contrib_year.items():
+        cy, ty, mxy, tc, tt = _summarize(year_buckets)
+        cm, tm, mxm, _, _ = _summarize(contrib_month.get(base, {}))
+        # Overall top contributors (across the whole corpus, all periods)
+        all_contribs = [c for contribs in year_buckets.values() for c in contribs]
+        all_contribs.sort(key=lambda c: -c["count"])
+        overall_top[base] = all_contribs[:8]
         animals_out.append({
             "name": base,
-            "category": category,
+            "category": _animal_category(base),
             "label": base,
-            "by_period": by_period_count,
-            "by_period_tablets": by_period_tablets,
-            "by_period_max": by_period_max,
-            "total_count": total_count,
-            "total_tablets": total_tablets,
-            "top_contributors": top_tablets_overall,
+            "by_period":          cy,
+            "by_period_tablets":  ty,
+            "by_period_max":      mxy,
+            "by_month":           cm,
+            "by_month_tablets":   tm,
+            "by_month_max":       mxm,
+            "top_contributors":   overall_top[base],  # corpus-wide top 8
+            "total_count":        tc,
+            "total_tablets":      tt,
         })
 
-    # Drop singletons (one tablet) since they bloat the list with
-    # one-off readings; researchers can still find them via the issue
-    # log if needed.
+    # Drop singleton animals
     animals_out = [a for a in animals_out if a["total_tablets"] >= 2]
     animals_out.sort(key=lambda a: (-a["total_tablets"], -a["total_count"]))
 
-    # Sheep-to-tablet ratio per period — useful for spotting suspicious
-    # records (e.g. one tablet inflating the count).
-    sheep_to_tablet = {}
-    for p, n_tab in tablets_by_period.items():
+    # Sheep-to-tablet ratio per period — outlier spotter
+    sheep_to_tablet_y = {}
+    for p, n_tab in tablets_by_period_y.items():
         if n_tab > 0:
-            sheep_to_tablet[p] = round(by_period_total[p] / n_tab, 1)
+            sheep_to_tablet_y[p] = round(by_period_total_y[p] / n_tab, 1)
 
     categories_out = {
         k: {"label": v["label"], "color": v["color"]}
         for k, v in ANIMAL_CATEGORIES.items()
     }
 
+    # Publish contributions for the lazy /api/animals_cell endpoint.
+    global ANIMAL_CONTRIB_YEAR, ANIMAL_CONTRIB_MONTH
+    ANIMAL_CONTRIB_YEAR = {a: dict(d) for a, d in contrib_year.items()}
+    ANIMAL_CONTRIB_MONTH = {a: dict(d) for a, d in contrib_month.items()}
+
     return {
-        "periods": periods,
-        "animals": animals_out,
-        "categories": categories_out,
-        "by_period_total": dict(by_period_total),
-        "by_period_tx": {k: dict(v) for k, v in tx_by_period.items()},
-        "tablets_by_period": dict(tablets_by_period),
-        "sheep_to_tablet": sheep_to_tablet,
+        "periods":          periods_year,
+        "periods_month":    periods_month,
+        "animals":          animals_out,
+        "categories":       categories_out,
+        "by_period_total":  dict(by_period_total_y),
+        "by_month_total":   dict(by_period_total_m),
+        "by_period_tx":     {k: dict(v) for k, v in tx_by_period_y.items()},
+        "tablets_by_period": dict(tablets_by_period_y),
+        "tablets_by_month":  dict(tablets_by_period_m),
+        "sheep_to_tablet":   sheep_to_tablet_y,
+    }
+
+
+def get_animals_cell(animal: str, period: str, granularity: str = "year", limit: int = 100):
+    """Drill-down: return tablets that contributed to one (animal, period) cell.
+
+    `granularity` is "year" or "month". `period` is the period label
+    (e.g. "AS.05" for year, "AS.05.07" for month).
+    """
+    src = ANIMAL_CONTRIB_MONTH if granularity == "month" else ANIMAL_CONTRIB_YEAR
+    cell = src.get(animal, {}).get(period, [])
+    if not cell:
+        return {"animal": animal, "period": period, "granularity": granularity,
+                "total_count": 0, "total_tablets": 0, "tablets": []}
+    sorted_cell = sorted(cell, key=lambda c: -c["count"])[:limit]
+    total_count = sum(c["count"] for c in cell)
+    return {
+        "animal": animal,
+        "period": period,
+        "granularity": granularity,
+        "total_count": total_count,
+        "total_tablets": len(cell),
+        "tablets": sorted_cell,
     }
 
 
