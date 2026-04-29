@@ -725,6 +725,33 @@
       overflow: visible;
     }
 
+    /* Damage indicator: thin red bar above token text */
+    .damage-indicator {
+      display: block;
+      width: 100%;
+      height: 2px;
+      min-height: 2px;
+      background: linear-gradient(90deg, rgba(255, 80, 80, 0.0), rgba(255, 80, 80, 0.85), rgba(255, 80, 80, 0.0));
+      border-radius: 1px;
+      margin-bottom: 1px;
+      box-shadow: 0 0 4px rgba(255, 60, 60, 0.4);
+      animation: damagePulse 3s ease-in-out infinite;
+    }
+
+    @keyframes damagePulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* When hovering over a damaged token, make the indicator more prominent */
+    .token-wrap:hover .damage-indicator {
+      height: 3px;
+      background: linear-gradient(90deg, rgba(255, 80, 80, 0.0), rgba(255, 80, 80, 1), rgba(255, 80, 80, 0.0));
+      box-shadow: 0 0 8px rgba(255, 60, 60, 0.6);
+      animation: none;
+      opacity: 1;
+    }
+
     .token {
       display: inline-block;
       padding: 2px 5px;
@@ -3597,7 +3624,8 @@
                 const wt = toks[wi];
                 const wr = wt.role || 'text';
                 const wtl = currentLang === 'nl' ? (wt.nl || wt.en || '') : (wt.en || '');
-                html += `<span class="token-wrap" data-role="${wr}" data-en="${esc(wt.en || '')}" data-nl="${esc(wt.nl || '')}" data-detail="${esc(wt.detail || '')}" data-text="${esc(wt.text)}">`;
+                html += `<span class="token-wrap${wt.damaged ? ' has-damage' : ''}" data-role="${wr}" data-en="${esc(wt.en || '')}" data-nl="${esc(wt.nl || '')}" data-detail="${esc(wt.detail || '')}" data-text="${esc(wt.text)}">`;
+                if (wt.damaged) html += `<span class="damage-indicator"></span>`;
                 html += `<span class="token role-${wr} cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(wt.text)}</span>`;
                 if (wtl && !['text', 'unknown', 'damage', 'damage_note', 'ruling', 'metadata', 'section_header', 'line_number', 'year_text'].includes(wr)) {
                   html += `<span class="token-tl cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(wtl)}</span>`;
@@ -3610,7 +3638,8 @@
             }
           }
 
-          html += `<span class="token-wrap" data-role="${r}" data-en="${esc(tok.en || '')}" data-nl="${esc(tok.nl || '')}" data-detail="${esc(tok.detail || '')}" data-text="${esc(tok.text)}">`;
+          html += `<span class="token-wrap${tok.damaged ? ' has-damage' : ''}" data-role="${r}" data-en="${esc(tok.en || '')}" data-nl="${esc(tok.nl || '')}" data-detail="${esc(tok.detail || '')}" data-text="${esc(tok.text)}">`;
+          if (tok.damaged) html += `<span class="damage-indicator"></span>`;
           html += `<span class="token role-${r} cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(tok.text)}</span>`;
           if (tl && !['text', 'unknown', 'damage', 'damage_note', 'ruling', 'metadata', 'section_header', 'line_number', 'year_text'].includes(r)) {
             html += `<span class="token-tl cascade-color" style="animation-delay:${animIdx * 40 + 600}ms">${esc(tl)}</span>`;
@@ -3892,6 +3921,21 @@
       if (currentLang === 'nl') { ttNl.textContent = en ? `EN: ${en}` : ''; }
       else { ttNl.textContent = nl ? `NL: ${nl}` : ''; }
       ttNl.style.display = ttNl.textContent ? 'block' : 'none';
+
+      // Show damage warning if token is damaged
+      let dmgEl = tt.querySelector('.tt-damage');
+      if (!dmgEl) {
+        dmgEl = document.createElement('div');
+        dmgEl.className = 'tt-damage';
+        dmgEl.style.cssText = 'font-size:10px;font-weight:700;color:#ff5050;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;display:none;';
+        tt.appendChild(dmgEl);
+      }
+      if (el.classList.contains('has-damage')) {
+        dmgEl.textContent = 'damaged / reconstructed';
+        dmgEl.style.display = 'block';
+      } else {
+        dmgEl.style.display = 'none';
+      }
 
       const rect = el.getBoundingClientRect();
       tt.style.left = Math.min(rect.left, window.innerWidth - 300) + 'px';

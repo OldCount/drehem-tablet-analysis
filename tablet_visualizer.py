@@ -35,7 +35,7 @@ EXTRACTED = BASE_DIR / "drehem_extracted.csv"
 TRANSLATIONS = {
     # Animals
     "udu": ("sheep", "schaap"),
-    "masz2": ("billy goat", "bok"),
+    "masz2": ("goat", "geit"),
     "sila4": ("lamb", "lam"),
     "gu4": ("ox", "os"),
     "ab2": ("cow", "koe"),
@@ -67,6 +67,14 @@ TRANSLATIONS = {
     "dusu2": ("donkey", "ezel"),
     "dur3": ("young male donkey", "jonge mannelijke ezel"),
     "eme6": ("female donkey", "vrouwelijke ezel"),
+    # Birds
+    "buru4{muszen}": ("sparrow", "mus"),
+    "buru5{muszen}": ("sparrow", "mus"),
+    "buru5{muszen}-gi": ("bird", "vogel"),
+    "muszen": ("bird", "vogel"),
+    "tu-gur4{muszen}": ("dove", "duif"),
+    "ir7{muszen}": ("pigeon", "duif"),
+    "uz-tur": ("duckling", "eendje"),
     # Qualifiers
     "niga": ("fattened", "vetgemest"),
     "u2": ("grass-fed", "grasgevoerd"),
@@ -544,10 +552,25 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
                 prefix = token_clean[:-len(suf)]
                 if (prefix in person_names or prefix in ALL_OFFICIALS or prefix in STRUCTURAL_KEYWORDS or
                     prefix in DESTINATION_TERMS or _oracc_lookup(prefix) or len(prefix) > 3):
+                    # Find the suffix split point in the *cleaned* token, then
+                    # produce clean prefix and suffix fragments (stripping any
+                    # leftover damage markers like square brackets from either side).
                     last_hyphen = token.rfind("-")
                     if last_hyphen != -1:
-                        tokens_raw[i] = token[:last_hyphen]
-                        tokens_raw.insert(i + 1, token[last_hyphen:])
+                        raw_prefix = token[:last_hyphen]
+                        raw_suffix = token[last_hyphen:]
+                        # Strip any dangling brackets from each fragment
+                        # e.g. "puzur4-{d}en-[lil2" → "puzur4-{d}en-[lil2]"
+                        # e.g. "-ta]" → "-ta"
+                        # But we want to preserve the brackets in the prefix for display,
+                        # just close any dangling open bracket so it doesn't look broken.
+                        # Actually: we remove stray ] from suffix and stray [ from prefix end
+                        raw_suffix = raw_suffix.rstrip("]")
+                        # If the prefix ends with an unclosed '[', close it for display
+                        if raw_prefix.count("[") > raw_prefix.count("]"):
+                            raw_prefix = raw_prefix + "]"
+                        tokens_raw[i] = raw_prefix
+                        tokens_raw.insert(i + 1, raw_suffix)
                         token = tokens_raw[i]
                         token_clean = strip_atf_damage(token).lower()
 
@@ -755,12 +778,18 @@ def annotate_tablet(tablet_id, transliteration, date_of_origin=""):
             if not en and detail:
                 en = detail
 
+            # Detect ATF damage markers on the raw token
+            token_damaged = bool(
+                "[" in token or "]" in token or "#" in token or "?" in token
+            )
+
             annotated_tokens.append({
                 "text": token,
                 "role": role,
                 "detail": detail,
                 "en": en,
                 "nl": nl,
+                "damaged": token_damaged,
             })
             i += 1
 

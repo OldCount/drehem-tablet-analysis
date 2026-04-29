@@ -356,7 +356,8 @@ ANIMAL_TERMS = {
     "uz-tur{muszen}": "duckling",
     "muszen":        "bird",
     "buru4{muszen}": "sparrow",
-    "buru5{muszen}": "locust",
+    "buru5{muszen}": "sparrow",
+    "buru5{muszen}-gi": "bird",
     "peszer{muszen}": "duck",
     # Wild cattle
     "am":            "wild bull",
@@ -386,7 +387,7 @@ ANIMAL_TERMS = {
 # Key = animal term, value = list of contexts where it's NOT an animal.
 ANIMAL_FALSE_POSITIVE_CONTEXTS = {
     "amar": ["amar-{d}", "{d}amar"],  # theophoric: Amar-Suen
-    "masz2": ["masz2-e", "masz2-da-re-a"],  # extispicy, mashdarea offering
+    "masz2": ["masz2-e", "masz2-da-re-a", "masz2 tul2"],  # extispicy, mashdarea offering, goat-pen construction
     "az": ["a-zu", "nin-a-zu", "ba-az", "-az-"],  # part of Ninazu etc.
     "sila4": ["sila4-a", "sila4 ga-"],  # only false when not preceded by numeral
     "u8": ["u8-a"],  # uncertain context
@@ -948,6 +949,12 @@ def _is_animal_false_positive(animal: str, line: str) -> bool:
     Check if an animal term match is actually a false positive,
     e.g. part of a personal name, place name, or month name.
     """
+    # Check the ANIMAL_FALSE_POSITIVE_CONTEXTS dictionary
+    if animal in ANIMAL_FALSE_POSITIVE_CONTEXTS:
+        for context in ANIMAL_FALSE_POSITIVE_CONTEXTS[animal]:
+            if context in line:
+                return True
+
     # "az" is very short and appears in many non-animal contexts
     if animal == "az":
         # Only count as bear if it's a standalone word
