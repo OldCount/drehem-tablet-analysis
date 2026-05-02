@@ -1075,6 +1075,14 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
                 self.send_json(self._animals_timeline)
             else:
                 self.send_json(aggregate_animals_timeline(flow=flow, exclude=exclude))
+        elif self.path.startswith("/api/recipients_timeline"):
+            from urllib.parse import urlparse, parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            lens = (qs.get("lens") or ["deity"])[0]
+            flow = (qs.get("flow") or [None])[0]
+            excl_raw = (qs.get("exclude") or [""])[0]
+            exclude = [t for t in excl_raw.split(",") if t] if excl_raw else None
+            self.send_json(aggregate_recipients_timeline(lens=lens, flow=flow, exclude=exclude))
         elif self.path.startswith("/api/animals_cell"):
             from urllib.parse import urlparse, parse_qs
             qs = parse_qs(urlparse(self.path).query)
@@ -1496,6 +1504,14 @@ _ANIMAL_ENTRY_RE = re.compile(r"(\[imp:(\d+)\]|(\d+))\s*[×x]\s*([^,]+)")
 # without re-reading the CSV.
 ANIMAL_CONTRIB_YEAR = {}
 ANIMAL_CONTRIB_MONTH = {}
+# Recipient (deity / destination / destination category) caches — same
+# shape as the animal caches, so the same aggregator can be reused.
+DEITY_CONTRIB_YEAR = {}
+DEITY_CONTRIB_MONTH = {}
+DEST_CONTRIB_YEAR = {}
+DEST_CONTRIB_MONTH = {}
+DESTCAT_CONTRIB_YEAR = {}
+DESTCAT_CONTRIB_MONTH = {}
 # tablet_id -> (period_y, period_m_or_None, tx) — used for tablets-per-period
 # counts under filters (a tablet counts iff it has any matching contrib).
 TABLET_PERIOD_TX = {}
@@ -1570,6 +1586,16 @@ def _build_animal_contrib_cache():
 
     contrib_year = defaultdict(lambda: defaultdict(list))
     contrib_month = defaultdict(lambda: defaultdict(list))
+    # Recipient lenses: deity (multi-valued, split on '; '), destination
+    # (single string), destination_category (single label). Each tablet's
+    # contribution to a recipient is the SUM of its animal counts — the
+    # whole shipment goes to the named recipient(s).
+    deity_year = defaultdict(lambda: defaultdict(list))
+    deity_month = defaultdict(lambda: defaultdict(list))
+    dest_year = defaultdict(lambda: defaultdict(list))
+    dest_month = defaultdict(lambda: defaultdict(list))
+    destcat_year = defaultdict(lambda: defaultdict(list))
+    destcat_month = defaultdict(lambda: defaultdict(list))
     tx_by_period_y = defaultdict(Counter)
     tablet_period_tx = {}
     period_idx_year = {}
@@ -1614,22 +1640,62 @@ def _build_animal_contrib_cache():
                 if label_m:
                     contrib_month[base][label_m].append(rec)
 
+            # ─── Recipient lenses (deity / destination / destcat) ─────────
+            tablet_total = sum(c for c, _ in entries)
+            if tablet_total <= 0:
+                continue
+            rec_full = {"tablet": row["tablet_id"], "count": tablet_total,
+                        "animal": "", "tx": tx}
+            deities_raw = (row.get("divine_recipients") or "").strip()
+            if deities_raw:
+                # Sumerologists list co-recipients with "; "; we split so a
+                # joint Enlil+Ninlil offering counts toward each individually.
+                for d in (s.strip() for s in deities_raw.split(";")):
+                    if d:
+                        deity_year[d][label_y].append(rec_full)
+                        if label_m:
+                            deity_month[d][label_m].append(rec_full)
+            dest_raw = (row.get("destination") or "").strip()
+            if dest_raw:
+                dest_year[dest_raw][label_y].append(rec_full)
+                if label_m:
+                    dest_month[dest_raw][label_m].append(rec_full)
+            destcat_raw = (row.get("destination_category") or "").strip()
+            if destcat_raw:
+                destcat_year[destcat_raw][label_y].append(rec_full)
+                if label_m:
+                    destcat_month[destcat_raw][label_m].append(rec_full)
+
     global ANIMAL_CONTRIB_YEAR, ANIMAL_CONTRIB_MONTH, TABLET_PERIOD_TX
     global PERIODS_YEAR, PERIODS_MONTH, BY_PERIOD_TX
+    global DEITY_CONTRIB_YEAR, DEITY_CONTRIB_MONTH
+    global DEST_CONTRIB_YEAR, DEST_CONTRIB_MONTH
+    global DESTCAT_CONTRIB_YEAR, DESTCAT_CONTRIB_MONTH
     ANIMAL_CONTRIB_YEAR = {a: dict(d) for a, d in contrib_year.items()}
     ANIMAL_CONTRIB_MONTH = {a: dict(d) for a, d in contrib_month.items()}
+    DEITY_CONTRIB_YEAR = {k: dict(d) for k, d in deity_year.items()}
+    DEITY_CONTRIB_MONTH = {k: dict(d) for k, d in deity_month.items()}
+    DEST_CONTRIB_YEAR = {k: dict(d) for k, d in dest_year.items()}
+    DEST_CONTRIB_MONTH = {k: dict(d) for k, d in dest_month.items()}
+    DESTCAT_CONTRIB_YEAR = {k: dict(d) for k, d in destcat_year.items()}
+    DESTCAT_CONTRIB_MONTH = {k: dict(d) for k, d in destcat_month.items()}
     TABLET_PERIOD_TX = tablet_period_tx
     PERIODS_YEAR = sorted(period_idx_year.keys(), key=lambda p: period_idx_year[p])
     PERIODS_MONTH = sorted(period_idx_month.keys(), key=lambda p: period_idx_month[p])
     BY_PERIOD_TX = {k: dict(v) for k, v in tx_by_period_y.items()}
 
 
-def aggregate_animals_timeline(flow=None, exclude=None):
-    """Aggregate the cached per-animal contribs under the given filters.
+def _aggregate_dim(year_cache, month_cache, category_fn,
+                    flow=None, exclude=None, min_tablets=2,
+                    extra_payload=None):
+    """Generic per-period aggregator. Used by both the animals timeline
+    (lens=animal) and the recipients timeline (lens=deity/dest/destcat).
 
-    `flow` — one of None / "all" / "in" / "out" / "internal" / "external".
-    `exclude` — iterable of tablet IDs to drop from all aggregates.
-    Returns the same shape as the legacy compute_animals_timeline().
+    `year_cache` / `month_cache` — {dim_key: {period_label: [contrib]}}.
+    `category_fn(dim_key)` — string used by the front-end for row coloring.
+    `min_tablets` — drop dim entries with fewer matching tablets (after
+        filters). Defaults to 2 for animals; recipients pass 1 because
+        even single-tablet deities are interesting.
     """
     from collections import Counter
 
@@ -1664,20 +1730,18 @@ def aggregate_animals_timeline(flow=None, exclude=None):
             out_max[period] = max(c["count"] for c in kept)
         return out_count, out_tabs, out_max, total_c, total_t
 
-    animals_out = []
+    rows_out = []
     by_period_total_y = Counter()
     by_period_total_m = Counter()
-    for base, year_buckets in ANIMAL_CONTRIB_YEAR.items():
+    for key, year_buckets in year_cache.items():
         cy, ty, mxy, tc, tt = _summarize(year_buckets)
-        cm, tm, mxm, _, _ = _summarize(ANIMAL_CONTRIB_MONTH.get(base, {}))
-        if tt < 2:
-            # Drop singleton animals (or those that vanish under the filter).
+        cm, tm, mxm, _, _ = _summarize(month_cache.get(key, {}))
+        if tt < min_tablets:
             continue
         for p, v in cy.items():
             by_period_total_y[p] += v
         for p, v in cm.items():
             by_period_total_m[p] += v
-        # Top contributors: pick from the kept records, all periods.
         all_kept = []
         for contribs in year_buckets.values():
             for c in contribs:
@@ -1687,10 +1751,10 @@ def aggregate_animals_timeline(flow=None, exclude=None):
                     continue
                 all_kept.append(c)
         all_kept.sort(key=lambda c: -c["count"])
-        animals_out.append({
-            "name": base,
-            "category": _animal_category(base),
-            "label": base,
+        rows_out.append({
+            "name": key,
+            "category": category_fn(key),
+            "label": key,
             "by_period":         cy,
             "by_period_tablets": ty,
             "by_period_max":     mxy,
@@ -1701,31 +1765,153 @@ def aggregate_animals_timeline(flow=None, exclude=None):
             "total_count":       tc,
             "total_tablets":     tt,
         })
-    animals_out.sort(key=lambda a: (-a["total_tablets"], -a["total_count"]))
+    rows_out.sort(key=lambda a: (-a["total_tablets"], -a["total_count"]))
 
-    sheep_to_tablet_y = {}
-    for p, n_tab in tablets_by_period_y.items():
-        if n_tab > 0:
-            sheep_to_tablet_y[p] = round(by_period_total_y[p] / n_tab, 1)
-
-    categories_out = {
-        k: {"label": v["label"], "color": v["color"]}
-        for k, v in ANIMAL_CATEGORIES.items()
-    }
-
-    return {
+    payload = {
         "periods":          PERIODS_YEAR,
         "periods_month":    PERIODS_MONTH,
-        "animals":          animals_out,
-        "categories":       categories_out,
         "by_period_total":  dict(by_period_total_y),
         "by_month_total":   dict(by_period_total_m),
-        "by_period_tx":     BY_PERIOD_TX,  # always corpus-wide, unfiltered
+        "by_period_tx":     BY_PERIOD_TX,
         "tablets_by_period": dict(tablets_by_period_y),
         "tablets_by_month":  dict(tablets_by_period_m),
-        "sheep_to_tablet":   sheep_to_tablet_y,
         "filter":            {"flow": flow or "all", "exclude": sorted(exclude_set)},
     }
+    if extra_payload:
+        payload.update(extra_payload)
+    return rows_out, payload
+
+
+def aggregate_animals_timeline(flow=None, exclude=None):
+    """Aggregate the cached per-animal contribs under the given filters.
+
+    `flow` — one of None / "all" / "in" / "out" / "internal" / "external".
+    `exclude` — iterable of tablet IDs to drop from all aggregates.
+    Returns the same shape as the legacy compute_animals_timeline().
+    """
+    rows, base = _aggregate_dim(
+        ANIMAL_CONTRIB_YEAR, ANIMAL_CONTRIB_MONTH, _animal_category,
+        flow=flow, exclude=exclude, min_tablets=2,
+    )
+    by_period_total_y = base["by_period_total"]
+    sheep_to_tablet_y = {}
+    for p, n_tab in base["tablets_by_period"].items():
+        if n_tab > 0:
+            sheep_to_tablet_y[p] = round(by_period_total_y[p] / n_tab, 1)
+    base.update({
+        "animals":          rows,
+        "categories":       {k: {"label": v["label"], "color": v["color"]}
+                             for k, v in ANIMAL_CATEGORIES.items()},
+        "sheep_to_tablet":  sheep_to_tablet_y,
+    })
+    return base
+
+
+# Lens classifiers — coarse colouring categories per recipient row so the
+# front-end can colour the timeline by something meaningful even when the
+# axis is not an animal taxonomy.
+def _deity_category(name: str) -> str:
+    """Group a divine recipient string by major cult center / pantheon
+    branch. Quick substring heuristic — the order matters because some
+    deity names share fragments (e.g. 'nanna' is a substring of 'inanna',
+    so Inanna must be checked first)."""
+    s = (name or "").lower()
+    if "inanna" in s or "na-na-a" in s or "an-nu-ni-tum" in s:
+        return "uruk"          # Inanna and her circle
+    if "en-lil2" in s or "nin-lil2" in s or "nin-urta" in s or "nusku" in s:
+        return "nippur"        # Enlil family — Nippur
+    if "nanna" in s or "nin-gal" in s or "{d}suen" in s or "su'en" in s:
+        return "ur"            # Nanna/Suen — Ur
+    if "szara2" in s or "geszti" in s:
+        return "umma"          # Šara — Umma
+    if "utu" in s or "szerida" in s:
+        return "larsa"         # Utu — Larsa/Sippar
+    return "other"
+
+
+# Front-end colours for the deity grouping (uses the existing category-color CSS variables).
+DEITY_CATEGORIES = {
+    "nippur": {"label": "Nippur (Enlil)",   "color": "#22c55e"},
+    "ur":     {"label": "Ur (Nanna/Suen)",  "color": "#0ea5e9"},
+    "uruk":   {"label": "Uruk (Inanna)",    "color": "#a855f7"},
+    "umma":   {"label": "Umma (Šara)",      "color": "#f59e0b"},
+    "larsa":  {"label": "Larsa (Utu)",      "color": "#fb923c"},
+    "other":  {"label": "Other / minor",    "color": "#94a3b8"},
+}
+
+# Destination-category visual identity (mirrors the values already tagged
+# by the extractor's DESTINATION_CATEGORIES table).
+DESTCAT_COLORS = {
+    "kitchen":         "#f59e0b",
+    "city":            "#22c55e",
+    "palace":          "#a855f7",
+    "soldiers":        "#ef4444",
+    "warehouse":       "#0ea5e9",
+    "sacred-site":     "#facc15",
+    "runners":         "#fb923c",
+    "prebend-holders": "#86efac",
+    "bala-obligation": "#7dd3fc",
+    "guards":          "#fecaca",
+    "dogs":            "#94a3b8",
+    "fattening-house": "#86efac",
+    "e-uzga":          "#d8b4fe",
+    "sheephouse":      "#86efac",
+    "other":           "#94a3b8",
+}
+
+
+def aggregate_recipients_timeline(lens="deity", flow=None, exclude=None):
+    """Aggregate per-recipient flows. `lens` selects the dimension:
+    'deity' / 'destination' / 'destcat'. Returns the same envelope as
+    aggregate_animals_timeline (with the rows under key "rows" instead
+    of "animals" — the front-end picks the right key)."""
+    if lens == "destination":
+        ycache, mcache = DEST_CONTRIB_YEAR, DEST_CONTRIB_MONTH
+        # Categorise destinations by the extractor-assigned destination_category
+        # (best-effort: rebuild from a quick lookup over destcat cache).
+        dest_to_cat = {}
+        for cat, buckets in DESTCAT_CONTRIB_YEAR.items():
+            for period, recs in buckets.items():
+                for r in recs:
+                    dest_to_cat.setdefault(r["tablet"], cat)
+        # We don't have a direct dest -> cat map here; fall back to a heuristic
+        # category function based on the destination string itself.
+        def cat_fn(dest):
+            d = dest.lower()
+            if "muhaldim" in d or "kitchen" in d:    return "kitchen"
+            if "e2-gal" in d or "palace" in d:       return "palace"
+            if "{ki}" in d or "nibru" in d or "uri5" in d: return "city"
+            if "aga3-us2" in d or "soldier" in d:    return "soldiers"
+            if "kiszib3" in d or "warehouse" in d:   return "warehouse"
+            if "kas4" in d or "runner" in d:         return "runners"
+            if "tum-ma-al" in d:                     return "sacred-site"
+            return "other"
+        categories_out = {k: {"label": k.replace("-", " ").title(), "color": v}
+                          for k, v in DESTCAT_COLORS.items()}
+        min_tab = 1
+    elif lens == "destcat":
+        ycache, mcache = DESTCAT_CONTRIB_YEAR, DESTCAT_CONTRIB_MONTH
+        cat_fn = lambda x: x  # category IS the row
+        categories_out = {k: {"label": k.replace("-", " ").title(), "color": v}
+                          for k, v in DESTCAT_COLORS.items()}
+        min_tab = 1
+    else:  # default: 'deity'
+        lens = "deity"
+        ycache, mcache = DEITY_CONTRIB_YEAR, DEITY_CONTRIB_MONTH
+        cat_fn = _deity_category
+        categories_out = DEITY_CATEGORIES
+        min_tab = 1
+
+    rows, base = _aggregate_dim(
+        ycache, mcache, cat_fn,
+        flow=flow, exclude=exclude, min_tablets=min_tab,
+    )
+    base.update({
+        "rows":       rows,
+        "lens":       lens,
+        "categories": categories_out,
+    })
+    return base
 
 
 def compute_animals_timeline():

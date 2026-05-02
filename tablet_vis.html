@@ -5398,17 +5398,31 @@
                                 // chart drops cumulative stacking and uses log
                                 // y so goats/cattle/equids stop being crushed
                                 // by udu's order-of-magnitude lead
+      lens: 'animals',          // animals | deity | destcat | destination —
+                                // which dimension the rows aggregate. Recipient
+                                // lenses live behind the same grid renderer.
     };
 
     // Fetch the timeline with current server-side filters (flow + excludedTablets).
-    // Returns the new payload; caller is responsible for storing it and re-rendering.
+    // Picks the endpoint that matches AV_STATE.lens. Returns a payload normalised
+    // so the rest of the code can read .animals regardless of the lens.
     async function avFetchTimeline() {
       const params = new URLSearchParams();
       if (AV_STATE.flow && AV_STATE.flow !== 'all') params.set('flow', AV_STATE.flow);
       if (AV_STATE.excludedTablets.size) params.set('exclude', [...AV_STATE.excludedTablets].join(','));
-      const url = `${API}/api/animals_timeline${params.toString() ? '?' + params : ''}`;
+      const lens = AV_STATE.lens || 'animals';
+      let url;
+      if (lens === 'animals') {
+        url = `${API}/api/animals_timeline${params.toString() ? '?' + params : ''}`;
+      } else {
+        params.set('lens', lens);
+        url = `${API}/api/recipients_timeline?${params}`;
+      }
       const r = await fetch(url);
-      return await r.json();
+      const data = await r.json();
+      // Recipients endpoint returns rows under .rows; normalise.
+      if (lens !== 'animals') data.animals = data.rows || [];
+      return data;
     }
 
     // Re-fetch + re-render when a server-side filter (flow/exclude) changes.
@@ -5418,8 +5432,21 @@
       try { animalsData = await avFetchTimeline(); }
       catch (e) { console.error('animals refetch failed', e); return; }
       finally { if (view) view.classList.remove('refreshing'); }
+      avInjectCategoryColors();
       avRenderHero(); avRenderGrid(); avSyncToolbarUI();
+      avApplyLensVisibility();
       if (AV_STATE.selected) avRenderDetail(AV_STATE.selected);
+    }
+
+    // Push the server-provided category colors onto :root as CSS variables,
+    // so existing code that resolves `var(--av-c-X)` Just Works for any
+    // lens (deity, destination, destcat) without duplicating colour logic.
+    function avInjectCategoryColors() {
+      const cats = animalsData && animalsData.categories;
+      if (!cats) return;
+      for (const [k, v] of Object.entries(cats)) {
+        if (v && v.color) document.documentElement.style.setProperty(`--av-c-${k}`, v.color);
+      }
     }
     const AV_CAT_ORDER = ['sheep_adult', 'sheep_young', 'goat_adult', 'goat_young', 'cattle_adult', 'cattle_young', 'equids', 'other'];
     const AV_CAT_COLOR = { sheep_adult: '#22c55e', sheep_young: '#86efac', goat_adult: '#0ea5e9', goat_young: '#7dd3fc', cattle_adult: '#a855f7', cattle_young: '#d8b4fe', equids: '#f59e0b', other: '#94a3b8' };
@@ -5437,6 +5464,7 @@
           main.innerHTML = '<div class="tl-empty">Failed to load animals data.</div>';
           return;
         }
+        avInjectCategoryColors();
       }
       currentTabletId = null;
 
@@ -5498,6 +5526,15 @@
                 <span class="av-mode-side"   data-mode="tablets">Tablets</span>
               </span>
             </div>
+            <div style="display:flex;align-items:center;gap:6px;" title="What each row counts: animal terms, divine recipients, destination categories, or specific destinations.">
+              <span class="tb-label">Lens</span>
+              <span class="av-mode" id="avLens">
+                <span class="av-mode-side on" data-lens="animals">Animals</span>
+                <span class="av-mode-side"    data-lens="deity">Deities</span>
+                <span class="av-mode-side"    data-lens="destcat">Destinations</span>
+                <span class="av-mode-side"    data-lens="destination">Specific dest.</span>
+              </span>
+            </div>
             <div style="display:flex;align-items:center;gap:6px;" title="Filter by Drehem flow direction. 'External' (intake + disbursal) avoids double-counting animals shuffled between bureaus via i3-dab5 / szu ba-ti.">
               <span class="tb-label">Flow</span>
               <span class="av-mode" id="avFlow">
@@ -5543,6 +5580,33 @@
       avSyncToolbarUI();
       avRenderHero();
       avRenderGrid();
+      avApplyLensVisibility();
+    }
+
+    // The label for one row, depending on the active lens. `plural` toggles
+    // the noun used in the subtitle ("animal terms" vs "deities" etc).
+    function avLensRowNoun(plural = false) {
+      switch (AV_STATE.lens) {
+        case 'deity':       return plural ? 'deities' : 'Deity';
+        case 'destination': return plural ? 'destinations' : 'Destination';
+        case 'destcat':     return plural ? 'destination categories' : 'Destination type';
+        default:            return plural ? 'animal terms' : 'Animal term';
+      }
+    }
+
+    // Lens-specific UI tweaks. The categories chip row, hero chart, and
+    // animal-only outlier toggle all assume the animal taxonomy; hide them
+    // when a recipient lens is active and re-show on return to animals.
+    function avApplyLensVisibility() {
+      const isAn = AV_STATE.lens === 'animals';
+      const hero = document.getElementById('avHero');
+      const cats = document.querySelectorAll('#avToolbar > div');
+      // The categories chip block is the one that contains .av-cat-chip;
+      // find by descendant rather than by index so it's robust.
+      cats.forEach(div => {
+        if (div.querySelector('.av-cat-chip')) div.style.display = isAn ? '' : 'none';
+      });
+      if (hero) hero.style.display = isAn ? '' : 'none';
     }
 
     function avBindToolbar() {
@@ -5576,6 +5640,17 @@
         if (!side || side.dataset.flow === AV_STATE.flow) return;
         AV_STATE.flow = side.dataset.flow;
         document.querySelectorAll('#avFlow .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
+        avRefreshAfterServerFilter();
+      });
+      // Lens (which dimension the rows aggregate — server-side, refetch).
+      $('avLens').addEventListener('click', e => {
+        const side = e.target.closest('.av-mode-side');
+        if (!side || side.dataset.lens === AV_STATE.lens) return;
+        AV_STATE.lens = side.dataset.lens;
+        document.querySelectorAll('#avLens .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
+        // Switching the lens invalidates the per-animal selection / panel state.
+        AV_STATE.selected = null;
+        AV_STATE.tags.clear();
         avRefreshAfterServerFilter();
       });
       $('avOutTog').addEventListener('click', () => {
@@ -5614,6 +5689,7 @@
         AV_STATE.heroMetric = 'absolute';
         AV_STATE.heroFocusYear = null;
         AV_STATE.heroLayout = 'stacked';
+        AV_STATE.lens = 'animals';
         AV_STATE.selected = null;
         AV_STATE.flow = 'all';
         AV_STATE.tags.clear();
@@ -5626,6 +5702,7 @@
         document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === 'animals'));
         document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === 'absolute'));
         document.querySelectorAll('#avHeroLayout .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.layout === 'stacked'));
+        document.querySelectorAll('#avLens .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.lens === 'animals'));
         document.querySelectorAll('#avFlow .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.flow === 'all'));
         $('avOutTog').classList.add('on');
         $('avDetail').classList.remove('open');
@@ -5700,6 +5777,8 @@
       document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === AV_STATE.mode));
       document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === AV_STATE.heroMetric));
       document.querySelectorAll('#avHeroLayout .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.layout === AV_STATE.heroLayout));
+      const lensSeg = document.getElementById('avLens');
+      if (lensSeg) lensSeg.querySelectorAll('.av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.lens === AV_STATE.lens));
       const flowSeg = document.getElementById('avFlow');
       if (flowSeg) flowSeg.querySelectorAll('.av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.flow === AV_STATE.flow));
       document.getElementById('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
@@ -5710,11 +5789,16 @@
       // Tag allow-list takes precedence: if any tags are set, the grid shows
       // only those animals (categories/search ignored). Empty tags = default
       // category + search filtering.
+      // Note: catOn only carries animal-taxonomy keys, so it's only applied
+      // when the active lens is the animals lens; recipient lenses skip it.
       let list;
       if (AV_STATE.tags.size > 0) {
         list = animalsData.animals.filter(a => AV_STATE.tags.has(a.name));
       } else {
-        list = animalsData.animals.filter(a => AV_STATE.catOn[a.category]);
+        list = animalsData.animals.slice();
+        if (AV_STATE.lens === 'animals') {
+          list = list.filter(a => AV_STATE.catOn[a.category]);
+        }
         if (AV_STATE.query) {
           const q = AV_STATE.query;
           list = list.filter(a => a.name.toLowerCase().includes(q) || a.category.includes(q));
@@ -5758,7 +5842,7 @@
       const visTotal = visible.reduce((s, x) => s + x.total_count, 0);
       const visTabs = visible.reduce((s, x) => s + x.total_tablets, 0);
       subtitle.textContent =
-        `${visible.length} of ${a.animals.length} animal terms · ${visTotal.toLocaleString()} animals · ${visTabs.toLocaleString()} tablet appearances · ${periods[0]} → ${periods[periods.length - 1]}`;
+        `${visible.length} of ${a.animals.length} ${avLensRowNoun(true)} · ${visTotal.toLocaleString()} animals · ${visTabs.toLocaleString()} tablet appearances · ${periods[0]} → ${periods[periods.length - 1]}`;
 
       // Maximum bar value for scaling — depends on mode.
       const valOf = (x, p) => AV_STATE.mode === 'tablets'
@@ -5778,7 +5862,7 @@
 
       // ─── Axis ─────────────────────────────────────────────
       let html = `<div class="av-axis">
-        <div class="av-axis-name">Animal term</div>
+        <div class="av-axis-name">${avLensRowNoun()}</div>
         <div class="av-axis-track" style="width:${trackWidth}px;">`;
       for (const b of reignBands) {
         const left = b.start * cw + 1;
@@ -5860,8 +5944,14 @@
         el.addEventListener('click', e => {
           // Bar click → cell drill-down (animal × period → tablet list).
           // Hold Shift / cmd to instead select the animal row.
-          if (e.shiftKey || e.metaKey) Router.goto({ view: 'an-animal', name: el.dataset.name });
-          else Router.goto({ view: 'an-cell', animal: el.dataset.name, period: el.dataset.period });
+          // Cell drill-down only makes sense for the animals lens (the
+          // recipients timeline doesn't have per-(recipient × period) tablet
+          // lists yet). For other lenses, open the recipient detail panel.
+          if (e.shiftKey || e.metaKey || AV_STATE.lens !== 'animals') {
+            Router.goto({ view: 'an-animal', name: el.dataset.name });
+          } else {
+            Router.goto({ view: 'an-cell', animal: el.dataset.name, period: el.dataset.period });
+          }
         });
       });
       area.querySelectorAll('.av-row').forEach(el => {
