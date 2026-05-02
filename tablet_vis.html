@@ -5394,6 +5394,10 @@
       flow: 'all',              // all | in | out | external — Drehem flow direction
       tags: new Set(),          // animal-name allow-list; empty = show all
       excludedTablets: new Set(), // P-ids to drop from server-side aggregation
+      heroLayout: 'stacked',    // stacked | categories — when 'categories' the
+                                // chart drops cumulative stacking and uses log
+                                // y so goats/cattle/equids stop being crushed
+                                // by udu's order-of-magnitude lead
     };
 
     // Fetch the timeline with current server-side filters (flow + excludedTablets).
@@ -5457,9 +5461,13 @@
             <div class="av-hero-header">
               <h3 id="avHeroTitle">Composition over time</h3>
               <div class="av-hero-controls">
-                <span class="av-mode" id="avHeroMetric">
+                <span class="av-mode" id="avHeroMetric" title="Y-axis units">
                   <span class="av-mode-side on" data-metric="absolute">Absolute</span>
                   <span class="av-mode-side"   data-metric="share">% share</span>
+                </span>
+                <span class="av-mode" id="avHeroLayout" title="In 'By category' mode each category is drawn as its own area from zero with a log y-axis, so smaller categories stop being crushed by udu's scale.">
+                  <span class="av-mode-side on" data-layout="stacked">Stacked</span>
+                  <span class="av-mode-side"   data-layout="categories">By category</span>
                 </span>
                 <span class="tb-label" id="avHeroFocusLabel" style="display:none;">Focused</span>
                 <span class="av-tb-toggle" id="avHeroBackBtn" style="display:none;">← All reigns</span>
@@ -5583,6 +5591,14 @@
         document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
         avRenderHero();
       });
+      // Hero layout switch (stacked vs by-category log lines)
+      $('avHeroLayout').addEventListener('click', e => {
+        const side = e.target.closest('.av-mode-side');
+        if (!side) return;
+        AV_STATE.heroLayout = side.dataset.layout;
+        document.querySelectorAll('#avHeroLayout .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
+        avRenderHero();
+      });
       $('avHeroBackBtn').addEventListener('click', () => {
         AV_STATE.heroFocusYear = null;
         avRenderHero();
@@ -5597,6 +5613,7 @@
         AV_STATE.showOutliers = true;
         AV_STATE.heroMetric = 'absolute';
         AV_STATE.heroFocusYear = null;
+        AV_STATE.heroLayout = 'stacked';
         AV_STATE.selected = null;
         AV_STATE.flow = 'all';
         AV_STATE.tags.clear();
@@ -5608,6 +5625,7 @@
         document.querySelectorAll('#avToolbar .av-cat-chip').forEach(el => el.classList.remove('off'));
         document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === 'animals'));
         document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === 'absolute'));
+        document.querySelectorAll('#avHeroLayout .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.layout === 'stacked'));
         document.querySelectorAll('#avFlow .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.flow === 'all'));
         $('avOutTog').classList.add('on');
         $('avDetail').classList.remove('open');
@@ -5681,6 +5699,7 @@
       });
       document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === AV_STATE.mode));
       document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === AV_STATE.heroMetric));
+      document.querySelectorAll('#avHeroLayout .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.layout === AV_STATE.heroLayout));
       const flowSeg = document.getElementById('avFlow');
       if (flowSeg) flowSeg.querySelectorAll('.av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.flow === AV_STATE.flow));
       document.getElementById('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
@@ -5923,9 +5942,20 @@
 
       // Compute totals per period (for share mode) and a y-max
       const totals = periods.map(p => Object.values(catMatrix[p] || {}).reduce((s, v) => s + v, 0));
-      const yMaxAbs = Math.max(1, ...totals);
-      const yMax = AV_STATE.heroMetric === 'share' ? 100 : yMaxAbs;
-      const ys = v => padT + innerH - (v / yMax) * innerH;
+      // Layout:
+      //   stacked    — cumulative areas, linear-y (or share-normalised)
+      //   categories — one area per category from y=0, log-y; lets goats /
+      //                cattle / equids stay visible when udu dwarfs them
+      const useLog = AV_STATE.heroLayout === 'categories';
+      const useShare = AV_STATE.heroMetric === 'share' && !useLog;
+      const totalMax = Math.max(1, ...totals);
+      // Per-category max across all periods (for log scale)
+      const catMax = Math.max(1, ...periods.flatMap(p => cats.map(c => (catMatrix[p] || {})[c] || 0)));
+      const yMaxAbs = useLog ? catMax : totalMax;
+      const yMax = useShare ? 100 : yMaxAbs;
+      const ys = useLog
+        ? (v => padT + innerH - (Math.log10(Math.max(1, v)) / Math.log10(Math.max(10, yMaxAbs))) * innerH)
+        : (v => padT + innerH - (v / yMax) * innerH);
 
       // For each period, build a cumulative stack (bottom→top in cat order)
       // For "share" mode, normalize each period's stack to 100 %.
@@ -5977,28 +6007,58 @@
         }
       });
 
-      // Y-axis labels (a few)
-      const ticks = AV_STATE.heroMetric === 'share' ? [0, 25, 50, 75, 100]
-        : [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
+      // Y-axis labels — pick log decades or evenly-spaced linear ticks.
+      const fmt = t => useShare ? Math.round(t) + '%'
+                    : t >= 1000 ? (t / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + 'k'
+                    : Math.round(t).toLocaleString();
+      const ticks = useLog
+        ? (() => {
+            const out = [];
+            for (let p = 0; Math.pow(10, p) <= yMaxAbs * 1.05; p++) out.push(Math.pow(10, p));
+            return out;
+          })()
+        : (useShare ? [0, 25, 50, 75, 100]
+                    : [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax]);
       const yLabels = ticks.map(t => `
         <line x1="${padL}" x2="${W - padR}" y1="${ys(t).toFixed(1)}" y2="${ys(t).toFixed(1)}" stroke="rgba(255,255,255,0.04)"/>
-        <text x="${padL - 6}" y="${(ys(t) + 3).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="end">${AV_STATE.heroMetric === 'share' ? Math.round(t) + '%' : Math.round(t).toLocaleString()}</text>
+        <text x="${padL - 6}" y="${(ys(t) + 3).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="end">${fmt(t)}</text>
       `).join('');
 
-      // Layered areas (bottom-up)
-      let areas = '';
-      for (let ci = 0; ci < cats.length; ci++) {
-        const c = cats[ci];
-        const topPts = periods.map((p, i) => [xs(i), ys(stack[i][c].to)]);
-        const botPts = periods.map((p, i) => [xs(i), ys(stack[i][c].from)]);
-        // Path: top forward, bottom reverse
+      // Areas. We paint each layer all the way down to the chart baseline
+      // and let z-order do the stacking — every visible edge is a single
+      // smoothed curve, so adjacent layers always tack together (no slivers
+      // from a smoothed top meeting a straight bottom).
+      const baseY = ys(useLog ? 1 : 0);
+      const drawArea = (cat, valuesPerPeriod, fillOpacity, strokeOpacity) => {
+        const topPts = periods.map((p, i) => [xs(i), ys(valuesPerPeriod[i] || (useLog ? 1 : 0))]);
         const fwd = smoothPath(topPts);
-        // For closing the area we use straight line back along the bottom
-        const back = botPts.slice().reverse().map(([x, y]) => `L ${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
-        const d = `${fwd} ${back} Z`;
-        areas += `<path d="${d}" fill="${AV_CAT_COLOR[c]}" fill-opacity="0.78" stroke="${AV_CAT_COLOR[c]}" stroke-width="0.5" stroke-opacity="0.5">
-          <title>${AV_CAT_LABEL[c]}</title>
+        const closeRight = `L ${xs(periods.length - 1).toFixed(1)} ${baseY.toFixed(1)}`;
+        const closeLeft  = `L ${xs(0).toFixed(1)} ${baseY.toFixed(1)} Z`;
+        return `<path d="${fwd} ${closeRight} ${closeLeft}" fill="${AV_CAT_COLOR[cat]}" fill-opacity="${fillOpacity}" stroke="${AV_CAT_COLOR[cat]}" stroke-width="1.4" stroke-opacity="${strokeOpacity}">
+          <title>${AV_CAT_LABEL[cat]}</title>
         </path>`;
+      };
+      let areas = '';
+      if (useLog) {
+        // Each category as its own area, semi-transparent, so overlaps read.
+        // Paint largest-on-average last so the smaller ones don't get buried.
+        const order = cats.slice().sort((a, b) => {
+          const sumA = periods.reduce((s, p) => s + ((catMatrix[p] || {})[a] || 0), 0);
+          const sumB = periods.reduce((s, p) => s + ((catMatrix[p] || {})[b] || 0), 0);
+          return sumB - sumA;
+        });
+        for (const c of order) {
+          const vals = periods.map(p => (catMatrix[p] || {})[c] || 0);
+          areas += drawArea(c, vals, 0.32, 0.9);
+        }
+      } else {
+        // Stacked, painted top-down (highest cumulative layer first) so each
+        // layer's bottom is hidden behind the next layer's smoothed top.
+        for (let ci = cats.length - 1; ci >= 0; ci--) {
+          const c = cats[ci];
+          const tops = periods.map((p, i) => stack[i][c].to);
+          areas += drawArea(c, tops, 0.78, 0.5);
+        }
       }
 
       // X-axis labels: show every Nth period
@@ -6180,73 +6240,114 @@
       const color = `var(--av-c-${x.category})`;
       const periods = a.periods;
 
-      // Build sparkline SVG showing animal-count + tablet-count over time
-      const w = 760, h = 110, padL = 36, padR = 8, padT = 8, padB = 22;
+      // ─── Sparkline: animal count + tablet count across the reign sequence ───
+      // Uses viewBox so it scales to whatever width the panel gives it.
+      // Bigger canvas + smoothed Bezier paths + fill area so the line reads
+      // even at small sizes. Two y-scales (animals, tablets) — animals on
+      // the left, tablets on the right — share the x-axis.
+      const w = 1100, h = 170, padL = 56, padR = 56, padT = 14, padB = 28;
+      const innerH = h - padT - padB;
       const xs = i => padL + (i / Math.max(1, periods.length - 1)) * (w - padL - padR);
       const animsArr = periods.map(p => x.by_period[p] || 0);
       const tabsArr = periods.map(p => x.by_period_tablets[p] || 0);
       const aMax = Math.max(1, ...animsArr);
       const tMax = Math.max(1, ...tabsArr);
-      const yA = v => h - padB - (v / aMax) * (h - padT - padB);
-      const yT = v => h - padB - (v / tMax) * (h - padT - padB);
-      const pathA = animsArr.map((v, i) => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yA(v).toFixed(1)}`).join(' ');
-      const pathT = tabsArr.map((v, i) => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yT(v).toFixed(1)}`).join(' ');
-      // Reign tick marks
+      const yA = v => h - padB - (v / aMax) * innerH;
+      const yT = v => h - padB - (v / tMax) * innerH;
+      // Smooth Bezier path matching the hero chart's smoothing — looks much
+      // less jagged than the previous M/L polyline.
+      const smoothLine = (pts) => {
+        if (!pts.length) return '';
+        if (pts.length === 1) return `M ${pts[0][0]} ${pts[0][1]}`;
+        let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+        for (let i = 1; i < pts.length; i++) {
+          const [px, py] = pts[i - 1];
+          const [cx, cy] = pts[i];
+          const mx = (px + cx) / 2;
+          d += ` C ${mx.toFixed(1)} ${py.toFixed(1)}, ${mx.toFixed(1)} ${cy.toFixed(1)}, ${cx.toFixed(1)} ${cy.toFixed(1)}`;
+        }
+        return d;
+      };
+      const aPts = animsArr.map((v, i) => [xs(i), yA(v)]);
+      const tPts = tabsArr.map((v, i) => [xs(i), yT(v)]);
+      const pathA = smoothLine(aPts);
+      const pathT = smoothLine(tPts);
+      const fillA = `${pathA} L ${xs(periods.length - 1).toFixed(1)} ${(h - padB).toFixed(1)} L ${xs(0).toFixed(1)} ${(h - padB).toFixed(1)} Z`;
+
+      // Reign tick marks + horizontal grid lines at quarter heights.
       let tickMarks = '';
       let prevPre = '';
       periods.forEach((p, i) => {
         const pre = p.split('.')[0];
         if (pre !== prevPre) {
-          tickMarks += `<line x1="${xs(i)}" x2="${xs(i)}" y1="${padT}" y2="${h - padB}" stroke="rgba(52,211,153,0.25)" stroke-dasharray="2 3"/>`
-            + `<text x="${xs(i) + 3}" y="${padT + 10}" font-size="9" fill="rgba(52,211,153,0.7)">${pre}</text>`;
+          tickMarks += `<line x1="${xs(i).toFixed(1)}" x2="${xs(i).toFixed(1)}" y1="${padT}" y2="${h - padB}" stroke="rgba(52,211,153,0.22)" stroke-dasharray="2 4"/>`
+            + `<text x="${(xs(i) + 4).toFixed(1)}" y="${(padT + 11).toFixed(1)}" font-size="10" fill="rgba(52,211,153,0.85)">${pre}</text>`;
           prevPre = pre;
         }
       });
-      // X-axis labels at first/last
-      const xAxis = `<text x="${padL}" y="${h - 6}" font-size="9" fill="#666">${periods[0]}</text>
-                     <text x="${w - padR}" y="${h - 6}" font-size="9" fill="#666" text-anchor="end">${periods[periods.length - 1]}</text>`;
-      // Y-axis labels (animals)
-      const yAxis = `<text x="6" y="${padT + 8}" font-size="9" fill="#34d399">${aMax.toLocaleString()}</text>
-                     <text x="6" y="${h - padB - 1}" font-size="9" fill="#34d399">0</text>`;
+      let gridLines = '';
+      for (const frac of [0.25, 0.5, 0.75]) {
+        const yy = (h - padB - frac * innerH).toFixed(1);
+        gridLines += `<line x1="${padL}" x2="${w - padR}" y1="${yy}" y2="${yy}" stroke="rgba(255,255,255,0.05)"/>`;
+      }
+      // X-axis labels: first, last, and every Nth period in between.
+      const labelStep = Math.max(1, Math.ceil(periods.length / 10));
+      const xAxis = periods.map((p, i) => {
+        if (i !== 0 && i !== periods.length - 1 && i % labelStep !== 0) return '';
+        return `<text x="${xs(i).toFixed(1)}" y="${(h - 8).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="middle">${esc(p)}</text>`;
+      }).join('');
+      // Dual y-axis labels — animals (green) on the left, tablets (yellow) on the right.
+      const fmtK = v => v >= 1000 ? (v / 1000).toLocaleString(undefined, { maximumFractionDigits: 1 }) + 'k' : v.toLocaleString();
+      const yAxis = `
+        <text x="${(padL - 4).toFixed(1)}" y="${(padT + 8).toFixed(1)}" font-size="10" fill="#34d399" text-anchor="end">${fmtK(aMax)}</text>
+        <text x="${(padL - 4).toFixed(1)}" y="${(h - padB).toFixed(1)}" font-size="10" fill="#34d399" text-anchor="end">0</text>
+        <text x="${(w - padR + 4).toFixed(1)}" y="${(padT + 8).toFixed(1)}" font-size="10" fill="#ffd166" text-anchor="start">${fmtK(tMax)}</text>
+        <text x="${(w - padR + 4).toFixed(1)}" y="${(h - padB).toFixed(1)}" font-size="10" fill="#ffd166" text-anchor="start">0</text>`;
 
-      const spark = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
-        ${tickMarks}
+      const spark = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:170px;display:block;">
+        ${gridLines}${tickMarks}
         ${yAxis}${xAxis}
-        <path d="${pathT}" stroke="rgba(255,209,102,0.45)" stroke-width="1.2" fill="none"/>
-        <path d="${pathA}" stroke="#34d399" stroke-width="1.8" fill="none"/>
+        <path d="${fillA}" fill="rgba(52,211,153,0.14)" stroke="none"/>
+        <path d="${pathT}" stroke="rgba(255,209,102,0.85)" stroke-width="1.6" fill="none"/>
+        <path d="${pathA}" stroke="#34d399" stroke-width="2.2" fill="none"/>
       </svg>`;
 
-      // Monthly seasonality histogram: aggregate this animal's counts by
-      // calendar month (1–12) across the entire span. Useful for the
-      // thesis question "are there seasonal patterns in intake".
+      // ─── Monthly seasonality histogram (12 calendar months) ────────────
       const monthBuckets = Array.from({ length: 12 }, () => 0);
       for (const [k, v] of Object.entries(x.by_month || {})) {
         const mm = parseInt(k.split('.')[2] || '0', 10);
         if (mm >= 1 && mm <= 12) monthBuckets[mm - 1] += v;
       }
       const monthMax = Math.max(1, ...monthBuckets);
-      const mw = 760, mh = 90, mPadL = 30, mPadR = 8, mPadT = 6, mPadB = 18;
+      const mw = 1100, mh = 130, mPadL = 56, mPadR = 56, mPadT = 14, mPadB = 28;
+      const mInnerH = mh - mPadT - mPadB;
       const mxScale = i => mPadL + (i / 11) * (mw - mPadL - mPadR);
-      const myScale = v => mh - mPadB - (v / monthMax) * (mh - mPadT - mPadB);
-      const monthBarWidth = (mw - mPadL - mPadR) / 12 * 0.75;
+      const myScale = v => mh - mPadB - (v / monthMax) * mInnerH;
+      const monthBarWidth = (mw - mPadL - mPadR) / 12 * 0.78;
+      const monthCatColor = AV_CAT_COLOR[x.category];
+      let mGrid = '';
+      for (const frac of [0.25, 0.5, 0.75, 1]) {
+        const yy = (mh - mPadB - frac * mInnerH).toFixed(1);
+        mGrid += `<line x1="${mPadL}" x2="${mw - mPadR}" y1="${yy}" y2="${yy}" stroke="rgba(255,255,255,0.05)"/>`
+              +  `<text x="${(mPadL - 4).toFixed(1)}" y="${(parseFloat(yy) + 3).toFixed(1)}" font-size="10" fill="#7a8aa0" text-anchor="end">${fmtK(monthMax * frac)}</text>`;
+      }
       const monthBars = monthBuckets.map((v, i) => {
-        if (v === 0) return '';
         const top = myScale(v);
         const baseY = mh - mPadB;
         const x0 = mxScale(i + 0.5) - monthBarWidth / 2;
-        return `<rect x="${x0.toFixed(1)}" y="${top.toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${(baseY - top).toFixed(1)}" fill="${color.replace('var(--av-c-', '').replace(')', '')}" rx="2" />`;
+        // Subtle bar even when zero, so the axis reads as a calendar
+        const heightPx = Math.max(0.4, baseY - top);
+        return `<rect x="${x0.toFixed(1)}" y="${(v === 0 ? baseY - 0.5 : top).toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${heightPx.toFixed(1)}" fill="${monthCatColor}" fill-opacity="${v === 0 ? 0.25 : 0.92}" rx="3" ry="3"><title>Month ${i + 1}: ${v.toLocaleString()}</title></rect>`;
       }).join('');
-      const monthLabels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'].map((m, i) => `<text x="${mxScale(i + 0.5).toFixed(1)}" y="${(mh - 4).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="middle">${m}</text>`).join('');
+      // Use Roman numerals for the month labels — matches Drehem date conventions.
+      const monthRoman = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+      const monthLabels = monthRoman.map((m, i) =>
+        `<text x="${mxScale(i + 0.5).toFixed(1)}" y="${(mh - 8).toFixed(1)}" font-size="11" fill="#9ca3af" text-anchor="middle">${m}</text>`
+      ).join('');
       const monthSpark = monthBuckets.some(v => v > 0) ? `
-        <svg viewBox="0 0 ${mw} ${mh}" preserveAspectRatio="none" style="width:100%;height:90px;">
-          <text x="6" y="${mPadT + 8}" font-size="9" fill="#34d399">${monthMax.toLocaleString()}</text>
-          ${monthBuckets.map((v, i) => {
-        if (v === 0) return '';
-        const x0 = mxScale(i + 0.5) - monthBarWidth / 2;
-        const top = myScale(v);
-        const baseY = mh - mPadB;
-        return `<rect x="${x0.toFixed(1)}" y="${top.toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${(baseY - top).toFixed(1)}" fill="${AV_CAT_COLOR[x.category]}" rx="2"><title>Month ${i + 1}: ${v.toLocaleString()}</title></rect>`;
-      }).join('')}
+        <svg viewBox="0 0 ${mw} ${mh}" preserveAspectRatio="none" style="width:100%;height:130px;display:block;">
+          ${mGrid}
+          ${monthBars}
           ${monthLabels}
         </svg>` : '';
 
