@@ -1064,15 +1064,28 @@ class VisualizerHandler(SimpleHTTPRequestHandler):
             self.send_json(self._corpus_stats)
         elif self.path == "/api/timeline":
             self.send_json(self._timeline)
-        elif self.path == "/api/animals_timeline":
-            self.send_json(self._animals_timeline)
+        elif self.path.startswith("/api/animals_timeline"):
+            from urllib.parse import urlparse, parse_qs
+            qs = parse_qs(urlparse(self.path).query)
+            flow = (qs.get("flow") or [None])[0]
+            excl_raw = (qs.get("exclude") or [""])[0]
+            exclude = [t for t in excl_raw.split(",") if t] if excl_raw else None
+            # Skip the recompute if no filters are set — return the cached default.
+            if not flow and not exclude:
+                self.send_json(self._animals_timeline)
+            else:
+                self.send_json(aggregate_animals_timeline(flow=flow, exclude=exclude))
         elif self.path.startswith("/api/animals_cell"):
             from urllib.parse import urlparse, parse_qs
             qs = parse_qs(urlparse(self.path).query)
             animal = (qs.get("animal") or [""])[0]
             period = (qs.get("period") or [""])[0]
             gran   = (qs.get("granularity") or ["year"])[0]
-            self.send_json(get_animals_cell(animal, period, gran))
+            flow = (qs.get("flow") or [None])[0]
+            excl_raw = (qs.get("exclude") or [""])[0]
+            exclude = [t for t in excl_raw.split(",") if t] if excl_raw else None
+            self.send_json(get_animals_cell(animal, period, gran,
+                                            flow=flow, exclude=exclude))
         else:
             super().do_GET()
 
@@ -1476,11 +1489,22 @@ def _animal_category(base: str) -> str:
 # count is either an integer or `[imp:N]` (deterministic imputation).
 _ANIMAL_ENTRY_RE = re.compile(r"(\[imp:(\d+)\]|(\d+))\s*[×x]\s*([^,]+)")
 
-# Cached cell-level contributions populated by compute_animals_timeline().
-# Keyed by animal_base -> period_label -> [{tablet, count, animal}].
-# Looked up by /api/animals_cell to lazy-load drill-down data.
+# Cached cell-level contributions populated by _build_animal_contrib_cache().
+# Keyed by animal_base -> period_label -> [{tablet, count, animal, tx}].
+# Each contrib record now carries the tablet's transaction_type so the
+# aggregator can filter by flow (intake / disbursal / internal transfer)
+# without re-reading the CSV.
 ANIMAL_CONTRIB_YEAR = {}
 ANIMAL_CONTRIB_MONTH = {}
+# tablet_id -> (period_y, period_m_or_None, tx) — used for tablets-per-period
+# counts under filters (a tablet counts iff it has any matching contrib).
+TABLET_PERIOD_TX = {}
+# Sorted period labels — populated alongside the contrib cache.
+PERIODS_YEAR = []
+PERIODS_MONTH = []
+# Per-period transaction-type tally — kept un-filtered (corpus-wide) for the
+# transaction breakdown panel; not affected by flow/exclude.
+BY_PERIOD_TX = {}
 
 
 def _parse_animals_detail(detail: str):
@@ -1495,30 +1519,59 @@ def _parse_animals_detail(detail: str):
             yield count, animal
 
 
-def compute_animals_timeline():
-    """Build per-period × animal activity grid for the livestock view.
+# Map normalized transaction_type labels (as produced by the extractor) to
+# coarse Drehem flow direction. Adjust here if the philological reading
+# changes — sub_disbursement is the most defensible flip case (sza3-bi-ta
+# is technically out-flow but already accounted for in its parent expenditure,
+# so counting it as 'internal' avoids double-counting).
+TX_FLOW_GROUPS = {
+    "delivery":         "in",        # mu-kux(DU): intake from external supplier
+    "royal_delivery":   "in",        # mu-DU lugal: royal/court delivery
+    "birth_record":     "in",        # animal joins the herd (no Sumerian flow term)
+    "expenditure":      "out",       # ba-zi / ba-an-zi: disbursement from account
+    "regular_offering": "out",       # sa2-du11 / dingir gub-ba: fixed cultic outflow
+    "transfer":         "internal",  # i3-dab5: inter-office transfer
+    "receipt":          "internal",  # szu ba-ti: physical-custody receipt
+    "running_account":  "internal",  # nig2-ka9: ledger summary, no flow movement
+    "deficit_account":  "internal",  # la2-i3: deficit ledger
+    "sub_disbursement": "internal",  # sza3-bi-ta: subline of an expenditure already counted
+}
 
-    Two granularities are produced:
-        – year-level   (e.g. "AS.05")  — always populated
-        – month-level  (e.g. "AS.05.07") — populated only when the tablet's
-          month_number is set
 
-    Per (animal × period) cells include the top-50 contributing tablets so
-    the front-end can show a direct drill-down without needing a second
-    round-trip.
+def _tx_flow(tx: str) -> str:
+    """Classify a transaction_type label into 'in' / 'out' / 'internal' / 'other'."""
+    return TX_FLOW_GROUPS.get((tx or "").lower(), "other")
+
+
+def _flow_match(tx: str, flow_filter: str) -> bool:
+    """Return True iff a record's tx matches the requested flow filter.
+
+    `flow_filter` is one of: None, "all", "in", "out", "internal", "external".
+    "external" is shorthand for in+out (the 'honest' Drehem flow, with internal
+    transfers excluded so animals are not double-counted as they shuffle
+    between bureaus).
+    """
+    if not flow_filter or flow_filter == "all":
+        return True
+    f = _tx_flow(tx)
+    if flow_filter == "external":
+        return f in ("in", "out")
+    return f == flow_filter
+
+
+def _build_animal_contrib_cache():
+    """Read EXTRACTED once; populate the module-level contrib caches.
+
+    Done at startup. Subsequent /api/animals_timeline requests aggregate
+    from these caches with whatever filter parameters the client passed,
+    avoiding a re-read of the CSV.
     """
     from collections import Counter, defaultdict
 
-    # animal_base -> {period_label: [{tablet, count, animal}]}
-    # These contributions are kept module-level so the /api/animals_cell
-    # endpoint can serve drill-downs lazily without recomputing.
     contrib_year = defaultdict(lambda: defaultdict(list))
     contrib_month = defaultdict(lambda: defaultdict(list))
-    by_period_total_y = Counter()
-    by_period_total_m = Counter()
     tx_by_period_y = defaultdict(Counter)
-    tablets_by_period_y = Counter()
-    tablets_by_period_m = Counter()
+    tablet_period_tx = {}
     period_idx_year = {}
     period_idx_month = {}
 
@@ -1549,65 +1602,107 @@ def compute_animals_timeline():
             if not entries:
                 continue
 
-            tablets_by_period_y[label_y] += 1
-            if label_m: tablets_by_period_m[label_m] += 1
             tx = row.get("transaction_type") or "unknown"
+            tablet_period_tx[row["tablet_id"]] = (label_y, label_m, tx)
             tx_by_period_y[label_y][tx] += 1
 
             for count, animal in entries:
                 base = _animal_base(animal)
-                rec = {"tablet": row["tablet_id"], "count": count, "animal": animal}
+                rec = {"tablet": row["tablet_id"], "count": count,
+                       "animal": animal, "tx": tx}
                 contrib_year[base][label_y].append(rec)
-                if label_m: contrib_month[base][label_m].append(rec)
-                by_period_total_y[label_y] += count
-                if label_m: by_period_total_m[label_m] += count
+                if label_m:
+                    contrib_month[base][label_m].append(rec)
 
-    periods_year  = sorted(period_idx_year.keys(),  key=lambda p: period_idx_year[p])
-    periods_month = sorted(period_idx_month.keys(), key=lambda p: period_idx_month[p])
+    global ANIMAL_CONTRIB_YEAR, ANIMAL_CONTRIB_MONTH, TABLET_PERIOD_TX
+    global PERIODS_YEAR, PERIODS_MONTH, BY_PERIOD_TX
+    ANIMAL_CONTRIB_YEAR = {a: dict(d) for a, d in contrib_year.items()}
+    ANIMAL_CONTRIB_MONTH = {a: dict(d) for a, d in contrib_month.items()}
+    TABLET_PERIOD_TX = tablet_period_tx
+    PERIODS_YEAR = sorted(period_idx_year.keys(), key=lambda p: period_idx_year[p])
+    PERIODS_MONTH = sorted(period_idx_month.keys(), key=lambda p: period_idx_month[p])
+    BY_PERIOD_TX = {k: dict(v) for k, v in tx_by_period_y.items()}
 
-    # Per-animal aggregates. Per-cell tablet lists are NOT included in the
-    # main payload (would be ~3 MB JSON); callers fetch them on-demand via
-    # /api/animals_cell which reads from the cached contrib_* dicts.
+
+def aggregate_animals_timeline(flow=None, exclude=None):
+    """Aggregate the cached per-animal contribs under the given filters.
+
+    `flow` — one of None / "all" / "in" / "out" / "internal" / "external".
+    `exclude` — iterable of tablet IDs to drop from all aggregates.
+    Returns the same shape as the legacy compute_animals_timeline().
+    """
+    from collections import Counter
+
+    exclude_set = set(exclude or ())
+
+    # ─── Per-tablet matching: which tablets pass the filter? ───────────────
+    tablets_by_period_y = Counter()
+    tablets_by_period_m = Counter()
+    for tid, (py, pm, tx) in TABLET_PERIOD_TX.items():
+        if tid in exclude_set:
+            continue
+        if not _flow_match(tx, flow):
+            continue
+        tablets_by_period_y[py] += 1
+        if pm:
+            tablets_by_period_m[pm] += 1
+
+    # ─── Per-animal aggregates ─────────────────────────────────────────────
     def _summarize(contribs_by_period):
         out_count, out_tabs, out_max, total_c, total_t = {}, {}, {}, 0, 0
         for period, contribs in contribs_by_period.items():
-            psum = sum(c["count"] for c in contribs)
+            kept = [c for c in contribs
+                    if c["tablet"] not in exclude_set
+                    and _flow_match(c["tx"], flow)]
+            if not kept:
+                continue
+            psum = sum(c["count"] for c in kept)
             total_c += psum
-            total_t += len(contribs)
+            total_t += len(kept)
             out_count[period] = psum
-            out_tabs[period] = len(contribs)
-            out_max[period] = max(c["count"] for c in contribs)
+            out_tabs[period] = len(kept)
+            out_max[period] = max(c["count"] for c in kept)
         return out_count, out_tabs, out_max, total_c, total_t
 
     animals_out = []
-    overall_top = {}  # animal -> top 8 contributors across the corpus
-    for base, year_buckets in contrib_year.items():
+    by_period_total_y = Counter()
+    by_period_total_m = Counter()
+    for base, year_buckets in ANIMAL_CONTRIB_YEAR.items():
         cy, ty, mxy, tc, tt = _summarize(year_buckets)
-        cm, tm, mxm, _, _ = _summarize(contrib_month.get(base, {}))
-        # Overall top contributors (across the whole corpus, all periods)
-        all_contribs = [c for contribs in year_buckets.values() for c in contribs]
-        all_contribs.sort(key=lambda c: -c["count"])
-        overall_top[base] = all_contribs[:8]
+        cm, tm, mxm, _, _ = _summarize(ANIMAL_CONTRIB_MONTH.get(base, {}))
+        if tt < 2:
+            # Drop singleton animals (or those that vanish under the filter).
+            continue
+        for p, v in cy.items():
+            by_period_total_y[p] += v
+        for p, v in cm.items():
+            by_period_total_m[p] += v
+        # Top contributors: pick from the kept records, all periods.
+        all_kept = []
+        for contribs in year_buckets.values():
+            for c in contribs:
+                if c["tablet"] in exclude_set:
+                    continue
+                if not _flow_match(c["tx"], flow):
+                    continue
+                all_kept.append(c)
+        all_kept.sort(key=lambda c: -c["count"])
         animals_out.append({
             "name": base,
             "category": _animal_category(base),
             "label": base,
-            "by_period":          cy,
-            "by_period_tablets":  ty,
-            "by_period_max":      mxy,
-            "by_month":           cm,
-            "by_month_tablets":   tm,
-            "by_month_max":       mxm,
-            "top_contributors":   overall_top[base],  # corpus-wide top 8
-            "total_count":        tc,
-            "total_tablets":      tt,
+            "by_period":         cy,
+            "by_period_tablets": ty,
+            "by_period_max":     mxy,
+            "by_month":          cm,
+            "by_month_tablets":  tm,
+            "by_month_max":      mxm,
+            "top_contributors":  all_kept[:8],
+            "total_count":       tc,
+            "total_tablets":     tt,
         })
-
-    # Drop singleton animals
-    animals_out = [a for a in animals_out if a["total_tablets"] >= 2]
     animals_out.sort(key=lambda a: (-a["total_tablets"], -a["total_count"]))
 
-    # Sheep-to-tablet ratio per period — outlier spotter
     sheep_to_tablet_y = {}
     for p, n_tab in tablets_by_period_y.items():
         if n_tab > 0:
@@ -1618,33 +1713,39 @@ def compute_animals_timeline():
         for k, v in ANIMAL_CATEGORIES.items()
     }
 
-    # Publish contributions for the lazy /api/animals_cell endpoint.
-    global ANIMAL_CONTRIB_YEAR, ANIMAL_CONTRIB_MONTH
-    ANIMAL_CONTRIB_YEAR = {a: dict(d) for a, d in contrib_year.items()}
-    ANIMAL_CONTRIB_MONTH = {a: dict(d) for a, d in contrib_month.items()}
-
     return {
-        "periods":          periods_year,
-        "periods_month":    periods_month,
+        "periods":          PERIODS_YEAR,
+        "periods_month":    PERIODS_MONTH,
         "animals":          animals_out,
         "categories":       categories_out,
         "by_period_total":  dict(by_period_total_y),
         "by_month_total":   dict(by_period_total_m),
-        "by_period_tx":     {k: dict(v) for k, v in tx_by_period_y.items()},
+        "by_period_tx":     BY_PERIOD_TX,  # always corpus-wide, unfiltered
         "tablets_by_period": dict(tablets_by_period_y),
         "tablets_by_month":  dict(tablets_by_period_m),
         "sheep_to_tablet":   sheep_to_tablet_y,
+        "filter":            {"flow": flow or "all", "exclude": sorted(exclude_set)},
     }
 
 
-def get_animals_cell(animal: str, period: str, granularity: str = "year", limit: int = 100):
+def compute_animals_timeline():
+    """Startup entry: build the cache, return the unfiltered aggregation."""
+    _build_animal_contrib_cache()
+    return aggregate_animals_timeline()
+
+
+def get_animals_cell(animal: str, period: str, granularity: str = "year",
+                     limit: int = 100, flow=None, exclude=None):
     """Drill-down: return tablets that contributed to one (animal, period) cell.
 
-    `granularity` is "year" or "month". `period` is the period label
-    (e.g. "AS.05" for year, "AS.05.07" for month).
+    Honours the same flow / exclude filters as the timeline aggregator so
+    the drill-down agrees with the chart.
     """
     src = ANIMAL_CONTRIB_MONTH if granularity == "month" else ANIMAL_CONTRIB_YEAR
-    cell = src.get(animal, {}).get(period, [])
+    cell_all = src.get(animal, {}).get(period, [])
+    exclude_set = set(exclude or ())
+    cell = [c for c in cell_all
+            if c["tablet"] not in exclude_set and _flow_match(c["tx"], flow)]
     if not cell:
         return {"animal": animal, "period": period, "granularity": granularity,
                 "total_count": 0, "total_tablets": 0, "tablets": []}

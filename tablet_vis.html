@@ -2930,6 +2930,91 @@
       background: rgba(52, 211, 153, 0.1);
     }
 
+    /* Tag bar — per-animal allow-list and excluded-tablet manager */
+    .av-tagbar {
+      display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+      padding: 8px 10px; margin: 6px 0 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 11px;
+    }
+    .av-tagbar .tg-label {
+      color: var(--text-dim);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      font-size: 10px;
+      margin-right: 2px;
+    }
+    .av-tagbar .tg-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 8px 3px 8px;
+      border-radius: 12px;
+      background: rgba(52, 211, 153, .12);
+      border: 1px solid rgba(52, 211, 153, .35);
+      color: #34d399;
+      cursor: default;
+      max-width: 220px;
+    }
+    .av-tagbar .tg-chip.exclude {
+      background: rgba(255, 107, 129, .12);
+      border-color: rgba(255, 107, 129, .35);
+      color: #ff8aa0;
+    }
+    .av-tagbar .tg-chip .x {
+      cursor: pointer;
+      opacity: .6;
+      font-size: 12px;
+      line-height: 1;
+      padding: 0 2px;
+    }
+    .av-tagbar .tg-chip .x:hover { opacity: 1; }
+    .av-tagbar .tg-clear {
+      cursor: pointer;
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-size: 10px;
+      background: transparent;
+    }
+    .av-tagbar .tg-clear:hover { color: var(--text); border-color: #34d399; }
+
+    /* Per-row "tag this animal" affordance, fades in on row hover */
+    .av-row .av-tag-add {
+      opacity: 0;
+      cursor: pointer;
+      margin-left: auto;
+      padding: 2px 6px;
+      font-size: 10px;
+      color: var(--text-dim);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      transition: opacity .15s, color .15s, border-color .15s;
+    }
+    .av-row:hover .av-tag-add { opacity: 1; }
+    .av-row .av-tag-add:hover { color: #34d399; border-color: #34d399; }
+    .av-row.tagged .av-tag-add { opacity: 1; color: #34d399; border-color: #34d399; border-style: solid; }
+
+    /* Cell-drilldown per-tablet exclude button */
+    .av-list .e .ex-btn {
+      cursor: pointer;
+      margin-left: 6px;
+      padding: 1px 6px;
+      font-size: 10px;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      opacity: .7;
+    }
+    .av-list .e .ex-btn:hover { color: #ff6b81; border-color: #ff6b81; opacity: 1; }
+    .av-list .e .ex-btn.excluded { color: #ff6b81; border-color: #ff6b81; opacity: 1; }
+
+    /* Refresh dim overlay while server filter is recomputing */
+    .anim-view.refreshing .av-frame,
+    .anim-view.refreshing .av-hero { opacity: .5; transition: opacity .15s; }
+
     /* Frame & track area */
     .av-frame {
       background: var(--surface);
@@ -5306,7 +5391,32 @@
       heroMetric: 'absolute',   // absolute | share — area-chart y-axis
       heroFocusYear: null,      // when set, hero zooms to month-level for that year
       selected: null,           // animal name
+      flow: 'all',              // all | in | out | external — Drehem flow direction
+      tags: new Set(),          // animal-name allow-list; empty = show all
+      excludedTablets: new Set(), // P-ids to drop from server-side aggregation
     };
+
+    // Fetch the timeline with current server-side filters (flow + excludedTablets).
+    // Returns the new payload; caller is responsible for storing it and re-rendering.
+    async function avFetchTimeline() {
+      const params = new URLSearchParams();
+      if (AV_STATE.flow && AV_STATE.flow !== 'all') params.set('flow', AV_STATE.flow);
+      if (AV_STATE.excludedTablets.size) params.set('exclude', [...AV_STATE.excludedTablets].join(','));
+      const url = `${API}/api/animals_timeline${params.toString() ? '?' + params : ''}`;
+      const r = await fetch(url);
+      return await r.json();
+    }
+
+    // Re-fetch + re-render when a server-side filter (flow/exclude) changes.
+    async function avRefreshAfterServerFilter() {
+      const view = document.getElementById('avView');
+      if (view) view.classList.add('refreshing');
+      try { animalsData = await avFetchTimeline(); }
+      catch (e) { console.error('animals refetch failed', e); return; }
+      finally { if (view) view.classList.remove('refreshing'); }
+      avRenderHero(); avRenderGrid(); avSyncToolbarUI();
+      if (AV_STATE.selected) avRenderDetail(AV_STATE.selected);
+    }
     const AV_CAT_ORDER = ['sheep_adult', 'sheep_young', 'goat_adult', 'goat_young', 'cattle_adult', 'cattle_young', 'equids', 'other'];
     const AV_CAT_COLOR = { sheep_adult: '#22c55e', sheep_young: '#86efac', goat_adult: '#0ea5e9', goat_young: '#7dd3fc', cattle_adult: '#a855f7', cattle_young: '#d8b4fe', equids: '#f59e0b', other: '#94a3b8' };
     const AV_CAT_LABEL = { sheep_adult: 'Sheep', sheep_young: 'Lambs', goat_adult: 'Goats', goat_young: 'Kids', cattle_adult: 'Cattle', cattle_young: 'Calves', equids: 'Equids', other: 'Other' };
@@ -5318,10 +5428,8 @@
       app.classList.add('animals-mode');
       if (!animalsData) {
         main.innerHTML = '<div class="empty-state" style="padding:40px;"><div class="spinner"></div> Loading livestock timeline...</div>';
-        try {
-          const r = await fetch(`${API}/api/animals_timeline`);
-          animalsData = await r.json();
-        } catch (e) {
+        try { animalsData = await avFetchTimeline(); }
+        catch (e) {
           main.innerHTML = '<div class="tl-empty">Failed to load animals data.</div>';
           return;
         }
@@ -5382,6 +5490,15 @@
                 <span class="av-mode-side"   data-mode="tablets">Tablets</span>
               </span>
             </div>
+            <div style="display:flex;align-items:center;gap:6px;" title="Filter by Drehem flow direction. 'External' (intake + disbursal) avoids double-counting animals shuffled between bureaus via i3-dab5 / szu ba-ti.">
+              <span class="tb-label">Flow</span>
+              <span class="av-mode" id="avFlow">
+                <span class="av-mode-side on" data-flow="all">All</span>
+                <span class="av-mode-side"    data-flow="in">In</span>
+                <span class="av-mode-side"    data-flow="out">Out</span>
+                <span class="av-mode-side"    data-flow="external">In+Out</span>
+              </span>
+            </div>
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
               <span class="tb-label">Categories</span>
               <span class="av-cat-chip" data-cat="sheep_adult"><span class="av-dot" style="background:var(--av-c-sheep_adult);"></span>Sheep</span>
@@ -5401,6 +5518,9 @@
             <div style="flex:1;"></div>
             <div class="av-tb-toggle" id="avReset">Reset</div>
           </div>
+
+          <!-- Tag bar: per-animal allow-list and excluded-tablet manager. Hidden when both empty. -->
+          <div class="av-tagbar" id="avTagbar" style="display:none;"></div>
 
           <div class="av-frame">
             <div class="av-scroll" id="avScroll">
@@ -5442,6 +5562,14 @@
         document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
         avRenderGrid();
       });
+      // Flow direction (server-side filter — triggers a refetch)
+      $('avFlow').addEventListener('click', e => {
+        const side = e.target.closest('.av-mode-side');
+        if (!side || side.dataset.flow === AV_STATE.flow) return;
+        AV_STATE.flow = side.dataset.flow;
+        document.querySelectorAll('#avFlow .av-mode-side').forEach(s => s.classList.toggle('on', s === side));
+        avRefreshAfterServerFilter();
+      });
       $('avOutTog').addEventListener('click', () => {
         AV_STATE.showOutliers = !AV_STATE.showOutliers;
         $('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
@@ -5460,6 +5588,7 @@
         avRenderHero();
       });
       $('avReset').addEventListener('click', () => {
+        const hadServerFilter = AV_STATE.flow !== 'all' || AV_STATE.excludedTablets.size > 0;
         Object.keys(AV_STATE.catOn).forEach(k => AV_STATE.catOn[k] = true);
         AV_STATE.query = '';
         AV_STATE.sort = 'tablets';
@@ -5469,6 +5598,9 @@
         AV_STATE.heroMetric = 'absolute';
         AV_STATE.heroFocusYear = null;
         AV_STATE.selected = null;
+        AV_STATE.flow = 'all';
+        AV_STATE.tags.clear();
+        AV_STATE.excludedTablets.clear();
         $('avSearch').value = '';
         $('avSort').value = 'tablets';
         $('avZoom').value = 28;
@@ -5476,11 +5608,68 @@
         document.querySelectorAll('#avToolbar .av-cat-chip').forEach(el => el.classList.remove('off'));
         document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === 'animals'));
         document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === 'absolute'));
+        document.querySelectorAll('#avFlow .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.flow === 'all'));
         $('avOutTog').classList.add('on');
         $('avDetail').classList.remove('open');
-        avRenderHero();
-        avRenderGrid();
+        if (hadServerFilter) avRefreshAfterServerFilter();
+        else { avRenderHero(); avRenderGrid(); avRenderTagbar(); }
       });
+    }
+
+    // Toggle an animal name into AV_STATE.tags. Tags are a client-side
+    // allow-list — if non-empty, the grid shows only those animals.
+    function avToggleTag(name) {
+      if (AV_STATE.tags.has(name)) AV_STATE.tags.delete(name);
+      else AV_STATE.tags.add(name);
+      avRenderTagbar();
+      avRenderGrid();
+    }
+
+    // Toggle a tablet ID in the excluded set, then refetch (server-side filter).
+    async function avToggleExcludedTablet(id) {
+      if (AV_STATE.excludedTablets.has(id)) AV_STATE.excludedTablets.delete(id);
+      else AV_STATE.excludedTablets.add(id);
+      await avRefreshAfterServerFilter();
+      // If the cell drilldown is open for the cell we're excluding from,
+      // re-fetch its panel too so the per-tablet list updates.
+      const detail = document.getElementById('avDetail');
+      if (detail && detail.classList.contains('open') && detail.dataset.cellAnimal && detail.dataset.cellPeriod) {
+        avShowCellDrilldown(detail.dataset.cellAnimal, detail.dataset.cellPeriod, detail.dataset.cellGran);
+      }
+    }
+
+    // Render the tag bar (selected animal tags + excluded tablets).
+    // Hidden when both lists are empty.
+    function avRenderTagbar() {
+      const bar = document.getElementById('avTagbar');
+      if (!bar) return;
+      const tags = [...AV_STATE.tags];
+      const excluded = [...AV_STATE.excludedTablets];
+      if (tags.length === 0 && excluded.length === 0) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+      let html = '';
+      if (tags.length) {
+        html += `<span class="tg-label">Showing only</span>`;
+        for (const t of tags) {
+          html += `<span class="tg-chip" title="Click × to remove tag">${esc(t)}<span class="x" data-rm-tag="${esc(t)}">&times;</span></span>`;
+        }
+        html += `<span class="tg-clear" data-clear="tags">Clear tags</span>`;
+      }
+      if (excluded.length) {
+        if (tags.length) html += `<span style="width:1px;height:18px;background:var(--border);margin:0 4px;"></span>`;
+        html += `<span class="tg-label">Excluded tablets</span>`;
+        for (const id of excluded) {
+          html += `<span class="tg-chip exclude" title="Click × to re-include">P${esc(id)}<span class="x" data-rm-excl="${esc(id)}">&times;</span></span>`;
+        }
+        html += `<span class="tg-clear" data-clear="excluded">Clear exclusions</span>`;
+      }
+      bar.innerHTML = html;
+      bar.style.display = '';
+      bar.querySelectorAll('[data-rm-tag]').forEach(el => el.addEventListener('click', () => avToggleTag(el.dataset.rmTag)));
+      bar.querySelectorAll('[data-rm-excl]').forEach(el => el.addEventListener('click', () => avToggleExcludedTablet(el.dataset.rmExcl)));
+      bar.querySelectorAll('[data-clear]').forEach(el => el.addEventListener('click', () => {
+        if (el.dataset.clear === 'tags') { AV_STATE.tags.clear(); avRenderTagbar(); avRenderGrid(); }
+        else { AV_STATE.excludedTablets.clear(); avRefreshAfterServerFilter(); }
+      }));
     }
     function avSyncToolbarUI() {
       document.getElementById('avSearch').value = AV_STATE.query;
@@ -5492,14 +5681,25 @@
       });
       document.querySelectorAll('#avMode .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.mode === AV_STATE.mode));
       document.querySelectorAll('#avHeroMetric .av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.metric === AV_STATE.heroMetric));
+      const flowSeg = document.getElementById('avFlow');
+      if (flowSeg) flowSeg.querySelectorAll('.av-mode-side').forEach(s => s.classList.toggle('on', s.dataset.flow === AV_STATE.flow));
       document.getElementById('avOutTog').classList.toggle('on', AV_STATE.showOutliers);
+      avRenderTagbar();
     }
 
     function avVisibleAnimals() {
-      let list = animalsData.animals.filter(a => AV_STATE.catOn[a.category]);
-      if (AV_STATE.query) {
-        const q = AV_STATE.query;
-        list = list.filter(a => a.name.toLowerCase().includes(q) || a.category.includes(q));
+      // Tag allow-list takes precedence: if any tags are set, the grid shows
+      // only those animals (categories/search ignored). Empty tags = default
+      // category + search filtering.
+      let list;
+      if (AV_STATE.tags.size > 0) {
+        list = animalsData.animals.filter(a => AV_STATE.tags.has(a.name));
+      } else {
+        list = animalsData.animals.filter(a => AV_STATE.catOn[a.category]);
+        if (AV_STATE.query) {
+          const q = AV_STATE.query;
+          list = list.filter(a => a.name.toLowerCase().includes(q) || a.category.includes(q));
+        }
       }
       switch (AV_STATE.sort) {
         case 'total': list.sort((a, b) => b.total_count - a.total_count); break;
@@ -5579,11 +5779,13 @@
         const color = `var(--av-c-${cat})`;
         const isSel = AV_STATE.selected === x.name;
         const fade = AV_STATE.selected && AV_STATE.selected !== x.name;
-        html += `<div class="av-row${isSel ? ' selected' : ''}${fade ? ' fade' : ''}" data-name="${esc(x.name)}" style="animation-delay:${Math.min(0.4, idx * 0.012)}s;">
+        const tagged = AV_STATE.tags.has(x.name);
+        html += `<div class="av-row${isSel ? ' selected' : ''}${fade ? ' fade' : ''}${tagged ? ' tagged' : ''}" data-name="${esc(x.name)}" style="animation-delay:${Math.min(0.4, idx * 0.012)}s;">
           <div class="av-name-cell" data-name="${esc(x.name)}">
             <span class="av-name-marker" style="background:${color};"></span>
             <span class="av-name-text" title="${esc(x.name)}">${esc(x.name)}</span>
             <span class="av-name-cat">${esc(cat.replace('_', ' '))}</span>
+            <span class="av-tag-add" data-tag="${esc(x.name)}" title="${tagged ? 'Untag' : 'Tag — show only this animal (and other tagged)'}">${tagged ? '✓ tag' : '+ tag'}</span>
           </div>
           <div class="av-track" style="width:${trackWidth}px;">`;
         let barI = 0;
@@ -5646,6 +5848,12 @@
       area.querySelectorAll('.av-row').forEach(el => {
         el.addEventListener('click', e => {
           if (e.target.closest('.av-bar')) return;
+          if (e.target.closest('.av-tag-add')) {
+            // Tag affordance — toggle membership in the allow-list and stop bubbling.
+            avToggleTag(el.dataset.name);
+            e.stopPropagation();
+            return;
+          }
           Router.goto(el.dataset.name === AV_STATE.selected ? { view: 'an' } : { view: 'an-animal', name: el.dataset.name });
         });
       });
@@ -5881,6 +6089,10 @@
     async function avShowCellDrilldown(animal, period, granularity) {
       granularity = granularity || (period.split('.').length === 3 ? 'month' : 'year');
       const detail = document.getElementById('avDetail');
+      // Stash on the panel so avToggleExcludedTablet can re-fetch the same cell.
+      detail.dataset.cellAnimal = animal;
+      detail.dataset.cellPeriod = period;
+      detail.dataset.cellGran = granularity;
       detail.classList.add('open');
       detail.innerHTML = `<div class="av-detail-head">
           <div>
@@ -5892,9 +6104,17 @@
         <div class="av-detail-body"><div class="loading"><div class="spinner"></div> Loading…</div></div>`;
       document.getElementById('avDetailClose').addEventListener('click', () => Router.goto({ view: 'an' }));
 
+      // Honour active flow / exclude filters when fetching the cell, so the
+      // drill-down agrees with whatever the chart currently shows.
+      const cellParams = new URLSearchParams({
+        animal, period, granularity,
+      });
+      if (AV_STATE.flow && AV_STATE.flow !== 'all') cellParams.set('flow', AV_STATE.flow);
+      if (AV_STATE.excludedTablets.size) cellParams.set('exclude', [...AV_STATE.excludedTablets].join(','));
+
       let cell;
       try {
-        const r = await fetch(`${API}/api/animals_cell?animal=${encodeURIComponent(animal)}&period=${encodeURIComponent(period)}&granularity=${granularity}`);
+        const r = await fetch(`${API}/api/animals_cell?${cellParams}`);
         cell = await r.json();
       } catch (e) {
         detail.querySelector('.av-detail-body').innerHTML = '<div class="tl-empty">Failed to load drill-down.</div>';
@@ -5914,7 +6134,7 @@
               <span class="av-detail-badge" style="background:${color};">${esc(cat.replace('_', ' '))}</span>
               ${esc(animal)} · ${esc(period)}
             </h3>
-            <div class="av-detail-sub">${cell.total_count.toLocaleString()} animals across ${cell.total_tablets.toLocaleString()} tablets </div>
+            <div class="av-detail-sub">${cell.total_count.toLocaleString()} animals across ${cell.total_tablets.toLocaleString()} tablets · click any P-id to open · click <span style="color:#ff8aa0;">×</span> to exclude that tablet from totals</div>
           </div>
           <span class="av-detail-close" id="avDetailClose">&times;</span>
         </div>
@@ -5926,12 +6146,16 @@
                 <span class="nm" data-tablet="${esc(t.tablet)}" title="Open P${esc(t.tablet)}">P${esc(t.tablet)} <span style="color:var(--text-dim);font-size:10px;">${esc(t.animal)}</span></span>
                 <span class="bar"><span style="width:${Math.round(t.count / max * 100)}%;background:${color};"></span></span>
                 <span class="c">${t.count.toLocaleString()}</span>
+                <span class="ex-btn${AV_STATE.excludedTablets.has(t.tablet) ? ' excluded' : ''}" data-excl="${esc(t.tablet)}" title="${AV_STATE.excludedTablets.has(t.tablet) ? 'Re-include this tablet' : 'Exclude this tablet from all totals'}">${AV_STATE.excludedTablets.has(t.tablet) ? '✓' : '×'}</span>
               </div>`).join('')}
           </div>
         </div>`;
       document.getElementById('avDetailClose').addEventListener('click', () => Router.goto({ view: 'an' }));
       detail.querySelectorAll('.nm[data-tablet]').forEach(el => {
         el.addEventListener('click', () => Router.goto({ view: 'tablet', id: el.dataset.tablet }));
+      });
+      detail.querySelectorAll('.ex-btn[data-excl]').forEach(el => {
+        el.addEventListener('click', e => { e.stopPropagation(); avToggleExcludedTablet(el.dataset.excl); });
       });
       detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
