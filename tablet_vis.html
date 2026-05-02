@@ -95,9 +95,17 @@
 
     /* Timeline view takes the full main + right-panel width.
        The right panel collapses, the sidebar is hidden by default. */
-    .app.timeline-mode { grid-template-columns: 0px 1fr 0; }
-    .app.timeline-mode.sidebar-open { grid-template-columns: 300px 1fr 0; }
-    .app.timeline-mode #rightPanel { display: none; }
+    .app.timeline-mode {
+      grid-template-columns: 0px 1fr 0;
+    }
+
+    .app.timeline-mode.sidebar-open {
+      grid-template-columns: 300px 1fr 0;
+    }
+
+    .app.timeline-mode #rightPanel {
+      display: none;
+    }
 
     /* Header */
     .header {
@@ -739,8 +747,15 @@
     }
 
     @keyframes damagePulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
+
+      0%,
+      100% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
     }
 
     /* When hovering over a damaged token, make the indicator more prominent */
@@ -1975,11 +1990,13 @@
       --tl-c-X: #ff6b81;
       padding: 24px 28px 60px;
     }
+
     .timeline-view h2 {
       font-size: 22px;
       font-weight: 700;
       margin-bottom: 4px;
     }
+
     .timeline-view .tl-subtitle {
       font-size: 12px;
       color: var(--text-dim);
@@ -1999,11 +2016,13 @@
       margin-bottom: 14px;
       font-size: 12px;
     }
+
     .tl-toolbar .tl-tb-group {
       display: flex;
       align-items: center;
       gap: 6px;
     }
+
     .tl-toolbar .tl-tb-label {
       font-size: 10px;
       text-transform: uppercase;
@@ -2011,6 +2030,7 @@
       color: var(--text-dim);
       margin-right: 2px;
     }
+
     .tl-toolbar input[type=text] {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -2021,7 +2041,11 @@
       width: 160px;
       outline: none;
     }
-    .tl-toolbar input[type=text]:focus { border-color: var(--accent); }
+
+    .tl-toolbar input[type=text]:focus {
+      border-color: var(--accent);
+    }
+
     .tl-toolbar select {
       background: var(--surface2);
       border: 1px solid var(--border);
@@ -2031,7 +2055,11 @@
       font-size: 12px;
       outline: none;
     }
-    .tl-toolbar input[type=range] { width: 110px; }
+
+    .tl-toolbar input[type=range] {
+      width: 110px;
+    }
+
     .tl-chip {
       cursor: pointer;
       padding: 3px 9px;
@@ -2045,12 +2073,22 @@
       align-items: center;
       gap: 5px;
     }
-    .tl-chip:hover { border-color: var(--border-glow); }
-    .tl-chip.off { opacity: 0.35; }
+
+    .tl-chip:hover {
+      border-color: var(--border-glow);
+    }
+
+    .tl-chip.off {
+      opacity: 0.35;
+    }
+
     .tl-chip .tl-dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       display: inline-block;
     }
+
     .tl-tb-toggle {
       cursor: pointer;
       padding: 4px 10px;
@@ -2060,11 +2098,13 @@
       font-size: 11px;
       user-select: none;
     }
+
     .tl-tb-toggle.on {
       border-color: var(--accent);
       color: var(--accent);
       background: rgba(74, 158, 255, 0.1);
     }
+
     .tl-name-switch {
       display: inline-flex;
       align-items: center;
@@ -2078,7 +2118,11 @@
       font-size: 11px;
       position: relative;
     }
-    .tl-name-switch input { display: none; }
+
+    .tl-name-switch input {
+      display: none;
+    }
+
     .tl-name-switch .tl-name-side {
       padding: 3px 10px;
       border-radius: 999px;
@@ -2086,13 +2130,17 @@
       color: var(--text-dim);
       z-index: 1;
     }
+
     .tl-name-switch.norm .tl-name-side[data-mode="norm"],
-    .tl-name-switch.raw  .tl-name-side[data-mode="raw"] {
+    .tl-name-switch.raw .tl-name-side[data-mode="raw"] {
       background: var(--accent);
       color: #051018;
       font-weight: 700;
     }
-    .tl-name-knob { display: none; }
+
+    .tl-name-knob {
+      display: none;
+    }
 
     /* Frame & scroller */
     .tl-frame {
@@ -2101,6 +2149,7 @@
       border-radius: 12px;
       overflow: hidden;
     }
+
     .tl-scroll {
       overflow-x: auto;
       overflow-y: visible;
@@ -2108,6 +2157,7 @@
       overflow-y: auto;
       position: relative;
     }
+
     .tl-track-area {
       min-width: max-content;
       font-family: 'JetBrains Mono', monospace;
@@ -2125,6 +2175,7 @@
       border-bottom: 1px solid var(--border-glow);
       height: var(--tl-axis-h);
     }
+
     .tl-axis-name {
       width: var(--tl-name-w);
       flex: 0 0 auto;
@@ -2138,10 +2189,12 @@
       border-right: 1px solid var(--border);
       background: var(--surface);
     }
+
     .tl-axis-track {
       flex: 0 0 auto;
       position: relative;
     }
+
     .tl-axis-meta {
       width: var(--tl-meta-w);
       flex: 0 0 auto;
@@ -2156,6 +2209,7 @@
       border-left: 1px solid var(--border);
       background: var(--surface);
     }
+
     .tl-reign-band {
       position: absolute;
       top: 4px;
@@ -2174,10 +2228,12 @@
       overflow: hidden;
       white-space: nowrap;
     }
+
     .tl-reign-band span {
       padding: 0 8px;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
     }
+
     .tl-period-label {
       position: absolute;
       bottom: 8px;
@@ -2196,29 +2252,43 @@
       cursor: pointer;
       user-select: none;
     }
-    .tl-period-label:hover { color: var(--text); }
+
+    .tl-period-label:hover {
+      color: var(--text);
+    }
+
     .tl-period-label.reign-start {
       color: var(--accent);
       font-weight: 700;
     }
+
     .tl-period-label.active {
       color: var(--accent);
     }
+
     .tl-period-marker {
       position: absolute;
-      top: 0; bottom: 0;
+      top: 0;
+      bottom: 0;
       width: 1px;
       background: rgba(80, 90, 130, 0.18);
       pointer-events: none;
     }
+
     .tl-period-marker.reign {
       background: rgba(74, 158, 255, 0.4);
       width: 1px;
     }
 
     /* Office groups */
-    .tl-office-group { border-bottom: 1px solid var(--border); }
-    .tl-office-group:last-child { border-bottom: none; }
+    .tl-office-group {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tl-office-group:last-child {
+      border-bottom: none;
+    }
+
     .tl-office-header {
       display: flex;
       align-items: center;
@@ -2232,7 +2302,11 @@
       left: 0;
       z-index: 2;
     }
-    .tl-office-header:hover { background: rgba(255, 255, 255, 0.04); }
+
+    .tl-office-header:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
     .tl-office-header .tl-chevron {
       display: inline-block;
       width: 10px;
@@ -2240,18 +2314,24 @@
       color: var(--text-dim);
       font-size: 9px;
     }
-    .tl-office-group.collapsed .tl-chevron { transform: rotate(-90deg); }
+
+    .tl-office-group.collapsed .tl-chevron {
+      transform: rotate(-90deg);
+    }
+
     .tl-office-header .tl-office-color {
       width: 8px;
       height: 16px;
       border-radius: 2px;
     }
+
     .tl-office-header .tl-office-label {
       font-size: 12px;
       font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
     }
+
     .tl-office-header .tl-office-count {
       font-size: 10px;
       color: var(--text-dim);
@@ -2259,10 +2339,12 @@
       text-transform: none;
       letter-spacing: 0;
     }
+
     .tl-office-rows {
       overflow: hidden;
       transition: max-height 0.3s ease;
     }
+
     .tl-office-group.collapsed .tl-office-rows {
       max-height: 0 !important;
     }
@@ -2274,12 +2356,20 @@
       height: var(--tl-row-h);
       transition: background 0.12s;
     }
-    .tl-official:hover { background: rgba(74, 158, 255, 0.04); }
+
+    .tl-official:hover {
+      background: rgba(74, 158, 255, 0.04);
+    }
+
     .tl-official.selected {
       background: rgba(74, 158, 255, 0.1);
       box-shadow: inset 3px 0 0 var(--accent);
     }
-    .tl-official.fade { opacity: 0.25; }
+
+    .tl-official.fade {
+      opacity: 0.25;
+    }
+
     .tl-name-cell {
       width: var(--tl-name-w);
       flex: 0 0 auto;
@@ -2294,11 +2384,22 @@
       background: inherit;
       z-index: 1;
     }
-    .tl-official:not(.selected) .tl-name-cell { background: var(--surface); }
-    .tl-official.selected .tl-name-cell { background: rgba(74, 158, 255, 0.12); }
-    .tl-name-cell .tl-name-marker {
-      width: 6px; height: 6px; border-radius: 50%; flex: 0 0 auto;
+
+    .tl-official:not(.selected) .tl-name-cell {
+      background: var(--surface);
     }
+
+    .tl-official.selected .tl-name-cell {
+      background: rgba(74, 158, 255, 0.12);
+    }
+
+    .tl-name-cell .tl-name-marker {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
     .tl-name-cell .tl-name-text {
       flex: 1;
       white-space: nowrap;
@@ -2306,6 +2407,7 @@
       text-overflow: ellipsis;
       font-size: 11px;
     }
+
     .tl-name-cell .tl-name-sub {
       font-size: 9px;
       color: var(--text-dim);
@@ -2314,6 +2416,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
     .tl-track {
       flex: 0 0 auto;
       position: relative;
@@ -2321,6 +2424,7 @@
         linear-gradient(to right, transparent calc(var(--tl-cell-w) - 1px), rgba(80, 90, 130, 0.12) calc(var(--tl-cell-w) - 1px), rgba(80, 90, 130, 0.12) var(--tl-cell-w), transparent var(--tl-cell-w));
       background-size: var(--tl-cell-w) 100%;
     }
+
     .tl-tenure-band {
       position: absolute;
       top: 4px;
@@ -2329,6 +2433,7 @@
       opacity: 0.08;
       pointer-events: none;
     }
+
     .tl-bar {
       position: absolute;
       bottom: 4px;
@@ -2338,16 +2443,27 @@
       transition: filter 0.15s, transform 0.15s;
       transform-origin: bottom;
     }
+
     .tl-bar:hover {
       filter: brightness(1.5);
       transform: scaleX(1.4);
       z-index: 3;
     }
+
     @keyframes tl-grow {
-      from { transform: scaleY(0); }
-      to   { transform: scaleY(1); }
+      from {
+        transform: scaleY(0);
+      }
+
+      to {
+        transform: scaleY(1);
+      }
     }
-    .tl-bar.animate { animation: tl-grow 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards; }
+
+    .tl-bar.animate {
+      animation: tl-grow 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards;
+    }
+
     .tl-meta-cell {
       width: var(--tl-meta-w);
       flex: 0 0 auto;
@@ -2361,6 +2477,7 @@
       border-left: 1px solid var(--border);
       background: var(--surface);
     }
+
     .tl-meta-cell .tl-meta-num {
       color: var(--text);
       font-weight: 600;
@@ -2374,6 +2491,7 @@
       z-index: 4;
       overflow: visible;
     }
+
     .tl-edge-path {
       fill: none;
       stroke-linecap: round;
@@ -2390,7 +2508,12 @@
       overflow: hidden;
       display: none;
     }
-    .tl-detail-panel.open { display: block; animation: fadeInUp 0.25s ease both; }
+
+    .tl-detail-panel.open {
+      display: block;
+      animation: fadeInUp 0.25s ease both;
+    }
+
     .tl-detail-head {
       padding: 16px 20px;
       background: linear-gradient(135deg, rgba(74, 158, 255, 0.06), transparent);
@@ -2401,6 +2524,7 @@
       gap: 14px;
       flex-wrap: wrap;
     }
+
     .tl-detail-head h3 {
       font-size: 17px;
       margin: 0 0 3px 0;
@@ -2408,6 +2532,7 @@
       align-items: center;
       gap: 10px;
     }
+
     .tl-detail-head .tl-detail-badge {
       font-size: 10px;
       padding: 3px 8px;
@@ -2417,37 +2542,49 @@
       font-weight: 700;
       color: #000;
     }
+
     .tl-detail-head .tl-detail-sub {
       font-size: 11px;
       color: var(--text-dim);
       letter-spacing: 0.4px;
     }
+
     .tl-detail-close {
       cursor: pointer;
       font-size: 18px;
       color: var(--text-dim);
       padding: 0 4px;
     }
-    .tl-detail-close:hover { color: var(--text); }
-    .tl-detail-body { padding: 16px 20px 20px; }
+
+    .tl-detail-close:hover {
+      color: var(--text);
+    }
+
+    .tl-detail-body {
+      padding: 16px 20px 20px;
+    }
+
     .tl-stat-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 10px;
       margin-bottom: 18px;
     }
+
     .tl-stat {
       background: var(--surface2);
       padding: 10px 14px;
       border-radius: 8px;
       border: 1px solid var(--border);
     }
+
     .tl-stat .v {
       font-size: 22px;
       font-weight: 700;
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
     }
+
     .tl-stat .l {
       font-size: 10px;
       color: var(--text-dim);
@@ -2455,12 +2592,19 @@
       letter-spacing: 0.5px;
       margin-top: 2px;
     }
+
     .tl-network-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
     }
-    @media (max-width: 720px) { .tl-network-grid { grid-template-columns: 1fr; } }
+
+    @media (max-width: 720px) {
+      .tl-network-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .tl-network-grid h4 {
       font-size: 11px;
       color: var(--text-dim);
@@ -2468,6 +2612,7 @@
       letter-spacing: 0.5px;
       margin: 0 0 8px 0;
     }
+
     .tl-edge-list .e {
       display: grid;
       grid-template-columns: 130px 1fr 40px;
@@ -2477,6 +2622,7 @@
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
     }
+
     .tl-edge-list .e .nm {
       color: var(--text);
       white-space: nowrap;
@@ -2484,19 +2630,25 @@
       text-overflow: ellipsis;
       cursor: pointer;
     }
-    .tl-edge-list .e .nm:hover { color: var(--accent); }
+
+    .tl-edge-list .e .nm:hover {
+      color: var(--accent);
+    }
+
     .tl-edge-list .e .bar {
       height: 6px;
       border-radius: 3px;
       background: var(--surface2);
       overflow: hidden;
     }
-    .tl-edge-list .e .bar > span {
+
+    .tl-edge-list .e .bar>span {
       display: block;
       height: 100%;
       border-radius: 3px;
       transition: width 0.4s ease;
     }
+
     .tl-edge-list .e .c {
       color: var(--accent);
       font-weight: 600;
@@ -2519,10 +2671,25 @@
       transition: opacity 0.12s;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
-    .tl-tip.visible { opacity: 1; }
-    .tl-tip .t-name { color: var(--accent); font-weight: 600; }
-    .tl-tip .t-period { color: var(--text-dim); margin-left: 6px; }
-    .tl-tip .t-count { color: var(--text); margin-top: 2px; }
+
+    .tl-tip.visible {
+      opacity: 1;
+    }
+
+    .tl-tip .t-name {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tl-tip .t-period {
+      color: var(--text-dim);
+      margin-left: 6px;
+    }
+
+    .tl-tip .t-count {
+      color: var(--text);
+      margin-top: 2px;
+    }
 
     .tl-empty {
       padding: 28px;
@@ -2540,8 +2707,15 @@
       --border-glow: rgba(52, 211, 153, 0.45);
       --gold-glow: rgba(52, 211, 153, 0.06);
     }
-    .app.animals-mode .header h1 span { color: #34d399; }
-    .app.animals-mode #btnAnimals { border-color: #34d399; color: #34d399; }
+
+    .app.animals-mode .header h1 span {
+      color: #34d399;
+    }
+
+    .app.animals-mode #btnAnimals {
+      border-color: #34d399;
+      color: #34d399;
+    }
 
     .anim-view {
       --av-cell-w: 28px;
@@ -2549,21 +2723,30 @@
       --av-axis-h: 92px;
       --av-name-w: 220px;
       --av-meta-w: 130px;
-      --av-c-sheep_adult:  #22c55e;
-      --av-c-sheep_young:  #86efac;
-      --av-c-goat_adult:   #0ea5e9;
-      --av-c-goat_young:   #7dd3fc;
+      --av-c-sheep_adult: #22c55e;
+      --av-c-sheep_young: #86efac;
+      --av-c-goat_adult: #0ea5e9;
+      --av-c-goat_young: #7dd3fc;
       --av-c-cattle_adult: #a855f7;
       --av-c-cattle_young: #d8b4fe;
-      --av-c-equids:       #f59e0b;
-      --av-c-other:        #94a3b8;
+      --av-c-equids: #f59e0b;
+      --av-c-other: #94a3b8;
       padding: 24px 28px 60px;
       animation: fadeInUp 0.32s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
+
     @keyframes avFade {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
+
     .anim-view h2 {
       font-size: 22px;
       font-weight: 700;
@@ -2572,17 +2755,30 @@
       align-items: center;
       gap: 10px;
     }
+
     .anim-view h2 .av-pulse {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: #34d399;
       box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
       animation: avPulse 1.8s ease-out infinite;
     }
+
     @keyframes avPulse {
-      0%   { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6); }
-      80%  { box-shadow: 0 0 0 14px rgba(52, 211, 153, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.6);
+      }
+
+      80% {
+        box-shadow: 0 0 0 14px rgba(52, 211, 153, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+      }
     }
+
     .anim-view .av-subtitle {
       font-size: 12px;
       color: var(--text-dim);
@@ -2596,6 +2792,7 @@
       gap: 10px;
       margin-bottom: 14px;
     }
+
     .av-strip .av-stat {
       background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), rgba(34, 197, 94, 0.02));
       border: 1px solid rgba(52, 211, 153, 0.2);
@@ -2603,16 +2800,19 @@
       padding: 12px 14px;
       transition: transform 0.18s, border-color 0.18s;
     }
+
     .av-strip .av-stat:hover {
       transform: translateY(-2px);
       border-color: rgba(52, 211, 153, 0.5);
     }
+
     .av-strip .av-stat .v {
       font-family: 'JetBrains Mono', monospace;
       font-size: 22px;
       font-weight: 700;
       color: #34d399;
     }
+
     .av-strip .av-stat .l {
       font-size: 10px;
       color: var(--text-dim);
@@ -2634,12 +2834,14 @@
       margin-bottom: 14px;
       font-size: 12px;
     }
+
     .av-toolbar .tb-label {
       font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-dim);
     }
+
     .av-toolbar input[type=text],
     .av-toolbar select {
       background: var(--surface2);
@@ -2650,8 +2852,15 @@
       font-size: 12px;
       outline: none;
     }
-    .av-toolbar input[type=text]:focus { border-color: #34d399; }
-    .av-toolbar input[type=range] { width: 110px; }
+
+    .av-toolbar input[type=text]:focus {
+      border-color: #34d399;
+    }
+
+    .av-toolbar input[type=range] {
+      width: 110px;
+    }
+
     .av-mode {
       display: inline-flex;
       background: var(--surface2);
@@ -2659,6 +2868,7 @@
       border-radius: 999px;
       padding: 2px;
     }
+
     .av-mode .av-mode-side {
       cursor: pointer;
       padding: 3px 11px;
@@ -2668,11 +2878,13 @@
       user-select: none;
       transition: color 0.18s, background 0.18s;
     }
+
     .av-mode .av-mode-side.on {
       background: #34d399;
       color: #052017;
       font-weight: 700;
     }
+
     .av-cat-chip {
       cursor: pointer;
       padding: 3px 9px;
@@ -2686,9 +2898,22 @@
       align-items: center;
       gap: 5px;
     }
-    .av-cat-chip .av-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-    .av-cat-chip:hover { border-color: var(--border-glow); }
-    .av-cat-chip.off { opacity: 0.32; }
+
+    .av-cat-chip .av-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .av-cat-chip:hover {
+      border-color: var(--border-glow);
+    }
+
+    .av-cat-chip.off {
+      opacity: 0.32;
+    }
+
     .av-tb-toggle {
       cursor: pointer;
       padding: 4px 10px;
@@ -2698,6 +2923,7 @@
       font-size: 11px;
       user-select: none;
     }
+
     .av-tb-toggle.on {
       border-color: #34d399;
       color: #34d399;
@@ -2711,11 +2937,13 @@
       border-radius: 12px;
       overflow: hidden;
     }
+
     .av-scroll {
       overflow: auto;
       max-height: 70vh;
       position: relative;
     }
+
     .av-area {
       min-width: max-content;
       font-family: 'JetBrains Mono', monospace;
@@ -2733,7 +2961,9 @@
       border-bottom: 1px solid var(--border-glow);
       height: var(--av-axis-h);
     }
-    .av-axis-name, .av-axis-meta {
+
+    .av-axis-name,
+    .av-axis-meta {
       flex: 0 0 auto;
       display: flex;
       align-items: flex-end;
@@ -2744,17 +2974,28 @@
       color: var(--text-dim);
       background: var(--surface);
     }
-    .av-axis-name { width: var(--av-name-w); border-right: 1px solid var(--border); }
+
+    .av-axis-name {
+      width: var(--av-name-w);
+      border-right: 1px solid var(--border);
+    }
+
     .av-axis-meta {
       width: var(--av-meta-w);
       justify-content: flex-end;
       padding: 0 12px 8px 0;
       border-left: 1px solid var(--border);
     }
-    .av-axis-track { flex: 0 0 auto; position: relative; }
+
+    .av-axis-track {
+      flex: 0 0 auto;
+      position: relative;
+    }
+
     .av-reign-band {
       position: absolute;
-      top: 4px; height: 22px;
+      top: 4px;
+      height: 22px;
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -2770,14 +3011,20 @@
       white-space: nowrap;
       transition: opacity 0.4s, transform 0.4s;
     }
+
     .av-period-marker {
       position: absolute;
-      top: 0; bottom: 0;
+      top: 0;
+      bottom: 0;
       width: 1px;
       background: rgba(80, 90, 130, 0.18);
       pointer-events: none;
     }
-    .av-period-marker.reign { background: rgba(52, 211, 153, 0.4); }
+
+    .av-period-marker.reign {
+      background: rgba(52, 211, 153, 0.4);
+    }
+
     .av-period-label {
       position: absolute;
       bottom: 8px;
@@ -2795,8 +3042,15 @@
       cursor: pointer;
       user-select: none;
     }
-    .av-period-label.reign-start { color: #34d399; font-weight: 700; }
-    .av-period-label:hover { color: var(--text); }
+
+    .av-period-label.reign-start {
+      color: #34d399;
+      font-weight: 700;
+    }
+
+    .av-period-label:hover {
+      color: var(--text);
+    }
 
     /* Animal rows */
     .av-row {
@@ -2806,9 +3060,20 @@
       transition: background 0.12s;
       animation: avFade 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards;
     }
-    .av-row:hover { background: rgba(52, 211, 153, 0.05); }
-    .av-row.selected { background: rgba(52, 211, 153, 0.12); box-shadow: inset 3px 0 0 #34d399; }
-    .av-row.fade { opacity: 0.28; }
+
+    .av-row:hover {
+      background: rgba(52, 211, 153, 0.05);
+    }
+
+    .av-row.selected {
+      background: rgba(52, 211, 153, 0.12);
+      box-shadow: inset 3px 0 0 #34d399;
+    }
+
+    .av-row.fade {
+      opacity: 0.28;
+    }
+
     .av-name-cell {
       width: var(--av-name-w);
       flex: 0 0 auto;
@@ -2823,10 +3088,18 @@
       background: var(--surface);
       z-index: 1;
     }
-    .av-row.selected .av-name-cell { background: rgba(52, 211, 153, 0.14); }
-    .av-name-marker {
-      width: 8px; height: 16px; border-radius: 2px; flex: 0 0 auto;
+
+    .av-row.selected .av-name-cell {
+      background: rgba(52, 211, 153, 0.14);
     }
+
+    .av-name-marker {
+      width: 8px;
+      height: 16px;
+      border-radius: 2px;
+      flex: 0 0 auto;
+    }
+
     .av-name-text {
       flex: 1;
       white-space: nowrap;
@@ -2835,12 +3108,14 @@
       font-size: 11px;
       font-weight: 600;
     }
+
     .av-name-cat {
       font-size: 9px;
       color: var(--text-dim);
       text-transform: uppercase;
       letter-spacing: 0.4px;
     }
+
     .av-track {
       flex: 0 0 auto;
       position: relative;
@@ -2848,6 +3123,7 @@
         linear-gradient(to right, transparent calc(var(--av-cell-w) - 1px), rgba(80, 90, 130, 0.1) calc(var(--av-cell-w) - 1px), rgba(80, 90, 130, 0.1) var(--av-cell-w), transparent var(--av-cell-w));
       background-size: var(--av-cell-w) 100%;
     }
+
     .av-bar {
       position: absolute;
       bottom: 4px;
@@ -2858,18 +3134,27 @@
       transition: filter 0.15s, transform 0.15s;
       animation: avGrow 0.5s cubic-bezier(0.5, 1.4, 0.5, 1) backwards;
     }
+
     @keyframes avGrow {
-      from { transform: scaleY(0); }
-      to   { transform: scaleY(1); }
+      from {
+        transform: scaleY(0);
+      }
+
+      to {
+        transform: scaleY(1);
+      }
     }
+
     .av-bar:hover {
       filter: brightness(1.5);
       transform: scaleX(1.4);
       z-index: 3;
     }
+
     .av-bar.outlier {
       box-shadow: 0 0 0 1px rgba(255, 200, 50, 0.7), 0 0 8px rgba(255, 200, 50, 0.4);
     }
+
     .av-meta-cell {
       width: var(--av-meta-w);
       flex: 0 0 auto;
@@ -2883,11 +3168,13 @@
       border-left: 1px solid var(--border);
       background: var(--surface);
     }
+
     .av-meta-cell .av-meta-num {
       color: var(--text);
       font-weight: 600;
       font-family: 'JetBrains Mono', monospace;
     }
+
     .av-meta-cell .av-meta-second {
       color: var(--text-dim);
       font-size: 10px;
@@ -2901,6 +3188,7 @@
       border-bottom: 1px solid var(--border-glow);
       animation: avFade 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
+
     .av-stack-name {
       width: var(--av-name-w);
       flex: 0 0 auto;
@@ -2917,7 +3205,12 @@
       left: 0;
       z-index: 1;
     }
-    .av-stack-track { flex: 0 0 auto; position: relative; }
+
+    .av-stack-track {
+      flex: 0 0 auto;
+      position: relative;
+    }
+
     .av-stack-col {
       position: absolute;
       bottom: 4px;
@@ -2927,9 +3220,19 @@
       cursor: pointer;
       transition: filter 0.15s;
     }
-    .av-stack-col:hover { filter: brightness(1.4); }
-    .av-stack-col > div { width: 100%; }
-    .av-stack-col > div:first-child { border-radius: 2px 2px 0 0; }
+
+    .av-stack-col:hover {
+      filter: brightness(1.4);
+    }
+
+    .av-stack-col>div {
+      width: 100%;
+    }
+
+    .av-stack-col>div:first-child {
+      border-radius: 2px 2px 0 0;
+    }
+
     .av-stack-meta {
       width: var(--av-meta-w);
       flex: 0 0 auto;
@@ -2946,7 +3249,12 @@
       overflow: hidden;
       display: none;
     }
-    .av-detail.open { display: block; animation: fadeInUp 0.28s ease both; }
+
+    .av-detail.open {
+      display: block;
+      animation: fadeInUp 0.28s ease both;
+    }
+
     .av-detail-head {
       padding: 16px 20px;
       background: linear-gradient(135deg, rgba(52, 211, 153, 0.08), transparent);
@@ -2956,6 +3264,7 @@
       justify-content: space-between;
       gap: 14px;
     }
+
     .av-detail-head h3 {
       font-size: 17px;
       margin: 0 0 3px 0;
@@ -2963,6 +3272,7 @@
       align-items: center;
       gap: 10px;
     }
+
     .av-detail-head .av-detail-badge {
       font-size: 10px;
       padding: 3px 10px;
@@ -2972,19 +3282,27 @@
       letter-spacing: 0.4px;
       color: #052017;
     }
+
     .av-detail-head .av-detail-sub {
       font-size: 11px;
       color: var(--text-dim);
       letter-spacing: 0.3px;
     }
+
     .av-detail-close {
       cursor: pointer;
       font-size: 18px;
       color: var(--text-dim);
       padding: 0 4px;
     }
-    .av-detail-close:hover { color: var(--text); }
-    .av-detail-body { padding: 16px 20px 20px; }
+
+    .av-detail-close:hover {
+      color: var(--text);
+    }
+
+    .av-detail-body {
+      padding: 16px 20px 20px;
+    }
 
     .av-spark {
       width: 100%;
@@ -2995,14 +3313,24 @@
       border-radius: 8px;
       overflow: hidden;
     }
-    .av-spark svg { width: 100%; height: 100%; }
+
+    .av-spark svg {
+      width: 100%;
+      height: 100%;
+    }
 
     .av-detail-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
     }
-    @media (max-width: 720px) { .av-detail-grid { grid-template-columns: 1fr; } }
+
+    @media (max-width: 720px) {
+      .av-detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     .av-detail-grid h4 {
       font-size: 11px;
       color: var(--text-dim);
@@ -3010,6 +3338,7 @@
       letter-spacing: 0.5px;
       margin: 0 0 8px 0;
     }
+
     .av-list .e {
       display: grid;
       grid-template-columns: 110px 1fr 60px;
@@ -3019,6 +3348,7 @@
       font-size: 11px;
       font-family: 'JetBrains Mono', monospace;
     }
+
     .av-list .e .nm {
       color: var(--text);
       cursor: pointer;
@@ -3026,23 +3356,30 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .av-list .e .nm:hover { color: #34d399; }
+
+    .av-list .e .nm:hover {
+      color: #34d399;
+    }
+
     .av-list .e .bar {
       height: 6px;
       border-radius: 3px;
       background: var(--surface2);
       overflow: hidden;
     }
-    .av-list .e .bar > span {
+
+    .av-list .e .bar>span {
       display: block;
       height: 100%;
       transition: width 0.4s ease;
     }
+
     .av-list .e .c {
       color: #34d399;
       font-weight: 600;
       text-align: right;
     }
+
     .av-warn {
       margin-top: 10px;
       padding: 8px 12px;
@@ -3063,6 +3400,7 @@
       margin-bottom: 18px;
       animation: avFade 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
     }
+
     .av-hero-header {
       display: flex;
       align-items: center;
@@ -3071,6 +3409,7 @@
       flex-wrap: wrap;
       margin-bottom: 10px;
     }
+
     .av-hero-header h3 {
       font-size: 14px;
       font-weight: 600;
@@ -3078,25 +3417,31 @@
       margin: 0;
       letter-spacing: 0.2px;
     }
+
     .av-hero-controls {
       display: flex;
       align-items: center;
       gap: 10px;
       font-size: 11px;
     }
+
     .av-hero-chart {
       cursor: crosshair;
       transition: filter 0.3s;
     }
+
     .av-hero-chart svg {
       transition: opacity 0.4s;
     }
+
     .av-hero-chart svg path {
       transition: fill-opacity 0.2s;
     }
+
     .av-hero-chart svg path:hover {
       fill-opacity: 1;
     }
+
     .av-hero-legend {
       display: flex;
       gap: 14px;
@@ -3105,13 +3450,18 @@
       font-size: 11px;
       color: var(--text-dim);
     }
+
     .av-hero-leg {
       display: inline-flex;
       align-items: center;
       gap: 6px;
     }
+
     .av-hero-leg .av-dot {
-      width: 10px; height: 10px; border-radius: 2px; display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      display: inline-block;
     }
 
     .av-tip {
@@ -3129,10 +3479,25 @@
       transition: opacity 0.12s;
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
     }
-    .av-tip.visible { opacity: 1; }
-    .av-tip .t-name { color: #34d399; font-weight: 600; }
-    .av-tip .t-period { color: var(--text-dim); margin-left: 6px; }
-    .av-tip .t-count { color: var(--text); margin-top: 2px; }
+
+    .av-tip.visible {
+      opacity: 1;
+    }
+
+    .av-tip .t-name {
+      color: #34d399;
+      font-weight: 600;
+    }
+
+    .av-tip .t-period {
+      color: var(--text-dim);
+      margin-left: 6px;
+    }
+
+    .av-tip .t-count {
+      color: var(--text);
+      margin-top: 2px;
+    }
 
     /* Help modal */
     .help-modal {
@@ -3309,7 +3674,7 @@
             data-en='Explore Random Tablet <kbd class="kbd">R</kbd>'
             data-nl='Verken Willekeurig Tablet <kbd class="kbd">R</kbd>'>Explore Random Tablet <kbd
               class="kbd">R</kbd></button>
-          <button class="btn" onclick="renderCorpusStats()" data-en='Corpus Overview <kbd class="kbd">O</kbd>'
+          <button class="btn" onclick="Router.goto({view:'stats'})" data-en='Corpus Overview <kbd class="kbd">O</kbd>'
             data-nl='Corpus Overzicht <kbd class="kbd">O</kbd>'>Corpus Overview <kbd class="kbd">O</kbd></button>
         </div>
         <div class="welcome-stats" id="welcomeStats"></div>
@@ -3403,7 +3768,7 @@
       list.innerHTML = pinnedTablets.map(id => {
         const info = tabletIndex.find(t => t.id === id);
         const label = info ? `${info.designation || ''}` : '';
-        return `<div class="pinned-item" onclick="loadTablet('${id}')">
+        return `<div class="pinned-item" onclick="Router.goto({view:'tablet',id:'${id}'})">
           <span class="pin-id">P${id}</span>
           <span style="font-size:10px;color:var(--text-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(label)}</span>
           <span class="pin-remove" onclick="event.stopPropagation();togglePin('${id}')">&times;</span>
@@ -3435,6 +3800,108 @@
     let ROLE_COLORS = ROLE_COLORS_NORMAL;
     const LEGEND_ROLES = ['numeral', 'animal', 'qualifier', 'person', 'title', 'transaction', 'month', 'deity', 'role_marker', 'summary_marker', 'structural_keyword', 'damage', 'measure', 'glossary_term'];
 
+    // ---- Router ----
+    // Hash-based history routing. Every drill-in (year, month, animal cell,
+    // tablet) lives in the URL, so back/forward traverse the navigation
+    // history within timelines as well as between tablets.
+    //   #t/<id>                          tablet view
+    //   #stats                           corpus stats
+    //   #tl, #tl/o/<name>, #tl/p/<period>             officials timeline
+    //   #an, #an/a/<name>, #an/p/<period>/<gran>      animals timeline
+    //   #an/c/<animal>/<period>/<gran>                cell drill-down
+    //   bare P<digits>                   legacy tablet route (kept for old links)
+    const Router = {
+      parse(hash) {
+        const h = (hash || '').replace(/^#/, '');
+        if (!h) return { view: 'home' };
+        if (/^P?\d+$/i.test(h)) return { view: 'tablet', id: h.replace(/^P/i, '') };
+        const parts = h.split('/').map(s => { try { return decodeURIComponent(s); } catch (e) { return s; } });
+        switch (parts[0]) {
+          case 't': return parts[1] ? { view: 'tablet', id: parts[1] } : { view: 'home' };
+          case 'stats': return { view: 'stats' };
+          case 'tl':
+            if (parts[1] === 'o' && parts[2]) return { view: 'tl-official', name: parts[2] };
+            if (parts[1] === 'p' && parts[2]) return { view: 'tl-period', period: parts[2] };
+            return { view: 'tl' };
+          case 'an':
+            if (parts[1] === 'a' && parts[2]) return { view: 'an-animal', name: parts[2] };
+            if (parts[1] === 'p' && parts[2]) return { view: 'an-period', period: parts[2], gran: parts[3] || 'year' };
+            if (parts[1] === 'c' && parts[2] && parts[3]) return { view: 'an-cell', animal: parts[2], period: parts[3], gran: parts[4] || 'year' };
+            return { view: 'an' };
+        }
+        return { view: 'home' };
+      },
+      encode(s) {
+        const e = encodeURIComponent;
+        switch (s.view) {
+          case 'home': return '';
+          case 'tablet': return `t/${e(s.id)}`;
+          case 'stats': return 'stats';
+          case 'tl': return 'tl';
+          case 'tl-official': return `tl/o/${e(s.name)}`;
+          case 'tl-period': return `tl/p/${e(s.period)}`;
+          case 'an': return 'an';
+          case 'an-animal': return `an/a/${e(s.name)}`;
+          case 'an-period': return `an/p/${e(s.period)}/${s.gran || 'year'}`;
+          case 'an-cell': return `an/c/${e(s.animal)}/${e(s.period)}/${s.gran || 'year'}`;
+        }
+        return '';
+      },
+      goto(state, opts) {
+        const target = '#' + this.encode(state);
+        if (opts && opts.replace) history.replaceState(state, '', target);
+        else if (window.location.hash !== target) history.pushState(state, '', target);
+        this.apply(state);
+      },
+      async apply(state) {
+        const app = document.getElementById('app');
+        const inAnimals = app && app.classList.contains('animals-mode');
+        const inTimeline = app && app.classList.contains('timeline-mode') && !inAnimals;
+        switch (state.view) {
+          case 'home':
+            if (app) app.classList.remove('timeline-mode', 'animals-mode');
+            currentTabletId = null;
+            { const main = document.getElementById('mainContent'); if (main) main.innerHTML = ''; }
+            break;
+          case 'tablet':
+            if (currentTabletId !== state.id) await loadTablet(state.id);
+            break;
+          case 'stats':
+            renderCorpusStats();
+            break;
+          case 'tl':
+            if (!inTimeline) await renderTimelineView();
+            tlSelectOfficial(null);
+            break;
+          case 'tl-official':
+            if (!inTimeline) await renderTimelineView();
+            tlSelectOfficial(state.name);
+            break;
+          case 'tl-period':
+            if (!inTimeline) await renderTimelineView();
+            tlShowPeriodSummary(state.period);
+            break;
+          case 'an':
+            if (!inAnimals) await renderAnimalsView();
+            avSelectAnimal(null);
+            break;
+          case 'an-animal':
+            if (!inAnimals) await renderAnimalsView();
+            avSelectAnimal(state.name);
+            break;
+          case 'an-period':
+            if (!inAnimals) await renderAnimalsView();
+            avShowPeriodSummary(state.period, state.gran);
+            break;
+          case 'an-cell':
+            if (!inAnimals) await renderAnimalsView();
+            avShowCellDrilldown(state.animal, state.period, state.gran);
+            break;
+        }
+      },
+    };
+    window.addEventListener('popstate', () => Router.apply(Router.parse(window.location.hash)));
+
     // ---- Init ----
     async function loadIndex() {
       try {
@@ -3451,8 +3918,7 @@
             <div class="welcome-stat"><div class="ws-value">${Math.round((corpusStats.by_confidence.high || 0) / corpusStats.total_tablets * 100)}%</div><div class="ws-label">High Confidence</div></div>
           `;
         }
-        const hash = window.location.hash.replace('#', '');
-        if (hash) loadTablet(hash);
+        Router.apply(Router.parse(window.location.hash));
       } catch (e) {
         document.getElementById('tabletList').innerHTML = '<p style="color:#ff6b81;padding:10px;">Server not running? Start with: python tablet_visualizer.py</p>';
       }
@@ -3481,7 +3947,7 @@
           <div class="meta">${t.tx || '—'} · ${t.animals} · ${t.date || '—'}</div>
         </div>`).join('');
       if (filteredIndex.length > 150) list.innerHTML += `<div style="padding:6px;color:var(--text-dim);font-size:10px;text-align:center;">150 of ${filteredIndex.length}</div>`;
-      list.querySelectorAll('.tablet-item').forEach(el => el.addEventListener('click', () => loadTablet(el.dataset.id)));
+      list.querySelectorAll('.tablet-item').forEach(el => el.addEventListener('click', () => Router.goto({ view: 'tablet', id: el.dataset.id })));
     }
 
     // ---- Tablet loading ----
@@ -3492,7 +3958,6 @@
       app.classList.remove('animals-mode');
       currentTabletId = id;
       currentFilterIdx = filteredIndex.findIndex(t => t.id === id);
-      window.location.hash = id;
       document.getElementById('mainContent').innerHTML = `<div class="loading"><div class="spinner"></div> Loading tablet...</div>`;
       renderTabletList();
       try {
@@ -3591,9 +4056,9 @@
 
           // Check for ki + person(s) + -ta pattern
           const tcl = (tok.detail || '').toLowerCase();
-          const isKi = r === 'role_marker' && tok.text.replace(/[\[\]]/g,'').toLowerCase() === 'ki';
-          const isGiri3 = r === 'role_marker' && tok.text.replace(/[\[\]]/g,'').toLowerCase() === 'giri3';
-          const isMaszkim = r === 'role_marker' && tok.text.replace(/[\[\]]/g,'').toLowerCase() === 'maszkim';
+          const isKi = r === 'role_marker' && tok.text.replace(/[\[\]]/g, '').toLowerCase() === 'ki';
+          const isGiri3 = r === 'role_marker' && tok.text.replace(/[\[\]]/g, '').toLowerCase() === 'giri3';
+          const isMaszkim = r === 'role_marker' && tok.text.replace(/[\[\]]/g, '').toLowerCase() === 'maszkim';
           if (isKi || isGiri3 || isMaszkim) {
             // Scan ahead for person tokens and closing suffix
             let endIdx = ti + 1;
@@ -3616,8 +4081,8 @@
               }
               const pnStr = personNames.join(' ') || 'PN';
               const label = isKi ? (closingSuffix === 'destination_suffix' ? `to ${pnStr}` : `from ${pnStr}`)
-                          : isGiri3 ? `via ${pnStr}`
-                          : `commissioner: ${pnStr}`;
+                : isGiri3 ? `via ${pnStr}`
+                  : `commissioner: ${pnStr}`;
               const wrapClass = closingSuffix === 'destination_suffix' ? 'suffix-wrap-group wrap-destination' : 'suffix-wrap-group';
               html += `<span class="${wrapClass}" data-wrap-label="${esc(label)}">`;
               for (let wi = ti; wi < endIdx; wi++) {
@@ -4382,7 +4847,7 @@
       switchEl.addEventListener('click', e => {
         const side = e.target.closest('.tl-name-side');
         if (side) setNameMode(side.dataset.mode);
-        else      setNameMode(TL_STATE.nameMode === 'raw' ? 'norm' : 'raw');
+        else setNameMode(TL_STATE.nameMode === 'raw' ? 'norm' : 'raw');
       });
       document.getElementById('tlEdges').addEventListener('click', () => {
         TL_STATE.showEdges = !TL_STATE.showEdges;
@@ -4443,7 +4908,7 @@
       switch (TL_STATE.sort) {
         case 'total': list.sort((a, b) => b.total_tablets - a.total_tablets); break;
         case 'first': list.sort((a, b) => (a.first_year_idx || 0) - (b.first_year_idx || 0) || cmpName(a, b)); break;
-        case 'name':  list.sort(cmpName); break;
+        case 'name': list.sort(cmpName); break;
         default:
           // Office grouping is handled by the renderer; within each office, sort by first-active.
           list.sort((a, b) => {
@@ -4485,7 +4950,7 @@
       const subtitle = document.getElementById('tlSubtitle');
       const totalTablets = visible.reduce((s, o) => s + o.total_tablets, 0);
       subtitle.textContent =
-        `${visible.length} of ${t.officials.length} officials · ${periods.length} regnal-year periods (${periods[0]} → ${periods[periods.length-1]}) · ${totalTablets.toLocaleString()} tablets in current selection`;
+        `${visible.length} of ${t.officials.length} officials · ${periods.length} regnal-year periods (${periods[0]} → ${periods[periods.length - 1]}) · ${totalTablets.toLocaleString()} tablets in current selection`;
 
       // Max activity in any single (visible-official, period) cell, for bar scaling.
       let maxCellActivity = 1;
@@ -4518,8 +4983,8 @@
       // Period markers + labels
       periods.forEach((p, i) => {
         const reign = reignStarts.has(i);
-        axis += `<div class="tl-period-marker${reign ? ' reign' : ''}" style="left:${i*cw}px;"></div>`;
-        axis += `<div class="tl-period-label${reign ? ' reign-start' : ''}" data-period="${p}" data-i="${i}" style="left:${i*cw}px;width:${cw}px;">${p}</div>`;
+        axis += `<div class="tl-period-marker${reign ? ' reign' : ''}" style="left:${i * cw}px;"></div>`;
+        axis += `<div class="tl-period-label${reign ? ' reign-start' : ''}" data-period="${p}" data-i="${i}" style="left:${i * cw}px;width:${cw}px;">${p}</div>`;
       });
       axis += `</div><div class="tl-axis-meta">Tablets</div></div>`;
 
@@ -4542,7 +5007,7 @@
             <span class="tl-chevron">▾</span>
             <span class="tl-office-color" style="background:${officeColor};"></span>
             <span class="tl-office-label">${g.label}</span>
-            <span class="tl-office-count">· ${g.officials.length} officials · ${g.officials.reduce((s,o)=>s+o.total_tablets,0).toLocaleString()} tablets</span>
+            <span class="tl-office-count">· ${g.officials.length} officials · ${g.officials.reduce((s, o) => s + o.total_tablets, 0).toLocaleString()} tablets</span>
           </div>
           <div class="tl-office-rows" style="max-height:${rowsHeight}px;">`;
 
@@ -4596,7 +5061,7 @@
             const w = cw - 4;
             const delay = Math.min(0.4, barIdx * 0.005);
             body += `<div class="tl-bar animate" data-name="${esc(o.name)}" data-period="${p}" data-count="${v}" `
-                  + `style="left:${left}px;width:${w}px;height:${h}px;background:${TL_OFFICE_COLOR[o.office] || '#778ca3'};opacity:${opacity};animation-delay:${delay}s;"></div>`;
+              + `style="left:${left}px;width:${w}px;height:${h}px;background:${TL_OFFICE_COLOR[o.office] || '#778ca3'};opacity:${opacity};animation-delay:${delay}s;"></div>`;
             barIdx++;
           });
           body += `</div>
@@ -4624,7 +5089,7 @@
         el.addEventListener('click', e => {
           if (e.target.closest('.tl-bar')) return;  // bar click handled separately
           const name = el.dataset.name;
-          tlSelectOfficial(name === TL_STATE.selected ? null : name);
+          Router.goto(name === TL_STATE.selected ? { view: 'tl' } : { view: 'tl-official', name });
         });
       });
       // Bar tooltip + click
@@ -4637,22 +5102,22 @@
           const p = el.dataset.period;
           const c = el.dataset.count;
           tip.innerHTML = `<div><span class="t-name">${esc(display)}</span><span class="t-period">${p}</span></div>
-                          <div class="t-count">${c} tablet${c==1?'':'s'}</div>`;
+                          <div class="t-count">${c} tablet${c == 1 ? '' : 's'}</div>`;
           tip.classList.add('visible');
         });
         el.addEventListener('mousemove', e => {
           tip.style.left = (e.clientX + 12) + 'px';
-          tip.style.top  = (e.clientY + 12) + 'px';
+          tip.style.top = (e.clientY + 12) + 'px';
         });
         el.addEventListener('mouseleave', () => tip.classList.remove('visible'));
         el.addEventListener('click', e => {
           e.stopPropagation();
-          tlSelectOfficial(el.dataset.name);
+          Router.goto({ view: 'tl-official', name: el.dataset.name });
         });
       });
       // Period label click → highlight column
       area.querySelectorAll('.tl-period-label').forEach(el => {
-        el.addEventListener('click', () => tlShowPeriodSummary(el.dataset.period));
+        el.addEventListener('click', () => Router.goto({ view: 'tl-period', period: el.dataset.period }));
       });
 
       // Detail panel state restore
@@ -4725,8 +5190,8 @@
       const atfName = o.atf_name || o.name;
       const altLine = (o.normalized_name && o.normalized_name !== atfName)
         ? (TL_STATE.nameMode === 'norm'
-            ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(atfName)})</span>`
-            : `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.normalized_name)})</span>`)
+          ? `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(atfName)})</span>`
+          : `<span style="color:var(--text-dim);font-weight:400;font-size:13px;">(${esc(o.normalized_name)})</span>`)
         : '';
       const html = `
         <div class="tl-detail-head">
@@ -4735,7 +5200,7 @@
               <span class="tl-detail-badge" style="background:${officeColor};">${o.office}</span>
               ${esc(display)} ${altLine}
             </h3>
-            <div class="tl-detail-sub">${esc(o.office_label)} · ${esc(o.sub_office)} · ${span} · ${activeYears} active year${activeYears===1?'':'s'}${peakPeriod ? ` · peak ${peakPeriod[0]} (${peakPeriod[1]})` : ''}</div>
+            <div class="tl-detail-sub">${esc(o.office_label)} · ${esc(o.sub_office)} · ${span} · ${activeYears} active year${activeYears === 1 ? '' : 's'}${peakPeriod ? ` · peak ${peakPeriod[0]} (${peakPeriod[1]})` : ''}</div>
           </div>
           <span class="tl-detail-close" id="tlDetailClose" title="Close">&times;</span>
         </div>
@@ -4766,9 +5231,9 @@
       const detail = document.getElementById('tlDetail');
       detail.innerHTML = html;
       detail.classList.add('open');
-      document.getElementById('tlDetailClose').addEventListener('click', () => tlSelectOfficial(null));
+      document.getElementById('tlDetailClose').addEventListener('click', () => Router.goto({ view: 'tl' }));
       detail.querySelectorAll('.nm[data-jump]').forEach(el => {
-        el.addEventListener('click', () => tlSelectOfficial(el.dataset.jump));
+        el.addEventListener('click', () => Router.goto({ view: 'tl-official', name: el.dataset.jump }));
       });
     }
 
@@ -4829,8 +5294,10 @@
     // direct cell drill-down; lazy /api/animals_cell for tablet lists).
     // ============================================================
     const AV_STATE = {
-      catOn: { sheep_adult: true, sheep_young: true, goat_adult: true, goat_young: true,
-               cattle_adult: true, cattle_young: true, equids: true, other: true },
+      catOn: {
+        sheep_adult: true, sheep_young: true, goat_adult: true, goat_young: true,
+        cattle_adult: true, cattle_young: true, equids: true, other: true
+      },
       query: '',
       sort: 'tablets',
       cellW: 28,
@@ -5036,9 +5503,9 @@
       }
       switch (AV_STATE.sort) {
         case 'total': list.sort((a, b) => b.total_count - a.total_count); break;
-        case 'name':  list.sort((a, b) => a.name.localeCompare(b.name)); break;
+        case 'name': list.sort((a, b) => a.name.localeCompare(b.name)); break;
         case 'category': list.sort((a, b) => a.category.localeCompare(b.category) || b.total_tablets - a.total_tablets); break;
-        default:      list.sort((a, b) => b.total_tablets - a.total_tablets);
+        default: list.sort((a, b) => b.total_tablets - a.total_tablets);
       }
       return list;
     }
@@ -5070,9 +5537,9 @@
       const visible = avVisibleAnimals();
       const subtitle = document.getElementById('avSubtitle');
       const visTotal = visible.reduce((s, x) => s + x.total_count, 0);
-      const visTabs  = visible.reduce((s, x) => s + x.total_tablets, 0);
+      const visTabs = visible.reduce((s, x) => s + x.total_tablets, 0);
       subtitle.textContent =
-        `${visible.length} of ${a.animals.length} animal terms · ${visTotal.toLocaleString()} animals · ${visTabs.toLocaleString()} tablet appearances · ${periods[0]} → ${periods[periods.length-1]}`;
+        `${visible.length} of ${a.animals.length} animal terms · ${visTotal.toLocaleString()} animals · ${visTabs.toLocaleString()} tablet appearances · ${periods[0]} → ${periods[periods.length - 1]}`;
 
       // Maximum bar value for scaling — depends on mode.
       const valOf = (x, p) => AV_STATE.mode === 'tablets'
@@ -5101,8 +5568,8 @@
       }
       periods.forEach((p, i) => {
         const reign = reignStarts.has(i);
-        html += `<div class="av-period-marker${reign ? ' reign' : ''}" style="left:${i*cw}px;"></div>`;
-        html += `<div class="av-period-label${reign ? ' reign-start' : ''}" data-period="${esc(p)}" style="left:${i*cw}px;width:${cw}px;">${esc(p)}</div>`;
+        html += `<div class="av-period-marker${reign ? ' reign' : ''}" style="left:${i * cw}px;"></div>`;
+        html += `<div class="av-period-label${reign ? ' reign-start' : ''}" data-period="${esc(p)}" style="left:${i * cw}px;width:${cw}px;">${esc(p)}</div>`;
       });
       html += `</div><div class="av-axis-meta">${AV_STATE.mode === 'tablets' ? 'Tablets · animals' : 'Animals · tablets'}</div></div>`;
 
@@ -5112,7 +5579,7 @@
         const color = `var(--av-c-${cat})`;
         const isSel = AV_STATE.selected === x.name;
         const fade = AV_STATE.selected && AV_STATE.selected !== x.name;
-        html += `<div class="av-row${isSel ? ' selected' : ''}${fade ? ' fade' : ''}" data-name="${esc(x.name)}" style="animation-delay:${Math.min(0.4, idx*0.012)}s;">
+        html += `<div class="av-row${isSel ? ' selected' : ''}${fade ? ' fade' : ''}" data-name="${esc(x.name)}" style="animation-delay:${Math.min(0.4, idx * 0.012)}s;">
           <div class="av-name-cell" data-name="${esc(x.name)}">
             <span class="av-name-marker" style="background:${color};"></span>
             <span class="av-name-text" title="${esc(x.name)}">${esc(x.name)}</span>
@@ -5131,7 +5598,7 @@
           // Outlier flag: in this period one tablet contributes ≥70 %
           // of the term's total — likely a single anomalous tablet.
           const tot = x.by_period[p] || 0;
-          const mx  = x.by_period_max[p] || 0;
+          const mx = x.by_period_max[p] || 0;
           const outlier = AV_STATE.showOutliers && tot > 0 && (mx / tot) >= 0.7 && tot >= 20;
           const dy = Math.min(0.5, barI * 0.005);
           html += `<div class="av-bar${outlier ? ' outlier' : ''}" data-name="${esc(x.name)}" data-period="${esc(p)}" data-count="${v}" data-tablets="${x.by_period_tablets[p] || 0}" data-total="${tot}" data-max="${mx}" style="left:${left}px;width:${w}px;height:${h}px;background:${color};opacity:${op};animation-delay:${dy}s;"></div>`;
@@ -5160,7 +5627,7 @@
           else
             extra = `<div class="t-count">${tot.toLocaleString()} animals · ${t} tablet${t === 1 ? '' : 's'}</div>`;
           if (mx > 0 && tot > 0 && mx / tot >= 0.7 && tot >= 20)
-            extra += `<div style="color:#ffd166;margin-top:2px;">Single tablet ≥${Math.round(mx/tot*100)}% of total</div>`;
+            extra += `<div style="color:#ffd166;margin-top:2px;">Single tablet ≥${Math.round(mx / tot * 100)}% of total</div>`;
           tip.innerHTML = `<div><span class="t-name">${esc(name)}</span><span class="t-period">${esc(p)}</span></div>${extra}`;
           tip.classList.add('visible');
         });
@@ -5172,18 +5639,18 @@
         el.addEventListener('click', e => {
           // Bar click → cell drill-down (animal × period → tablet list).
           // Hold Shift / cmd to instead select the animal row.
-          if (e.shiftKey || e.metaKey) avSelectAnimal(el.dataset.name);
-          else avShowCellDrilldown(el.dataset.name, el.dataset.period);
+          if (e.shiftKey || e.metaKey) Router.goto({ view: 'an-animal', name: el.dataset.name });
+          else Router.goto({ view: 'an-cell', animal: el.dataset.name, period: el.dataset.period });
         });
       });
       area.querySelectorAll('.av-row').forEach(el => {
         el.addEventListener('click', e => {
           if (e.target.closest('.av-bar')) return;
-          avSelectAnimal(el.dataset.name === AV_STATE.selected ? null : el.dataset.name);
+          Router.goto(el.dataset.name === AV_STATE.selected ? { view: 'an' } : { view: 'an-animal', name: el.dataset.name });
         });
       });
       area.querySelectorAll('.av-period-label').forEach(el => {
-        el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
+        el.addEventListener('click', () => Router.goto({ view: 'an-period', period: el.dataset.period }));
       });
 
       if (AV_STATE.selected) avRenderDetail(AV_STATE.selected);
@@ -5267,7 +5734,7 @@
         if (AV_STATE.heroMetric === 'share' && total > 0) {
           for (const c of cats) {
             out[c].from = (out[c].from / total) * 100;
-            out[c].to   = (out[c].to   / total) * 100;
+            out[c].to = (out[c].to / total) * 100;
           }
         }
         return out;
@@ -5304,7 +5771,7 @@
 
       // Y-axis labels (a few)
       const ticks = AV_STATE.heroMetric === 'share' ? [0, 25, 50, 75, 100]
-                                                     : [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
+        : [0, yMax * 0.25, yMax * 0.5, yMax * 0.75, yMax];
       const yLabels = ticks.map(t => `
         <line x1="${padL}" x2="${W - padR}" y1="${ys(t).toFixed(1)}" y2="${ys(t).toFixed(1)}" stroke="rgba(255,255,255,0.04)"/>
         <text x="${padL - 6}" y="${(ys(t) + 3).toFixed(1)}" font-size="9" fill="#7a8aa0" text-anchor="end">${AV_STATE.heroMetric === 'share' ? Math.round(t) + '%' : Math.round(t).toLocaleString()}</text>
@@ -5404,7 +5871,7 @@
           avRenderHero();
         } else {
           // Already monthly — show period summary for that month
-          avShowPeriodSummary(p, periodKind);
+          Router.goto({ view: 'an-period', period: p, gran: periodKind });
         }
       });
     }
@@ -5423,7 +5890,7 @@
           <span class="av-detail-close" id="avDetailClose">&times;</span>
         </div>
         <div class="av-detail-body"><div class="loading"><div class="spinner"></div> Loading…</div></div>`;
-      document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      document.getElementById('avDetailClose').addEventListener('click', () => Router.goto({ view: 'an' }));
 
       let cell;
       try {
@@ -5444,27 +5911,27 @@
       detail.innerHTML = `<div class="av-detail-head">
           <div>
             <h3>
-              <span class="av-detail-badge" style="background:${color};">${esc(cat.replace('_',' '))}</span>
+              <span class="av-detail-badge" style="background:${color};">${esc(cat.replace('_', ' '))}</span>
               ${esc(animal)} · ${esc(period)}
             </h3>
-            <div class="av-detail-sub">${cell.total_count.toLocaleString()} animals across ${cell.total_tablets.toLocaleString()} tablets · click any tablet to open it</div>
+            <div class="av-detail-sub">${cell.total_count.toLocaleString()} animals across ${cell.total_tablets.toLocaleString()} tablets </div>
           </div>
           <span class="av-detail-close" id="avDetailClose">&times;</span>
         </div>
         <div class="av-detail-body">
-          ${dominant ? `<div class="av-warn">Tablet P${esc(tablets[0].tablet)} alone contributes ${tablets[0].count.toLocaleString()} of ${sum.toLocaleString()} animals (${Math.round(tablets[0].count/sum*100)}%) — worth re-checking the extraction.</div>` : ''}
+          ${dominant ? `<div class="av-warn">Tablet P${esc(tablets[0].tablet)} alone contributes ${tablets[0].count.toLocaleString()} of ${sum.toLocaleString()} animals (${Math.round(tablets[0].count / sum * 100)}%) — worth re-checking the extraction.</div>` : ''}
           <div class="av-list" style="margin-top:8px;max-height:380px;overflow:auto;">
             ${tablets.map(t => `
               <div class="e">
                 <span class="nm" data-tablet="${esc(t.tablet)}" title="Open P${esc(t.tablet)}">P${esc(t.tablet)} <span style="color:var(--text-dim);font-size:10px;">${esc(t.animal)}</span></span>
-                <span class="bar"><span style="width:${Math.round(t.count/max*100)}%;background:${color};"></span></span>
+                <span class="bar"><span style="width:${Math.round(t.count / max * 100)}%;background:${color};"></span></span>
                 <span class="c">${t.count.toLocaleString()}</span>
               </div>`).join('')}
           </div>
         </div>`;
-      document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      document.getElementById('avDetailClose').addEventListener('click', () => Router.goto({ view: 'an' }));
       detail.querySelectorAll('.nm[data-tablet]').forEach(el => {
-        el.addEventListener('click', () => loadTablet(el.dataset.tablet));
+        el.addEventListener('click', () => Router.goto({ view: 'tablet', id: el.dataset.tablet }));
       });
       detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -5493,13 +5960,13 @@
       const w = 760, h = 110, padL = 36, padR = 8, padT = 8, padB = 22;
       const xs = i => padL + (i / Math.max(1, periods.length - 1)) * (w - padL - padR);
       const animsArr = periods.map(p => x.by_period[p] || 0);
-      const tabsArr  = periods.map(p => x.by_period_tablets[p] || 0);
+      const tabsArr = periods.map(p => x.by_period_tablets[p] || 0);
       const aMax = Math.max(1, ...animsArr);
       const tMax = Math.max(1, ...tabsArr);
       const yA = v => h - padB - (v / aMax) * (h - padT - padB);
       const yT = v => h - padB - (v / tMax) * (h - padT - padB);
       const pathA = animsArr.map((v, i) => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yA(v).toFixed(1)}`).join(' ');
-      const pathT = tabsArr.map((v, i)  => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yT(v).toFixed(1)}`).join(' ');
+      const pathT = tabsArr.map((v, i) => `${i ? 'L' : 'M'} ${xs(i).toFixed(1)} ${yT(v).toFixed(1)}`).join(' ');
       // Reign tick marks
       let tickMarks = '';
       let prevPre = '';
@@ -5507,7 +5974,7 @@
         const pre = p.split('.')[0];
         if (pre !== prevPre) {
           tickMarks += `<line x1="${xs(i)}" x2="${xs(i)}" y1="${padT}" y2="${h - padB}" stroke="rgba(52,211,153,0.25)" stroke-dasharray="2 3"/>`
-                    +  `<text x="${xs(i) + 3}" y="${padT + 10}" font-size="9" fill="rgba(52,211,153,0.7)">${pre}</text>`;
+            + `<text x="${xs(i) + 3}" y="${padT + 10}" font-size="9" fill="rgba(52,211,153,0.7)">${pre}</text>`;
           prevPre = pre;
         }
       });
@@ -5550,12 +6017,12 @@
         <svg viewBox="0 0 ${mw} ${mh}" preserveAspectRatio="none" style="width:100%;height:90px;">
           <text x="6" y="${mPadT + 8}" font-size="9" fill="#34d399">${monthMax.toLocaleString()}</text>
           ${monthBuckets.map((v, i) => {
-            if (v === 0) return '';
-            const x0 = mxScale(i + 0.5) - monthBarWidth / 2;
-            const top = myScale(v);
-            const baseY = mh - mPadB;
-            return `<rect x="${x0.toFixed(1)}" y="${top.toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${(baseY - top).toFixed(1)}" fill="${AV_CAT_COLOR[x.category]}" rx="2"><title>Month ${i+1}: ${v.toLocaleString()}</title></rect>`;
-          }).join('')}
+        if (v === 0) return '';
+        const x0 = mxScale(i + 0.5) - monthBarWidth / 2;
+        const top = myScale(v);
+        const baseY = mh - mPadB;
+        return `<rect x="${x0.toFixed(1)}" y="${top.toFixed(1)}" width="${monthBarWidth.toFixed(1)}" height="${(baseY - top).toFixed(1)}" fill="${AV_CAT_COLOR[x.category]}" rx="2"><title>Month ${i + 1}: ${v.toLocaleString()}</title></rect>`;
+      }).join('')}
           ${monthLabels}
         </svg>` : '';
 
@@ -5572,14 +6039,14 @@
       // Outlier periods
       const outliers = periods.map(p => {
         const tot = x.by_period[p] || 0;
-        const mx  = x.by_period_max[p] || 0;
+        const mx = x.by_period_max[p] || 0;
         if (tot >= 20 && mx / tot >= 0.7) return { p, tot, mx, ratio: mx / tot };
         return null;
       }).filter(Boolean).sort((a, b) => b.ratio - a.ratio).slice(0, 6);
       const outlierBlock = outliers.length ? `
         <div class="av-warn">
           <strong>Possible outliers:</strong>
-          ${outliers.map(o => `${esc(o.p)} (${o.mx.toLocaleString()}/${o.tot.toLocaleString()}, ${Math.round(o.ratio*100)}%)`).join(' · ')}
+          ${outliers.map(o => `${esc(o.p)} (${o.mx.toLocaleString()}/${o.tot.toLocaleString()}, ${Math.round(o.ratio * 100)}%)`).join(' · ')}
           — periods where a single tablet drives most of the count for ${esc(x.name)}. Worth re-checking the extraction.
         </div>` : '';
 
@@ -5613,25 +6080,25 @@
             <div>
               <h4>Active periods (top by total)</h4>
               <div class="av-list">
-                ${Object.entries(x.by_period).sort((a,b) => b[1]-a[1]).slice(0, 8).map(([p, v]) => {
-                  const pmax = Math.max(1, ...Object.values(x.by_period));
-                  return `<div class="e">
+                ${Object.entries(x.by_period).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([p, v]) => {
+        const pmax = Math.max(1, ...Object.values(x.by_period));
+        return `<div class="e">
                     <span class="nm" data-period="${esc(p)}">${esc(p)}</span>
                     <span class="bar"><span style="width:${Math.round(v / pmax * 100)}%;background:${color};"></span></span>
                     <span class="c">${v.toLocaleString()}</span>
                   </div>`;
-                }).join('')}
+      }).join('')}
               </div>
             </div>
           </div>
         </div>`;
       detail.classList.add('open');
-      document.getElementById('avDetailClose').addEventListener('click', () => avSelectAnimal(null));
+      document.getElementById('avDetailClose').addEventListener('click', () => Router.goto({ view: 'an' }));
       detail.querySelectorAll('.nm[data-tablet]').forEach(el => {
-        el.addEventListener('click', () => loadTablet(el.dataset.tablet));
+        el.addEventListener('click', () => Router.goto({ view: 'tablet', id: el.dataset.tablet }));
       });
       detail.querySelectorAll('.nm[data-period]').forEach(el => {
-        el.addEventListener('click', () => avShowPeriodSummary(el.dataset.period));
+        el.addEventListener('click', () => Router.goto({ view: 'an-period', period: el.dataset.period }));
       });
     }
 
@@ -5682,20 +6149,20 @@
               <div class="e">
                 <span class="nm" data-jump="${esc(r.name)}">
                   <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--av-c-${r.category});margin-right:8px;"></span>
-                  ${esc(r.name)} <span style="color:var(--text-dim);font-size:10px;">· ${r.tablets} tablet${r.tablets===1?'':'s'}</span>
+                  ${esc(r.name)} <span style="color:var(--text-dim);font-size:10px;">· ${r.tablets} tablet${r.tablets === 1 ? '' : 's'}</span>
                 </span>
-                <span class="bar"><span style="width:${Math.round(r.count/max*100)}%;background:var(--av-c-${r.category});"></span></span>
+                <span class="bar"><span style="width:${Math.round(r.count / max * 100)}%;background:var(--av-c-${r.category});"></span></span>
                 <span class="c" data-cell-animal="${esc(r.name)}" data-cell-period="${esc(period)}" data-cell-gran="${granularity}" style="cursor:pointer;text-decoration:underline dotted;">${r.count.toLocaleString()}</span>
               </div>`).join('')}
           </div>
         </div>`;
       detail.classList.add('open');
-      document.getElementById('avDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      document.getElementById('avDetailClose').addEventListener('click', () => Router.goto({ view: 'an' }));
       detail.querySelectorAll('.nm[data-jump]').forEach(el => {
-        el.addEventListener('click', () => avSelectAnimal(el.dataset.jump));
+        el.addEventListener('click', () => Router.goto({ view: 'an-animal', name: el.dataset.jump }));
       });
       detail.querySelectorAll('.c[data-cell-animal]').forEach(el => {
-        el.addEventListener('click', () => avShowCellDrilldown(el.dataset.cellAnimal, el.dataset.cellPeriod, el.dataset.cellGran));
+        el.addEventListener('click', () => Router.goto({ view: 'an-cell', animal: el.dataset.cellAnimal, period: el.dataset.cellPeriod, gran: el.dataset.cellGran }));
       });
       detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -5720,34 +6187,34 @@
               <span class="tl-detail-badge" style="background:#778ca3;">YEAR</span>
               ${esc(period)}
             </h3>
-            <div class="tl-detail-sub">${rows.length} active official${rows.length===1?'':'s'} · ${total.toLocaleString()} tablets recorded this regnal year</div>
+            <div class="tl-detail-sub">${rows.length} active official${rows.length === 1 ? '' : 's'} · ${total.toLocaleString()} tablets recorded this regnal year</div>
           </div>
           <span class="tl-detail-close" id="tlDetailClose" title="Close">&times;</span>
         </div>
         <div class="tl-detail-body">
           <div class="tl-edge-list">
             ${rows.length
-              ? rows.slice(0, 25).map(r => {
-                  const o = tlOfficialByEither(r.name);
-                  const dn = o ? tlDisplayName(o) : r.name;
-                  const atf = o ? (o.atf_name || o.name) : r.name;
-                  return `
+          ? rows.slice(0, 25).map(r => {
+            const o = tlOfficialByEither(r.name);
+            const dn = o ? tlDisplayName(o) : r.name;
+            const atf = o ? (o.atf_name || o.name) : r.name;
+            return `
                 <div class="e">
                   <span class="nm" data-jump="${esc(r.name)}" title="${esc(atf)}${o && o.normalized_name && o.normalized_name !== atf ? ' · ' + esc(o.normalized_name) : ''}">
                     <span class="tl-name-marker" style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${TL_OFFICE_COLOR[r.office]};margin-right:6px;"></span>
                     ${esc(dn)} <span style="color:var(--text-dim);">· ${esc(r.sub)}</span>
                   </span>
-                  <span class="bar"><span style="width:${Math.round(r.count/max*100)}%;background:${TL_OFFICE_COLOR[r.office]};"></span></span>
+                  <span class="bar"><span style="width:${Math.round(r.count / max * 100)}%;background:${TL_OFFICE_COLOR[r.office]};"></span></span>
                   <span class="c">${r.count}</span>
                 </div>`;
-                }).join('')
-              : '<div style="color:var(--text-dim);font-size:11px;">No officials recorded for this period.</div>'}
+          }).join('')
+          : '<div style="color:var(--text-dim);font-size:11px;">No officials recorded for this period.</div>'}
           </div>
         </div>`;
       detail.classList.add('open');
-      document.getElementById('tlDetailClose').addEventListener('click', () => detail.classList.remove('open'));
+      document.getElementById('tlDetailClose').addEventListener('click', () => Router.goto({ view: 'tl' }));
       detail.querySelectorAll('.nm[data-jump]').forEach(el => {
-        el.addEventListener('click', () => tlSelectOfficial(el.dataset.jump));
+        el.addEventListener('click', () => Router.goto({ view: 'tl-official', name: el.dataset.jump }));
       });
       detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -5832,31 +6299,44 @@
     document.getElementById('btnRandom').addEventListener('click', async () => {
       try {
         const res = await fetch(`${API}/api/random`);
-        currentData = await res.json();
-        currentTabletId = currentData.tablet_id;
-        window.location.hash = currentTabletId;
-        currentFilterIdx = filteredIndex.findIndex(t => t.id === currentTabletId);
+        const data = await res.json();
+        // Push the tablet route, then short-circuit the refetch by stashing
+        // currentData/currentTabletId so loadTablet (when triggered by Router.apply)
+        // sees the id is already current and skips fetching again. Render inline.
+        const id = data.tablet_id;
+        currentData = data;
+        currentTabletId = id;
+        currentFilterIdx = filteredIndex.findIndex(t => t.id === id);
+        const target = '#' + Router.encode({ view: 'tablet', id });
+        if (window.location.hash !== target) history.pushState({ view: 'tablet', id }, '', target);
+        const app = document.getElementById('app');
+        app.classList.remove('timeline-mode', 'animals-mode');
         renderTabletList(); renderTablet(currentData); renderPanel(currentData);
       } catch (e) { console.error(e); }
     });
     document.getElementById('btnPrev').addEventListener('click', () => {
       if (!filteredIndex.length) return;
       currentFilterIdx = Math.max(0, currentFilterIdx - 1);
-      loadTablet(filteredIndex[currentFilterIdx].id);
+      Router.goto({ view: 'tablet', id: filteredIndex[currentFilterIdx].id });
     });
     document.getElementById('btnNext').addEventListener('click', () => {
       if (!filteredIndex.length) return;
       currentFilterIdx = Math.min(filteredIndex.length - 1, currentFilterIdx + 1);
-      loadTablet(filteredIndex[currentFilterIdx].id);
+      Router.goto({ view: 'tablet', id: filteredIndex[currentFilterIdx].id });
     });
-    document.getElementById('btnStats').addEventListener('click', renderCorpusStats);
-    document.getElementById('btnTimeline').addEventListener('click', renderTimelineView);
-    document.getElementById('btnAnimals').addEventListener('click', renderAnimalsView);
+    document.getElementById('btnStats').addEventListener('click', () => Router.goto({ view: 'stats' }));
+    document.getElementById('btnTimeline').addEventListener('click', () => Router.goto({ view: 'tl' }));
+    document.getElementById('btnAnimals').addEventListener('click', () => Router.goto({ view: 'an' }));
     document.getElementById('btnColorblind').addEventListener('click', () => {
       document.body.classList.toggle('colorblind');
       ROLE_COLORS = document.body.classList.contains('colorblind') ? ROLE_COLORS_CB : ROLE_COLORS_NORMAL;
       document.getElementById('btnColorblind').classList.toggle('active');
-      if (currentData) renderTablet(currentData);
+      // Only re-render the tablet if a tablet is currently being viewed.
+      // Without this guard, toggling CB while in the timeline/animals view
+      // would replace those views with the previously viewed tablet.
+      const app = document.getElementById('app');
+      const inTimeline = app.classList.contains('timeline-mode') || app.classList.contains('animals-mode');
+      if (!inTimeline && currentData) renderTablet(currentData);
     });
     document.getElementById('btnLang').addEventListener('click', () => {
       currentLang = currentLang === 'en' ? 'nl' : 'en';
@@ -5898,9 +6378,9 @@
         case 'ArrowLeft': case 'j': document.getElementById('btnPrev').click(); break;
         case 'ArrowRight': case 'k': document.getElementById('btnNext').click(); break;
         case 'r': document.getElementById('btnRandom').click(); break;
-        case 'o': renderCorpusStats(); break;
-        case 't': renderTimelineView(); break;
-        case 'a': renderAnimalsView(); break;
+        case 'o': Router.goto({ view: 'stats' }); break;
+        case 't': Router.goto({ view: 'tl' }); break;
+        case 'a': Router.goto({ view: 'an' }); break;
         case 's': document.getElementById('btnToggleSidebar').click(); break;
         case 'c': document.getElementById('btnColorblind').click(); break;
         case '/': e.preventDefault(); document.getElementById('searchInput').focus(); break;
@@ -5913,10 +6393,8 @@
       }
     });
 
-    window.addEventListener('hashchange', () => {
-      const id = window.location.hash.replace('#', '');
-      if (id && id !== currentTabletId) loadTablet(id);
-    });
+    // hashchange listener removed — Router's popstate listener (registered
+    // above) handles back/forward and any external hash edit fires popstate too.
 
     loadIndex();
   </script>
